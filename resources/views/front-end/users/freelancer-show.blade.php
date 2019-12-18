@@ -220,7 +220,7 @@
                                                         <div class="wt-contenthead">
                                                             <div class="wt-title">
                                                                 <a href="{{{ url('profile/'.$job->employer->slug) }}}">@if ($user->user_verified === 1)<i class="fa fa-check-circle"></i>@endif {{{ Helper::getUserName($review->user_id) }}}</a>
-                                                                <h3>{{{ $job->title }}}</h3>
+                                                                <h3>{!! $job->title !!}</h3>
                                                             </div>
                                                             <ul class="wt-userlisting-breadcrumb">
                                                                 <li><span><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i> {{{ \App\Helper::getProjectLevel($job->project_level) }}}</span></li>

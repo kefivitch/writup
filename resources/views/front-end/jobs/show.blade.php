@@ -68,7 +68,7 @@
                                                         <li><span class="wt-clicksavefolder"><i class="far fa-folder wt-viewjobfolder"></i> {{{$job->mots}}} Mots</span></li>
                                                     @endif
                                                     @if (!empty($job->deadline))
-                                                        <li><span class="wt-dashboradclock"><i class="far fa-clock wt-viewjobclock"></i> {{{ date("d/m/Y", strtotime("$job->deadline")) }}}</span></li>
+                                                        <li><span class="wt-dashboradclock"><i class="far fa-clock wt-viewjobclock"></i> {{{ date("d/m/Y H:i", strtotime("$job->deadline")) }}}</span></li>
                                                     @endif
                                                     @if (!empty($job->price))
                                                         <li>

@@ -62,7 +62,7 @@
                                     @foreach ($jobs as $job)
                                         @php
                                             $job = \App\Job::find($job->id);
-                                            $description = strip_tags(stripslashes($job->description));
+                                            $description = $job->description;
                                             $featured_class = $job->is_featured == 'true' ? 'wt-featured' : '';
                                             $user = Auth::user() ? \App\User::find(Auth::user()->id) : '';
                                             $project_type  = Helper::getProjectTypeList($job->project_type);
@@ -78,7 +78,7 @@
                                                         <h2><a href="{{ url('job/'.$job->slug) }}">{!! $job->title !!}</a></h2>
                                                     </div>
                                                     <div class="wt-description">
-                                                        <p>{{{ str_limit($description,200) }}}</p>
+                                                        <p>{!! str_limit($description,200) !!}</p>
                                                     </div>
                                                     <div class="wt-tag wt-widgettag">
                                                         @foreach ($job->skills as $skill )

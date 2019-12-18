@@ -50,10 +50,10 @@
                                             <div class="wt-contenthead">
                                                 <div class="wt-title">
                                                     <a href="{{{ url('profile/'.$job->employer->slug) }}}">@if($verified_user === 1)<i class="fa fa-check-circle"></i>@endif {{{$job->employer->first_name.' '.$job->employer->last_name}}}</a>
-                                                    <h2>{{{$job->title}}}</h2>
+                                                    <h2>{!! $job->title !!}</h2>
                                                 </div>
                                                 <div class="wt-description">
-                                                    <p>{{str_limit($description, 300)}}</p>
+                                                    <p>{!!str_limit($description, 300)!!}</p>
                                                 </div>
                                                 <div class="wt-tag wt-widgettag">
                                                     @foreach ($job->skills as $skill )

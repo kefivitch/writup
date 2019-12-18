@@ -43,7 +43,7 @@
                                                         <a href="{{{ url('profile/'.$job->employer->slug) }}}">@if ($verified_user === 1)<i class="fa fa-check-circle"></i>@endif&nbsp;{{{ $employer_name }}}</a>
                                                     @endif
                                                     @if (!empty($job->title))
-                                                        <h2>{{{ $job->title }}}</h2>
+                                                        <h2>{!! $job->title !!}</h2>
                                                     @endif
                                                 </div>
                                             @endif

@@ -78,7 +78,7 @@
                             @endif
                             <div class="wt-proposalhead">
                                 @if (!empty($job->title))
-                                    <h2>{{{ $job->title }}}</h2>
+                                    <h2>{!! $job->title !!}</h2>
                                 @endif
                                 <ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
                                     @if (!empty($job->price))

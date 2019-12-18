@@ -105,12 +105,15 @@
 	<script src="{{ asset('js/vendor/jquery-library.js') }}"></script>
 	<script src="{{ asset('js/scrollbar.min.js') }}"></script>
     <script src="{{ asset('js/jquery-ui-min.js') }}"></script>
-    @stack('scripts')
+	
+	@stack('scripts')
     <script>
         jQuery(window).load(function () {
             jQuery(".preloader-outer").delay(500).fadeOut();
             jQuery(".pins").delay(500).fadeOut("slow");
         });
+		
     </script>
+	
 </body>
 </html>

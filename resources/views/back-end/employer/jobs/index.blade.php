@@ -42,7 +42,7 @@
 																	{{{ $user_name }}}</a>
 																@endif
 																@if (!empty($job->title))
-																	<h2><a href="{{{ url('job/'.$job->slug) }}}">{{{ $job->title }}}</a></h2>
+																	<h2><a href="{{{ url('job/'.$job->slug) }}}">{!! $job->title !!}</a></h2>
 																@endif
 															</div>
 														@endif

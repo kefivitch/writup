@@ -83,8 +83,10 @@
                                     <h2>{{ trans('lang.deadline') }}</h2>
                                 </div>
                                  <div class="form-group">
-                                    <input type="datetime-local" name="deadline" class="form-control" placeholder="{{ trans('lang.job_title') }}" v-model="deadline">
+                                    {{-- <input type="datetime-local" name="deadline" class="form-control" placeholder="{{ trans('lang.job_title') }}" v-model="deadline"> --}}
+                                    <input id="deadline" name="deadline" class="form-control" placeholder="Choisir votre date limite" v-model="deadline" />
                                 </div>
+                                
                             </div>
                             <div class="wt-jobskills wt-jobskills-holder wt-tabsinfo">
                                 <div class="wt-tabscontenttitle">
