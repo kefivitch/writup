@@ -1867,4 +1867,10 @@ class UserController extends Controller
             return $json;
         }
     }
+
+    public function verifyUser(Request $request) {
+        $user = User::find($request->user_id);
+        $user->user_verified = 1; 
+        $user->save();
+    }
 }

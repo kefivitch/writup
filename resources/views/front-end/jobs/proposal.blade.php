@@ -183,7 +183,14 @@
                                         </div>
                                     </div>
                                     <div class="wt-btnarea">
-                                        {!! Form::submit(trans('lang.btn_send'), ['class' => 'wt-btn']) !!}
+                                        @if (Auth::user()->user_verified == 1)
+                                            {!! Form::submit(trans('lang.btn_send'), ['class' => 'wt-btn']) !!}
+                                        @else
+                                            <div class="text-danger text-center">
+                                                Votre compte n'est pas activé. Vous ne pouvez pas postuler à un offre.
+                                            </div>  
+                                        @endif
+                                        
                                     </div>
                                 </div>
                             {!! form::close(); !!}

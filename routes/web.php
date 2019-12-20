@@ -92,6 +92,7 @@ Route::post('user/add-wishlist', 'UserController@addWishlist');
 Route::group(
     ['middleware' => ['role:admin']],
     function () {
+        Route::post('/verifyUser', 'UserController@verifyUser');
         Route::post('admin/clear-cache', 'SiteManagementController@clearCache');
         Route::get('admin/clear-allcache', 'SiteManagementController@clearAllCache');
         Route::get('admin/import-updates', 'SiteManagementController@importUpdate');
