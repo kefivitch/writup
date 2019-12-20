@@ -78,7 +78,7 @@
                             @endif
                             <div class="wt-proposalhead">
                                 @if (!empty($job->title))
-                                    <h2>{!! $job->title !!}</h2>
+                                    <h2>{{{ $job->title }}}</h2>
                                 @endif
                                 <ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
                                     @if (!empty($job->price))
@@ -128,7 +128,7 @@
                                             <h3>( <i>{{ !empty($symbol) ? $symbol['symbol'] : '$' }}</i> ) <em id="tva">- 00</em></h3>
                                             <span>
                                                 {{-- nahkiw TVA --}}
-                                                {{{ trans('lang.receiving_amount') }}} <strong>“ la Déduction des frais de TVA ”</strong>
+                                                Montant HT + TVA (19%)
                                                 <i class="fa fa-exclamation-circle template-content tipso_style" data-tipso="Plus Member"></i>
                                             </span>
                                         </li>
@@ -136,7 +136,7 @@
                                             <h3>( <i>{{ !empty($symbol) ? $symbol['symbol'] : '$' }}</i> ) <em id="rs">- 00</em></h3>
                                             <span>
                                                 {{-- nahkiw TVA --}}
-                                                {{{ trans('lang.receiving_amount') }}} <strong>“ la Déduction des frais de la Retenue à la source ”</strong>
+                                                Montant TTC - Retunue à la source (5%)
                                                 <i class="fa fa-exclamation-circle template-content tipso_style" data-tipso="Plus Member"></i>
                                             </span>
                                         </li>
@@ -144,7 +144,7 @@
                                             <h3>( <i>{{ !empty($symbol) ? $symbol['symbol'] : '$' }}</i> ) <em id="dt">- 00</em></h3>
                                             <span>
                                                 {{-- nahkiw TVA --}}
-                                                {{{ trans('lang.receiving_amount') }}} <strong>“ la Déduction des frais de Droit de timbre ”</strong>
+                                                Montant + Droit de timbre
                                                 <i class="fa fa-exclamation-circle template-content tipso_style" data-tipso="Plus Member"></i>
                                             </span>
                                         </li>
@@ -152,8 +152,7 @@
                                             <h3>( <i>{{ !empty($symbol) ? $symbol['symbol'] : '$' }}</i> ) <em id="total">- 00</em></h3>
                                             <span>
                                                 {{-- nahkiw aal montant final --}}
-                                                {{{ trans('lang.receiving_amount') }}} <strong>“ {{{ trans('lang.receiving_amount') }}} ”</strong>
-                                                Déduction de tous les frais
+                                                Net à recevoir
                                                 <i class="fa fa-exclamation-circle template-content tipso_style" data-tipso="Plus Member"></i>
                                             </span>
                                         </li>

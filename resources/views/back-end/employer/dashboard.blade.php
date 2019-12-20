@@ -35,11 +35,11 @@
                         </div>
                         @if ($access_type == 'jobs' || $access_type== 'both')
                             <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
-                                <div class="wt-insightsitem wt-dashboardbox">
+                                <div class="wt-insightsitem wt-dashboardbox wt-insightnoticon">
                                     <figure class="wt-userlistingimg">
                                         {{ Helper::getImages('uploads/settings/icon',$latest_proposals_icon, 'layers') }}
                                     </figure>
-                                    <div class="wt-insightdetails">
+                                    <div class="wt-insightdetails ">
                                         <div class="wt-title">
                                             <h3>{{ trans('lang.latest_proposals') }}</h3>
                                             <a href="{{{ url('employer/dashboard/manage-jobs') }}}">{{ trans('lang.click_view') }}</a>

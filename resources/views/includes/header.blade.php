@@ -66,14 +66,14 @@
                                     
                                 @if ($type =='jobs' || $type == 'both')
                                         <li>
-                                            <a href="{{url('search-results?type=job')}}">
+                                            <a href="{{url('search-results?type=job')}}" @if(Auth::check()) @if(App\User::getUserRoleType(Auth::user()->id)->role_type == 'freelancer') style=" border-radius:10px; background-color: #f89a1c; color : white;padding-right: 20px;padding-left: 20px;"@endif @endif>
                                                 {{{ trans('lang.browse_jobs') }}}
                                             </a>
                                         </li>
                                     @endif
                                 @if ($type =='services' || $type == 'both')
                                     <li>
-                                        <a href="{{url('search-results?type=service')}}">
+                                        <a href="{{url('search-results?type=service')}}" >
                                             {{{ trans('lang.browse_services') }}}
                                         </a>
                                         
@@ -82,8 +82,8 @@
                                 @if(Auth::check())
                                     @if(App\User::getUserRoleType(Auth::user()->id)->role_type == 'employer')
                                         <li>
-                                            <a href="{{ route('employerPostJob') }}">
-                                                {{'Publier un projet' }}
+                                            <a href="{{ route('employerPostJob') }}" style=" border-radius:10px; background-color: #f89a1c; color : white;padding-right: 20px;padding-left: 20px;">
+                                                {{ 'Publier un projet' }}
                                             </a>
                                         </li> 
                                     @endif
