@@ -193,7 +193,7 @@ class FreelancerController extends Controller
                 'first_name'    => 'required',
                 'last_name'    => 'required',
                 'gender'    => 'required',
-                'phone' => 'required|digits:8'
+                'phone' => 'digits:8'
             ]
         );
         if (Auth::user()) {

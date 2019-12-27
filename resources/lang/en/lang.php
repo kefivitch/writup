@@ -9,7 +9,7 @@ return [
     'enable_sandbox' => 'Enable/Disable Sanbox',
     'disbable_account_temp' => 'Disable my account temporarily',
     'taxonomies' => 'Taxonomies',
-    'phone' => 'phone',
+    'phone' => ' numéro de téléphone ',
     'mots' => 'Nombre de mots',
     'deadline' => 'Deadline',
     'save_update_note' => 'Import the lastest updates.',
