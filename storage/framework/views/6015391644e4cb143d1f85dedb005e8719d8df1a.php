@@ -111,12 +111,15 @@
 	<script src="<?php echo e(asset('js/vendor/jquery-library.js')); ?>"></script>
 	<script src="<?php echo e(asset('js/scrollbar.min.js')); ?>"></script>
     <script src="<?php echo e(asset('js/jquery-ui-min.js')); ?>"></script>
-    <?php echo $__env->yieldPushContent('scripts'); ?>
+	
+	<?php echo $__env->yieldPushContent('scripts'); ?>
     <script>
         jQuery(window).load(function () {
             jQuery(".preloader-outer").delay(500).fadeOut();
             jQuery(".pins").delay(500).fadeOut("slow");
         });
+		
     </script>
+	
 </body>
 </html>

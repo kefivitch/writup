@@ -67,7 +67,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                        <p class="wt-copyrights"><span>Copyright © <?php echo e(date('Y')); ?> Writup, Developped with ❤️ by <a href="https://www.linkedin.com/in/lassad-kefi/">Lassad KEFI</a></span></p>
+                        <p class="wt-copyrights"><span>Copyright © <?php echo e(date('Y')); ?> Writup, Powered By <a href="https://mc-zen.com">McZEN</a></span></p>
                         <?php if(!empty($footer['pages'])): ?>
                             <nav class="wt-addnav">
                                 <ul>

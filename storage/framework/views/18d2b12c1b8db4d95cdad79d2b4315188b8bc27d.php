@@ -68,7 +68,7 @@
                                     
                                 <?php if($type =='jobs' || $type == 'both'): ?>
                                         <li>
-                                            <a href="<?php echo e(url('search-results?type=job')); ?>">
+                                            <a href="<?php echo e(url('search-results?type=job')); ?>" <?php if(Auth::check()): ?> <?php if(App\User::getUserRoleType(Auth::user()->id)->role_type == 'freelancer'): ?> style=" border-radius:10px; background-color: #f89a1c; color : white;padding-right: 20px;padding-left: 20px;"<?php endif; ?> <?php endif; ?>>
                                                 <?php echo e(trans('lang.browse_jobs')); ?>
 
                                             </a>
@@ -76,7 +76,7 @@
                                     <?php endif; ?>
                                 <?php if($type =='services' || $type == 'both'): ?>
                                     <li>
-                                        <a href="<?php echo e(url('search-results?type=service')); ?>">
+                                        <a href="<?php echo e(url('search-results?type=service')); ?>" >
                                             <?php echo e(trans('lang.browse_services')); ?>
 
                                         </a>
@@ -86,7 +86,7 @@
                                 <?php if(Auth::check()): ?>
                                     <?php if(App\User::getUserRoleType(Auth::user()->id)->role_type == 'employer'): ?>
                                         <li>
-                                            <a href="<?php echo e(route('employerPostJob')); ?>">
+                                            <a href="<?php echo e(route('employerPostJob')); ?>" style=" border-radius:10px; background-color: #f89a1c; color : white;padding-right: 20px;padding-left: 20px;">
                                                 <?php echo e('Publier un projet'); ?>
 
                                             </a>
