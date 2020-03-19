@@ -20,9 +20,9 @@ Route::fallback(
         return View('errors.404 ');
     }
 );
- Route::any('/post-payment', function () {
+Route::any('/post-payment', function () {
     return redirect('employer/dashboard')->with('success', 'votre paiement a été accepté. Vous allez reçevoir un email de confirmation');
- });
+});
 Route::any('/error-payment', function () {
     return redirect('employer/dashboard')->with('error', 'votre paiement a été refusé vérifiez vos informations');
 });
@@ -64,7 +64,6 @@ Route::get(
         return Redirect::to('/');
     }
 );
-
 
 Route::get('profile/{slug}', 'PublicController@showUserProfile')->name('showUserProfile');
 Route::get('categories', 'CategoryController@categoriesList')->name('categoriesList');
@@ -239,6 +238,10 @@ Route::group(
         Route::post('admin/store-profile-settings', 'UserController@storeProfileSettings');
         Route::post('admin/upload-temp-image', 'UserController@uploadTempImage');
         Route::post('admin/submit-user-refund', 'UserController@submitUserRefund');
+        //Orders
+        Route::get('admin/orders', 'UserController@showOrders')->name('orderList');
+        Route::post('admin/order/change-status', 'UserController@changeOrderStatus');
+
     }
 );
 
@@ -321,7 +324,7 @@ Route::group(
         Route::get('freelancer/payouts', 'FreelancerController@getPayouts')->name('getFreelancerPayouts');
     }
 );
-// Employer|Freelancer Routes 
+// Employer|Freelancer Routes
 Route::group(
     ['middleware' => ['role:employer|freelancer|admin']],
     function () {
@@ -383,14 +386,11 @@ Route::post('proposal/submit-proposal', 'ProposalController@store');
 Route::post('get-freelancer-experiences', 'PublicController@getFreelancerExperience');
 Route::post('get-freelancer-education', 'PublicController@getFreelancerEducation');
 
-Route::get('addmoney/stripe', array('as' => 'addmoney.paywithstripe', 'uses' => 'StripeController@payWithStripe',));
-Route::post('addmoney/stripe', array('as' => 'addmoney.stripe', 'uses' => 'StripeController@postPaymentWithStripe',));
+Route::get('addmoney/stripe', array('as' => 'addmoney.paywithstripe', 'uses' => 'StripeController@payWithStripe'));
+Route::post('addmoney/stripe', array('as' => 'addmoney.stripe', 'uses' => 'StripeController@postPaymentWithStripe'));
 
 Route::get('/propos', function () {
     return App\Proposal::find(12);
 });
-
-
-
 
 Route::get('service/payment-process/{id}', 'ServiceController@employerPaymentProcess');

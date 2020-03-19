@@ -16,44 +16,43 @@ namespace App\Http\Controllers;
 
 use App\EmailTemplate;
 use App\Helper;
+use App\Http\Controllers\Exception;
 use App\Invoice;
+use App\Item;
 use App\Job;
 use App\Language;
 use App\Mail\AdminEmailMailable;
 use App\Mail\FreelancerEmailMailable;
 use App\Mail\GeneralEmailMailable;
+use App\Message;
+use App\Offer;
 use App\Package;
+use App\Payout;
 use App\Profile;
 use App\Proposal;
 use App\Report;
 use App\Review;
+use App\Service;
 use App\SiteManagement;
 use App\User;
 use Auth;
 use Carbon\Carbon;
 use DB;
+use File;
 use Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
+use PDF;
 use Session;
+use App\Order;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Support\Facades\Input;
-use View;
-use App\Offer;
-use App\Message;
-use Illuminate\Support\Arr;
-use App\Payout;
-use File;
 use Storage;
-use PDF;
-use App\Item;
-use App\Http\Controllers\Exception;
-use App\Service;
-use Illuminate\Support\Facades\Auth as FacadesAuth;
-use Illuminate\Support\Facades\Session as FacadesSession;
+use View;
 
 /**
  * Class UserController
@@ -139,7 +138,7 @@ class UserController extends Controller
             return Redirect::back();
         }
         $profile = new Profile();
-            $user_id = Auth::user()->id;
+        $user_id = Auth::user()->id;
         $profile->storeAccountSettings($request, $user_id);
         Session::flash('message', trans('lang.account_settings_saved'));
         return Redirect::back();
@@ -187,8 +186,8 @@ class UserController extends Controller
             $this->validate(
                 $request,
                 [
-                    'old_password'         => 'required',
-                    'confirm_password'     => 'required',
+                    'old_password' => 'required',
+                    'confirm_password' => 'required',
                     'confirm_new_password' => 'required',
                 ]
             );
@@ -316,7 +315,7 @@ class UserController extends Controller
             $request,
             [
                 'old_password' => 'required',
-                'retype_password'    => 'required',
+                'retype_password' => 'required',
             ]
         );
         $json = array();
@@ -528,11 +527,11 @@ class UserController extends Controller
         if (Auth::user()) {
             $user = $this->user::find(Auth::user()->id);
             $profile = $user->profile;
-            $saved_jobs        = !empty($profile->saved_jobs) ? unserialize($profile->saved_jobs) : array();
+            $saved_jobs = !empty($profile->saved_jobs) ? unserialize($profile->saved_jobs) : array();
             $saved_freelancers = !empty($profile->saved_freelancer) ? unserialize($profile->saved_freelancer) : array();
-            $saved_employers   = !empty($profile->saved_employers) ? unserialize($profile->saved_employers) : array();
-            $currency          = SiteManagement::getMetaValue('commision');
-            $symbol            = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
+            $saved_employers = !empty($profile->saved_employers) ? unserialize($profile->saved_employers) : array();
+            $currency = SiteManagement::getMetaValue('commision');
+            $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
             if ($request->path() === 'employer/saved-items') {
                 if (file_exists(resource_path('views/extend/back-end/employer/saved-items.blade.php'))) {
                     return view(
@@ -834,7 +833,7 @@ class UserController extends Controller
                     'reason' => 'required',
                 ]
             );
-            if ($request['model'] == "App\Job" && $request['report_type'] <> 'proposal_cancel') {
+            if ($request['model'] == "App\Job" && $request['report_type'] != 'proposal_cancel') {
                 $job = Job::find($request['id']);
                 if ($job->employer->id == Auth::user()->id) {
                     $json['type'] = 'error';
@@ -842,7 +841,7 @@ class UserController extends Controller
                     return $json;
                 }
             }
-            if ($request['model'] == "App\Service" && $request['report_type'] <> 'service_cancel') {
+            if ($request['model'] == "App\Service" && $request['report_type'] != 'service_cancel') {
                 $service = Service::find($request['id']);
                 $freelancer = $service->seller->first();
                 if ($freelancer->id == Auth::user()->id) {
@@ -888,7 +887,7 @@ class UserController extends Controller
                                 $template_data = EmailTemplate::getEmailTemplateByID($report_employer_template->id);
                                 $employer = User::find($request['id']);
                                 $email_params['reported_employer'] = Helper::getUserName($request['id']);
-                                $email_params['link'] = url('profile/' . $employer->slug);;
+                                $email_params['link'] = url('profile/' . $employer->slug);
                                 $email_params['report_by_link'] = url('profile/' . $user->slug);
                                 $email_params['reported_by'] = Helper::getUserName(Auth::user()->id);
                                 $email_params['message'] = $request['description'];
@@ -1122,8 +1121,8 @@ class UserController extends Controller
                         $excerpt = str_limit($content, 100);
                         $default_avatar = url('images/user-login.png');
                         $profile_image = !empty($data->avater)
-                            ? '/uploads/users/' . $data->author_id . '/' . $data->avater
-                            : $default_avatar;
+                        ? '/uploads/users/' . $data->author_id . '/' . $data->avater
+                        : $default_avatar;
                         $messages[$key]['id'] = $data->id;
                         $messages[$key]['author_id'] = $data->author_id;
                         $messages[$key]['proposal_id'] = $data->proposal_id;
@@ -1211,6 +1210,239 @@ class UserController extends Controller
             }
         }
     }
+    /**
+     * Store profile settings.
+     *
+     * @param \Illuminate\Http\Request $request request attributes
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function changeOrderStatus(Request $request)
+    {
+        $server = Helper::worketicIsDemoSiteAjax();
+        if (!empty($server)) {
+            $response['type'] = 'error';
+            $response['message'] = $server->getData()->message;
+            return $response;
+        }
+        $json = array();
+        if (!empty($request)) {
+            if (!empty($request['id']) && !empty($request['status'])) {
+                $item_type = '';
+                $order = Order::find($request['id']);
+                $order->status = $request['status'];
+                $order->save();
+                $invoice = Invoice::find($order->invoice->id);
+                $invoice->paid = 1;
+                $invoice->save();
+                $title = '';
+                $amount = '';
+                if ($order->type == 'job') {
+                    $item_type = 'project';
+                    $proposal = Proposal::find($order->product_id);
+                    $title = $proposal->job->title;
+                    $amount = $proposal->amount;
+                    $proposal->hired = 1;
+                    $proposal->status = 'hired';
+                    $proposal->paid = 'pending';
+                    $proposal->save();
+                    $job = Job::find($proposal->job->id);
+                    $job->status = 'hired';
+                    $job->save();
+                    // send message to freelancer
+                    $message = new Message();
+                    $user = User::find(intval($order->user_id));
+                    $message->user()->associate($user);
+                    $message->receiver_id = intval($proposal->freelancer_id);
+                    $message->body = trans('lang.hire_for') . ' ' . $job->title . ' ' . trans('lang.project');
+                    $message->status = 0;
+                    $message->save();
+                    // send mail
+                    if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
+                        $freelancer = User::find($proposal->freelancer_id);
+                        $employer = User::find($job->user_id);
+                        if (!empty($freelancer->email)) {
+                            $email_params = array();
+                            $template = DB::table('email_types')->select('id')->where('email_type', 'freelancer_email_hire_freelancer')->get()->first();
+                            if (!empty($template->id)) {
+                                $template_data = EmailTemplate::getEmailTemplateByID($template->id);
+                                $email_params['project_title'] = $job->title;
+                                $email_params['hired_project_link'] = url('job/' . $job->slug);
+                                $email_params['name'] = Helper::getUserName($freelancer->id);
+                                $email_params['link'] = url('profile/' . $freelancer->slug);
+                                $email_params['employer_profile'] = url('profile/' . $employer->slug);
+                                $email_params['emp_name'] = Helper::getUserName($employer->id);
+                                Mail::to($freelancer->email)
+                                    ->send(
+                                        new FreelancerEmailMailable(
+                                            'freelancer_email_hire_freelancer',
+                                            $template_data,
+                                            $email_params
+                                        )
+                                    );
+                            }
+                        }
+                    }
+                } elseif ($order->type == 'service') {
+                    $item_type = 'project';
+                    DB::table('service_user')
+                        ->where('id', $order->product_id)
+                        ->update(['status' => 'hired']);
+                    $order_service = DB::table('service_user')->select('service_id')->where('id', $order->product_id)->first();
+                    $service = Service::find($order_service->service_id);
+                    $title = $service->title;
+                    $amount = $service->price;
+                    // $service->users()->attach($order->user_id, ['type' => 'employer', 'status' => 'hired', 'seller_id' => $service->seller->id, 'paid' => 'pending']);
+                    // $service->save();
+                    // send message to freelancer
+                    $message = new Message();
+                    $user = User::find(intval($order->user_id));
+                    $message->user()->associate($user);
+                    $message->receiver_id = intval($service->seller[0]->id);
+                    $message->body = Helper::getUserName($order->user_id) . ' ' . trans('lang.service_purchase') . ' ' . $service->title;
+                    $message->status = 0;
+                    $message->save();
+                    // send mail
+                    if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
+                        $email_params = array();
+                        $template_data = Helper::getFreelancerNewOrderEmailContent();
+                        $email_params['title'] = $service->title;
+                        $email_params['service_link'] = url('service/' . $service->slug);
+                        $email_params['amount'] = $service->price;
+                        $email_params['freelancer_name'] = Helper::getUserName($service->seller[0]->id);
+                        $email_params['employer_profile'] = url('profile/' . $user->slug);
+                        $email_params['employer_name'] = Helper::getUserName($user->id);
+                        $freelancer_data = User::find(intval($service->seller[0]->id));
+                        Mail::to($freelancer_data->email)
+                            ->send(
+                                new FreelancerEmailMailable(
+                                    'freelancer_email_new_order',
+                                    $template_data,
+                                    $email_params
+                                )
+                            );
+                    }
+                } elseif ($order->type == 'package') {
+                    $item_type = 'package';
+                    $package = Package::find($order->product_id);
+                    $title = $package->title;
+                    $amount = $package->cost;
+                }
+
+                if ($order->type == 'package') {
+                    if (Schema::hasColumn('items', 'type')) {
+                        $item = DB::table('items')->select('id')->where('type', 'package')->where('subscriber', $order->user_id)->first();
+                        if (empty($item)) {
+                            $item = DB::table('items')->select('id')->where('subscriber', $order->user_id)->first();
+                        }
+                    } else {
+                        $item = DB::table('items')->select('id')->where('subscriber', $order->user_id)->first();
+                    }
+                    if (!empty($item)) {
+                        $item = Item::find($item->id);
+                    } else {
+                        $item = new Item();
+                    }
+                } else {
+                    $item = DB::table('items')->select('id')->where('invoice_id', $order->invoice->id)->first();
+                    if (!empty($item)) {
+                        $item = Item::find($item->id);
+                    } else {
+                        $item = new Item();
+                    }
+                }
+                $item->invoice_id = filter_var($order->invoice->id, FILTER_SANITIZE_NUMBER_INT);
+                $item->product_id = filter_var($order->product_id, FILTER_SANITIZE_NUMBER_INT);
+                $item->subscriber = $order->user_id;
+                $item->item_name = filter_var($title, FILTER_SANITIZE_STRING);
+                $item->item_price = $amount;
+                $item->type = $item_type;
+                $item->item_qty = 1;
+                $item->save();
+                // send package mail
+                if ($order->type == 'package') {
+                    $option = !empty($package->options) ? unserialize($package->options) : '';
+                    $expiry = !empty($option) ? $item->created_at->addDays($option['duration']) : '';
+                    $expiry_date = !empty($expiry) ? Carbon::parse($expiry)->toDateTimeString() : '';
+                    $user = User::find($order->user_id);
+                    if (!empty($package->badge_id) && $package->badge_id != 0) {
+                        $user->badge_id = $package->badge_id;
+                    }
+                    $user->expiry_date = $expiry_date;
+                    $user->save();
+                    // send mail
+                    if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
+                        $role = $user->getRoleNames()->first();
+                        $package_options = unserialize($package->options);
+                        $expiry_date = '';
+                        if (!empty($invoice)) {
+                            if ($package_options['duration'] === 'Quarter') {
+                                $expiry_date = $invoice->created_at->addDays(4);
+                            } elseif ($package_options['duration'] === 'Month') {
+                                $expiry_date = $invoice->created_at->addMonths(1);
+                            } elseif ($package_options['duration'] === 'Year') {
+                                $expiry_date = $invoice->created_at->addYears(1);
+                            }
+                        }
+                        if ($role === 'employer') {
+                            if (!empty($user->email)) {
+                                $email_params = array();
+                                $template = DB::table('email_types')->select('id')->where('email_type', 'employer_email_package_subscribed')->get()->first();
+                                if (!empty($template->id)) {
+                                    $template_data = EmailTemplate::getEmailTemplateByID($template->id);
+                                    $email_params['employer'] = Helper::getUserName($user->id);
+                                    $email_params['employer_profile'] = url('profile/' . $user->slug);
+                                    $email_params['name'] = $package->title;
+                                    $email_params['price'] = $package->cost;
+                                    $email_params['expiry_date'] = !empty($expiry_date) ? Carbon::parse($expiry_date)->format('M d, Y') : '';
+                                    Mail::to($user->email)
+                                        ->send(
+                                            new EmployerEmailMailable(
+                                                'employer_email_package_subscribed',
+                                                $template_data,
+                                                $email_params
+                                            )
+                                        );
+                                }
+                            }
+                        } elseif ($role === 'freelancer') {
+                            if (!empty($user->email)) {
+                                $email_params = array();
+                                $template = DB::table('email_types')->select('id')->where('email_type', 'freelancer_email_package_subscribed')->get()->first();
+                                if (!empty($template->id)) {
+                                    $template_data = EmailTemplate::getEmailTemplateByID($template->id);
+                                    $email_params['freelancer'] = Helper::getUserName($user->id);
+                                    $email_params['freelancer_profile'] = url('profile/' . $user->slug);
+                                    $email_params['name'] = $package->title;
+                                    $email_params['price'] = $package->cost;
+                                    $email_params['expiry_date'] = !empty($expiry_date) ? Carbon::parse($expiry_date)->format('M d, Y') : '';
+                                    Mail::to($user->email)
+                                        ->send(
+                                            new FreelancerEmailMailable(
+                                                'freelancer_email_package_subscribed',
+                                                $template_data,
+                                                $email_params
+                                            )
+                                        );
+                                }
+                            }
+                        }
+                    }
+                }
+                $json['type'] = 'success';
+                $json['message'] = trans('lang.status_updated');
+                return $json;
+            } else {
+                $json['type'] = 'error';
+                $json['message'] = trans('lang.something_wrong');
+                return $json;
+            }
+        } else {
+            $json['type'] = 'error';
+            $json['message'] = trans('lang.something_wrong');
+            return $json;
+        }
+    }
 
     /**
      * Print Thankyou.
@@ -1236,7 +1468,7 @@ class UserController extends Controller
     public function getEmployerInvoices($type = '')
     {
         if (Auth::user()->getRoleNames()[0] != 'admin' && Auth::user()->getRoleNames()[0] === 'employer') {
-            $currency   = SiteManagement::getMetaValue('commision');
+            $currency = SiteManagement::getMetaValue('commision');
             $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
             $invoices = array();
             $expiry_date = '';
@@ -1288,7 +1520,7 @@ class UserController extends Controller
                 ->where('invoices.type', $type)
                 ->get();
             $expiry_date = '';
-            $currency   = SiteManagement::getMetaValue('commision');
+            $currency = SiteManagement::getMetaValue('commision');
             $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
             if ($type === 'project') {
                 if (file_exists(resource_path('views/extend/back-end/freelancer/invoices/project.blade.php'))) {
@@ -1343,6 +1575,25 @@ class UserController extends Controller
     }
 
     /**
+     * Get Orders.
+     *
+     * @param integer $id roletype
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showOrders()
+    {
+        $orders = Order::all();
+        $currency = SiteManagement::getMetaValue('commision');
+        $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
+        $status_list = Helper::getOrderStatus();
+        if (file_exists(resource_path('views/extend/back-end/admin/orders/index.blade.php'))) {
+            return view::make('extend.back-end.admin.orders.index', compact('orders', 'symbol', 'status_list'));
+        } else {
+            return view::make('back-end.admin.orders.index', compact('orders', 'symbol', 'status_list'));
+        }
+    }
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -1396,10 +1647,10 @@ class UserController extends Controller
         $this->validate(
             $request,
             [
-                'first_name'    => 'required',
-                'last_name'    => 'required',
+                'first_name' => 'required',
+                'last_name' => 'required',
                 'email' => 'required|email',
-                'phone' => 'required|digits:8'
+                'phone' => 'required|digits:8',
             ]
         );
         $json = array();
@@ -1461,7 +1712,7 @@ class UserController extends Controller
             $request,
             [
                 'projects' => 'required',
-                'desc'    => 'required',
+                'desc' => 'required',
             ]
         );
 
@@ -1642,9 +1893,9 @@ class UserController extends Controller
                 $users = $this->user::where('first_name', 'like', '%' . $keyword . '%')->orWhere('last_name', 'like', '%' . $keyword . '%')->paginate(7)->setPath('');
                 $pagination = $users->appends(
                     array(
-                        'keyword' => Input::get('keyword')
+                        'keyword' => Input::get('keyword'),
                     )
-                ); 
+                );
             } else {
                 $users = User::select('*')->latest()->paginate(10);
             }
@@ -1668,7 +1919,7 @@ class UserController extends Controller
         if (!empty($_GET['year']) && !empty($_GET['month'])) {
             $year = $_GET['year'];
             $month = $_GET['month'];
-            $payouts =  DB::table('payouts')
+            $payouts = DB::table('payouts')
                 ->select('*')
                 ->whereYear('created_at', '=', $year)
                 ->whereMonth('created_at', '=', $month)
@@ -1676,11 +1927,11 @@ class UserController extends Controller
             $pagination = $payouts->appends(
                 array(
                     'year' => Input::get('year'),
-                    'month' => Input::get('month')
+                    'month' => Input::get('month'),
                 )
             );
         } else {
-            $payouts =  Payout::paginate(7);
+            $payouts = Payout::paginate(7);
         }
         $selected_year = !empty($_GET['year']) ? $_GET['year'] : '';
         $selected_month = !empty($_GET['month']) ? $_GET['month'] : '';
@@ -1708,16 +1959,16 @@ class UserController extends Controller
     {
         $slected_ids = array();
         if (!empty($id)) {
-            $slected_ids = explode(',', $id);    
+            $slected_ids = explode(',', $id);
         }
-        $payouts =  DB::table('payouts')
+        $payouts = DB::table('payouts')
             ->select('*')
             ->whereYear('created_at', '=', $year)
             ->whereMonth('created_at', '=', $month)
             ->whereIn('id', $slected_ids)
             ->get();
         $pdf = PDF::loadView('back-end.admin.payouts-pdf', compact('payouts', 'year', 'month'));
-        return $pdf->download('payout-'.$month.'-'.$year.'.pdf');
+        return $pdf->download('payout-' . $month . '-' . $year . '.pdf');
     }
 
     // /**
@@ -1868,9 +2119,10 @@ class UserController extends Controller
         }
     }
 
-    public function verifyUser(Request $request) {
+    public function verifyUser(Request $request)
+    {
         $user = User::find($request->user_id);
-        $user->user_verified = 1; 
+        $user->user_verified = 1;
         $user->save();
     }
 }

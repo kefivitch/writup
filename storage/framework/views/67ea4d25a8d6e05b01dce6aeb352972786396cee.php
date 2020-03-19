@@ -9,6 +9,12 @@
                         </a>
                     </li>
                 <?php endif; ?>
+                <li>
+                    <a href="<?php echo e(route('orderList')); ?>">
+                        <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                        <span><?php echo e(trans('lang.orders')); ?></span>
+                    </a>
+                </li>
                 <?php if(Helper::getAccessType() == 'both' || Helper::getAccessType() == 'services'): ?>
                     <li>
                         <a href="<?php echo e(route('allServices')); ?>">

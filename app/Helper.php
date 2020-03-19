@@ -31,6 +31,7 @@ use App\SiteManagement;
 use App\Badge;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
+use Request;
 
 /**
  * Class Helper
@@ -148,6 +149,42 @@ class Helper extends Model
     }
 
     /**
+     * Get Article Category image
+     *
+     * @param image $image location flag
+     *
+     * @access public
+     *
+     * @return string
+     */
+    public static function getArticleCategoryImage($image = '')
+    {
+        if (!empty($image)) {
+            return '/uploads/articles/categories/' . $image;
+        } else {
+            return 'images/small-default-article.png';
+        }
+    }
+
+    /**
+     * Get Article image
+     *
+     * @param image $image location flag
+     *
+     * @access public
+     *
+     * @return string
+     */
+    public static function getArticleImage($image)
+    {
+        if (!empty($image)) {
+            return '/uploads/articles/' . $image;
+        } else {
+            return 'images/small-default-article.png';
+        }
+    }
+
+    /**
      * Get badge Image
      *
      * @param image $image badge Image
@@ -180,7 +217,9 @@ class Helper extends Model
             $banner =  'images/frbanner-1920x400.jpg';
         } elseif (empty($image) && isset($_GET['type']) && $_GET['type'] == 'employer') {
             $banner =  'images/e-1110x300.jpg';
-        } elseif (empty($image) && isset($_GET['type']) && $_GET['type'] == 'job') {
+        } elseif (empty($image) && isset($_GET['type']) && ($_GET['type'] == 'job' || $_GET['type'] == 'service')) {
+            $banner =  'images/bannerimg/img-02.jpg';
+        } elseif (Request::segment(1) == 'articles') {
             $banner =  'images/bannerimg/img-02.jpg';
         } else {
             $banner = $path . '/' . $image;
@@ -386,6 +425,27 @@ class Helper extends Model
     }
 
     /**
+     * Uppload Attcahments.
+     *
+     * @param mixed $uploadedFile uploaded file
+     *
+     * @return relation
+     */
+    public static function uploadTempattachments($path, $uploadedFile)
+    {
+        $filename = $uploadedFile->getClientOriginalName();
+        if (!file_exists($path)) {
+            File::makeDirectory($path, 0755, true, true);
+        }
+        Storage::disk('local')->putFileAs(
+            $path,
+            $uploadedFile,
+            $filename
+        );
+        return 'success';
+    }
+
+    /**
      * Get English Level List
      *
      * @param string $key key
@@ -480,6 +540,156 @@ class Helper extends Model
     }
 
     /**
+     * Get Project Status
+     *
+     * @param string $key key
+     *
+     * @access public
+     *
+     * @return array
+     */
+    public static function getAppStyleList($key = "")
+    {
+        $list = array(
+            '0' => array(
+                'title' => trans('lang.style01'),
+                'value' => 'style1',
+            ),
+            '1' => array(
+                'title' => trans('lang.style02'),
+                'value' => 'style2',
+            ),
+        );
+        if (!empty($key) && array_key_exists($key, $list)) {
+            return $list[$key];
+        } else {
+            return $list;
+        }
+    }
+
+    /**
+     * Get Project Status
+     *
+     * @param string $key key
+     *
+     * @access public
+     *
+     * @return array
+     */
+    public static function getSliderStyleList($key = "")
+    {
+        $list = array(
+            '0' => array(
+                'title' => trans('lang.style01'),
+                'value' => 'style1',
+            ),
+            '1' => array(
+                'title' => trans('lang.style02'),
+                'value' => 'style2',
+            ),
+            '2' => array(
+                'title' => trans('lang.style03'),
+                'value' => 'style3',
+            ),
+        );
+        if (!empty($key) && array_key_exists($key, $list)) {
+            return $list[$key];
+        } else {
+            return $list;
+        }
+    }
+
+    /**
+     * Get page sections
+     *
+     * @param string $key key
+     *
+     * @access public
+     *
+     * @return array
+     */
+    public static function getPageSections($key = "")
+    {
+        $list = array(
+            '0' => array(
+                'name' => trans('lang.slider_section'),
+                'section' => 'slider',
+                'value' => 'sliders',
+                'icon' => 'img-01.png',
+                'id' => ''
+            ),
+            '1' => array(
+                'name' => trans('lang.cat_section'),
+                'section' => 'category',
+                'value' => 'cat',
+                'icon' => 'img-02.png',
+                'id' => ''
+            ),
+            '2' => array(
+                'name' => trans('lang.welcome_section'),
+                'section' => 'welcome_section',
+                'value' => 'welcome_sections',
+                'icon' => 'img-03.png',
+                'id' => ''
+            ),
+            '3' => array(
+                'name' => trans('lang.app_section'),
+                'section' => 'app_section',
+                'value' => 'app_section',
+                'icon' => 'img-04.png',
+                'id' => ''
+            ),
+            '4' => array(
+                'name' => trans('lang.service_section'),
+                'section' => 'service_section',
+                'value' => 'services',
+                'icon' => 'img-05.png',
+                'id' => ''
+            ),
+            '5' => array(
+                'name' => trans('lang.work_video_section'),
+                'section' => 'work_video_section',
+                'value' => 'work_videos',
+                'icon' => 'img-06.png',
+                'id' => ''
+            ),
+            '6' => array(
+                'name' => trans('lang.work_tab_section'),
+                'section' => 'work_tab_section',
+                'value' => 'work_tabs',
+                'icon' => 'img-07.png',
+                'id' => ''
+            ),
+            '7' => array(
+                'name' => trans('lang.freelancer_section'),
+                'section' => 'freelancer_section',
+                'value' => 'freelancers',
+                'icon' => 'img-08.png',
+                'id' => '',
+            ),
+            '8' => array(
+                'name' => trans('lang.description_section'),
+                'section' => 'content_section',
+                'value' => 'content',
+                'icon' => 'img-09.png',
+                'id' => '',
+            ),
+            '9' => array(
+                'name' => trans('lang.article_section'),
+                'section' => 'article_section',
+                'value' => 'articles',
+                'icon' => 'img-10.png',
+                'id' => '',
+            ),
+        );
+        if (!empty($key) && array_key_exists($key, $list)) {
+            return $list[$key];
+        } else {
+            return $list;
+        }
+    }
+
+    /**
      * Get Job Duration List
      *
      * @param string $key key
@@ -496,6 +706,29 @@ class Helper extends Model
             'three_month' => trans('lang.job_duration.three_month'),
             'six_month' => trans('lang.job_duration.six_month'),
             'more_than_six' => trans('lang.job_duration.more_than_six'),
+        );
+        if (!empty($key) && array_key_exists($key, $list)) {
+            return $list[$key];
+        } else {
+            return $list;
+        }
+    }
+
+    /**
+     * Get homepage List
+     *
+     * @param string $key key
+     *
+     * @access public
+     *
+     * @return array
+     */
+    public static function getHomepageList($key = "")
+    {
+        $list = array(
+            'v1' => 'Homepage v1',
+            'v2' => 'Homepage v2',
+            'v3' => 'Homepage v3',
         );
         if (!empty($key) && array_key_exists($key, $list)) {
             return $list[$key];
@@ -1129,7 +1362,7 @@ class Helper extends Model
     public static function getProfileImage($user_id)
     {
         $profile_image = User::find($user_id)->profile->avater;
-        if (file_exists('/uploads/users/' . $user_id . '/' . $profile_image)) {
+        if (file_exists(self::publicPath() . '/uploads/users/' . $user_id . '/' . $profile_image)) {
             return !empty($profile_image) ? '/uploads/users/' . $user_id . '/' . $profile_image : '/images/user.jpg';
         } else {
             return '/images/user.jpg';
@@ -1334,21 +1567,28 @@ class Helper extends Model
      *
      * @return \Illuminate\Http\Response
      */
-    public static function getProposalsBalance($user_id, $status)
+    public static function getProposalsBalance($user_id, $status, $paid_progress = 'in-progress')
     {
         $service_balance = 0;
+        $job_total_amount = 0;
+        $service_total_amount = 0;
         $commision = SiteManagement::getMetaValue('commision');
         $admin_commission = !empty($commision) && !empty($commision[0]['commision']) ? $commision[0]['commision'] : 0;
-        $job_balance =  Proposal::select('amount')
-            ->where('freelancer_id', $user_id)
-            ->where('status', $status)->sum('amount');
-        $job_total_amount = !empty($job_balance) ? $job_balance - ($job_balance / 100) * $admin_commission : 0;
+        if (Schema::hasColumn('proposals', 'paid_progress')) {
+            $job_balance =  Proposal::select('amount')
+                ->where('freelancer_id', $user_id)
+                ->where('status', $status)->where('paid_progress', $paid_progress)->sum('amount');
+            $job_total_amount = !empty($job_balance) ? $job_balance - ($job_balance / 100) * $admin_commission : 0;
+        }
+
         if (Schema::hasTable('services') && Schema::hasTable('service_user')) {
-            $services = DB::table('service_user')->select('service_id')->where('type', 'employer')
-                ->where('seller_id', $user_id)->where('status', $status)->get()->pluck('service_id')->toArray();
-            if (!empty($services)) {
-                foreach ($services as $id) {
-                    $service_balance += Service::select('price')->where('id', $id)->pluck('price')->first();
+            if (Schema::hasColumn('service_user', 'paid_progress')) {
+                $services = DB::table('service_user')->select('service_id')->where('type', 'employer')
+                    ->where('seller_id', $user_id)->where('status', $status)->where('paid_progress', $paid_progress)->get()->pluck('service_id')->toArray();
+                if (!empty($services)) {
+                    foreach ($services as $id) {
+                        $service_balance += Service::select('price')->where('id', $id)->pluck('price')->first();
+                    }
                 }
             }
         }
@@ -1392,13 +1632,15 @@ class Helper extends Model
      */
     public static function bytesToHuman($bytes)
     {
-        $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-
-        for ($i = 0; $bytes > 1024; $i++) {
-            $bytes /= 1024;
+        if (!empty($bytes)) {
+            $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+            for ($i = 0; $bytes > 1024; $i++) {
+                $bytes /= 1024;
+            }
+            return round($bytes, 2) . ' ' . $units[$i];
+        } else {
+            return '';
         }
-
-        return round($bytes, 2) . ' ' . $units[$i];
     }
 
     /**
@@ -1415,6 +1657,50 @@ class Helper extends Model
     }
 
     /**
+     * Format file name
+     *
+     * @param string $file_name filename
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getFileName($file_name)
+    {
+        if (!empty($file_name)) {
+            $file =  strstr($file_name, '-');
+            if ($file == true) {
+                return substr($file, 1);
+            } else {
+                return $file_name;
+            }
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     * Get file size and name
+     *
+     * @param string $file file
+     * @param string $type type
+     * @param string $path path
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getImageDetail($file, $path = '')
+    {
+        $json = array();
+        $json['size'] = 0;
+        $json['name'] = '';
+        if (!empty($file) && !empty($path)) {
+            if (file_exists(self::publicPath() . '/' . $path . '/' . $file)) {
+                $json['size'] =  self::bytesToHuman(File::size(self::publicPath() . '/' . $path . '/' . $file));
+            }
+            $json['name'] = self::getFileName($file);
+        }
+        return $json;
+    }
+
+    /**
      * Currency list
      *
      * @param string $code code
@@ -1426,14 +1712,6 @@ class Helper extends Model
     public static function currencyList($code = "")
     {
         $currency_array = array(
-            'TND' => array(
-                'numeric_code'  => 788,
-                'code'          => 'TND',
-                'name'          => 'Dinar Tunisien',
-                'symbol'        => 'TND',
-                'fraction_name' => 'Cent[D]',
-                'decimals'      => 3
-            ),
             'USD' => array(
                 'numeric_code'  => 840,
                 'code'          => 'USD',
@@ -1769,14 +2047,29 @@ class Helper extends Model
      *
      * @return \Illuminate\Http\Response
      */
-    public static function getFreelancerJobTotalEarning($user_id, $status)
+    public static function getFreelancerJobTotalEarning($user_id, $status, $paid_status = 'pending')
     {
         $commision = SiteManagement::getMetaValue('commision');
         $admin_commission = !empty($commision) && !empty($commision[0]['commision']) ? $commision[0]['commision'] : 0;
         $job_balance =  Proposal::select('amount')
             ->where('freelancer_id', $user_id)
-            ->where('status', $status)->sum('amount');
+            ->where('status', $status)->where('paid', $paid_status)->sum('amount');
         return !empty($job_balance) ? $job_balance - ($job_balance / 100) * $admin_commission : 0;
+    }
+
+    /**
+     * Get freelancer earning
+     *
+     * @param int $user_id User ID
+     * @param int $status  Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function deductAdminCommission($amount)
+    {
+        $commision = SiteManagement::getMetaValue('commision');
+        $admin_commission = !empty($commision) && !empty($commision[0]['commision']) ? $commision[0]['commision'] : 0;
+        return !empty($amount) ? $amount - (($amount/100) * $admin_commission) : 0;
     }
 
     /**
@@ -1792,28 +2085,51 @@ class Helper extends Model
         $min_payount = !empty($payout_settings) && !empty($payout_settings[0]['min_payout']) ? $payout_settings[0]['min_payout'] : '';
         $payment_settings = SiteManagement::getMetaValue('commision');
         $currency  = !empty($payment_settings) && !empty($payment_settings[0]['currency']) ? $payment_settings[0]['currency'] : 'USD';
-        // update jobs payouts
         $job_payouts = DB::select(
             DB::raw(
-                "SELECT id, freelancer_id, 
+                "SELECT id, freelancer_id AS user_id, 
                 SUM(amount) AS total,
                 GROUP_CONCAT(id) AS ids
                 FROM proposals
                 WHERE paid = 'pending' 
+                AND status = 'completed' 
                 GROUP BY freelancer_id"
             )
         );
-        if (!empty($job_payouts)) {
-            foreach ($job_payouts as $q) {
-                if ($q->total >= $min_payount) {
-                    $user = User::find($q->freelancer_id);
+        $purchased_services = DB::select(
+            DB::raw(
+                "SELECT SUM(services.price) AS total, service_user.seller_id AS user_id, GROUP_CONCAT(service_user.id) AS ids
+                FROM service_user 
+                INNER JOIN services
+                WHERE service_user.service_id = services.id
+                AND service_user.type = 'employer'
+                AND service_user.status = 'completed'
+                AND service_user.paid = 'pending' 
+                GROUP BY service_user.seller_id"
+            )
+        );
+        $data = array_merge($job_payouts, $purchased_services);
+        $result=array();
+        foreach ($data as $value) {
+            if (isset($result[((array)$value)["user_id"]])) {
+                $result[((array)$value)["user_id"]]["total"]+=((array)$value)["total"];
+            } else {
+                $result[((array)$value)["user_id"]]=(array)$value;
+            }
+        }
+        $totalPayouts = array();
+        $totalPayouts = array_values($result);
+        if (!empty($totalPayouts)) {
+            foreach ($totalPayouts as $q) {
+                if ($q['total'] >= $min_payount) {
+                    $user = User::find($q['user_id']);
                     if ($user->profile->count() > 0) {
                         $payout_id = !empty($user->profile->payout_id) ? $user->profile->payout_id : '';
                         $payout_detail = !empty($user->profile->payout_settings) ? $user->profile->payout_settings : array();
                         if (!empty($payout_id) || !empty($payout_detail)) {
-                            $total_earning = Self::getFreelancerJobTotalEarning($q->freelancer_id, 'completed');
+                            $total_earning = Self::deductAdminCommission($q['total']);
                             $payout = new Payout();
-                            $payout->user()->associate($q->freelancer_id);
+                            $payout->user()->associate($q['user_id']);
                             $payout->amount = $total_earning;
                             $payout->currency = $currency;
                             if (!empty($payout_detail)) {
@@ -1841,79 +2157,30 @@ class Helper extends Model
                             }
                             $payout->status = 'pending';
                             $payout->order_id = null;
+                            $payout->projects_ids = null;
                             $payout->type = 'job';
                             $payout->save();
-                            $primary_records = explode(',', $q->ids);
-                            foreach ($primary_records as $primary) {
-                                DB::table('proposals')
-                                    ->where('id', $primary)
-                                    ->update(['paid' => 'completed']);
-                            }
                         }
                     }
                 }
             }
-        }
-        // update services payouts
-        $purchased_services = DB::select(
-            DB::raw(
-                "SELECT SUM(services.price) AS total, service_user.seller_id AS seller, GROUP_CONCAT(service_user.id) AS ids
-                FROM service_user 
-                INNER JOIN services
-                WHERE service_user.service_id = services.id
-                AND service_user.type = 'employer'
-                AND service_user.status = 'completed'
-                AND service_user.paid = 'pending' 
-                GROUP BY service_user.seller_id"
-            )
-        );
-        if (!empty($purchased_services)) {
-            foreach ($purchased_services as $q) {
-                if ($q->total >= $min_payount) {
-                    $user = User::find($q->seller);
-                    if ($user->profile->count() > 0) {
-                        $payout_id = !empty($user->profile->payout_id) ? $user->profile->payout_id : '';
-                        $payout_detail = !empty($user->profile->payout_settings) ? $user->profile->payout_settings : array();
-                        if (!empty($payout_id) || !empty($payout_detail)) {
-                            $payout = new Payout();
-                            $payout->user()->associate($q->seller);
-                            $payout->amount = $q->total;
-                            $payout->currency = $currency;
-                            if (!empty($payout_detail)) {
-                                $payment_details  = Helper::getUnserializeData($user->profile->payout_settings);
-                                if ($payment_details['type'] == 'paypal') {
-                                    if (Schema::hasColumn('payouts', 'email')) {
-                                        $payout->email = $payment_details['paypal_email'];
-                                    } elseif (Schema::hasColumn('payouts', 'paypal_id')) {
-                                        $payout->paypal_id = $payment_details['paypal_email'];
-                                    }
-                                } else if ($payment_details['type'] == 'bacs') {
-                                    $payout->bank_details = $user->profile->payout_settings;
-                                    $payout->paypal_id = 'null';
-                                } else {
-                                    $payout->paypal_id = '';
-                                }
-                                $payout->payment_method = $payment_details['type'];
-                            } else if (!empty($payout_id)) {
-                                $payout->payment_method = 'paypal';
-                                if (Schema::hasColumn('payouts', 'email')) {
-                                    $payout->email = $payout_id;
-                                } elseif (Schema::hasColumn('payouts', 'paypal_id')) {
-                                    $payout->paypal_id = $payout_id;
-                                }
-                            }
-                            $payout->status = 'pending';
-                            $payout->order_id = null;
-                            $payout->type = 'service';
-                            $payout->save();
-                            $primary_records = explode(',', $q->ids);
-                            foreach ($primary_records as $primary) {
-                                DB::table('service_user')
-                                    ->where('id', $primary)
-                                    ->update(['paid' => 'completed']);
-
-                            }
-                        }
+            if (!empty($job_payouts)) {
+                foreach ($job_payouts as $q) {
+                    $primary_records = explode(',', $q->ids);
+                    foreach ($primary_records as $primary) {
+                        DB::table('proposals')
+                            ->where('id', $primary)
+                            ->update(['paid' => 'completed']);
+                    }
+                }
+            }
+            if (!empty($purchased_services)) {
+                foreach ($purchased_services as $q) {
+                    $primary_records = explode(',', $q->ids);
+                    foreach ($primary_records as $primary) {
+                        DB::table('service_user')
+                            ->where('id', $primary)
+                            ->update(['paid' => 'completed']);
                     }
                 }
             }
@@ -2395,6 +2662,21 @@ class Helper extends Model
      *
      * @return array
      */
+    public static function getServiceOrdersCount($service_id, $status)
+    {
+        return DB::table('service_user')->where('service_id', $service_id)->where('status', $status)->count();
+    }
+
+    /**
+     * Get service orders count
+     *
+     * @param int    $service_id service_id
+     * @param string $status     status
+     *
+     * @access public
+     *
+     * @return array
+     */
     public static function getServiceCount($service_id, $status)
     {
         return DB::table('service_user')->where('service_id', $service_id)->where('status', $status)->count();
@@ -2409,14 +2691,43 @@ class Helper extends Model
      *
      * @return array
      */
-    public static function getFreelancerServices($status, $user_id)
+    public static function getFreelancerServices($status, $user_id, $paid_status = '')
+    {
+        // return DB::table('services')
+        //     ->join('service_user', 'service_user.service_id', '=', 'services.id')
+        //     ->select('services.*', 'service_user.id as pivot_id', 'service_user.user_id as pivot_user', 'service_user.type', 'service_user.status as pivot_status')
+        //     ->where('service_user.status', $status)
+        //     ->where('service_user.seller_id', $user_id)
+        //     ->where('service_user.paid', $paid_status)
+        //     ->get();
+
+        $services = DB::table('services')
+            ->join('service_user', 'service_user.service_id', '=', 'services.id')
+            ->select('services.*', 'service_user.id as pivot_id', 'service_user.user_id as pivot_user', 'service_user.type', 'service_user.status as pivot_status')
+            ->where('service_user.status', $status)
+            ->where('service_user.seller_id', $user_id);
+        if (!empty($paid_status)) {
+            $services->where('service_user.paid', $paid_status);
+        }
+        return $services->get();
+    }
+
+    /**
+     * Get total freelancer services
+     *
+     * @param string $status pivot table status
+     *
+     * @access public
+     *
+     * @return array
+     */
+    public static function getTotalFreelancerServices($status, $user_id)
     {
         return DB::table('services')
             ->join('service_user', 'service_user.service_id', '=', 'services.id')
             ->select('services.*', 'service_user.id as pivot_id', 'service_user.user_id as pivot_user', 'service_user.type', 'service_user.status as pivot_status')
             ->where('service_user.status', $status)
-            ->where('service_user.seller_id', $user_id)
-            ->get();
+            ->where('service_user.seller_id', $user_id)->get();            
     }
 
     /**
@@ -2629,19 +2940,31 @@ class Helper extends Model
      *
      * @return string
      */
-    public static function getImageWithSize($path, $image, $size = "")
+    public static function getImageWithSize($path, $image, $size = "", $space_encode = false)
     {
+        $requested_file = $image;
         if (!empty($path) && !empty($image)) {
+            if ($space_encode == true) {
+                if ($image == trim($image) && strpos($image, ' ') !== false) {
+                    $requested_file = str_replace(' ', '%20', $image);
+                }
+            }
             if (!empty($size)) {
                 $file = $path . '/' . $size . '-' . $image;
                 if (file_exists($file)) {
-                    return $path . '/' . $size . '-' . $image;
+                    return $path . '/' . $size . '-' . $requested_file;
+                } elseif (file_exists($path . '/' . $image)) {
+                    return $path . '/' . $requested_file;
                 } else {
-                    return $path . '/' . $image;
+                    return '/images/user.jpg';
                 }
+            } elseif (file_exists($path . '/' . $image)) {
+                return $path . '/' . $requested_file;
             } else {
-                return $path . '/' . $image;
+                return '/images/user.jpg';
             }
+        } else {
+            return '/images/user.jpg';
         }
     }
 
@@ -2746,6 +3069,26 @@ class Helper extends Model
             'hired'            => trans('lang.hired'),
             'completed'     => trans('lang.completed'),
             'cancelled'     => trans('lang.cancelled'),
+        );
+        if (!empty($key) && array_key_exists($key, $proposal_status)) {
+            return $proposal_status[$key];
+        } else {
+            return $proposal_status;
+        }
+    }
+
+    /**
+     * Get Auth translated role name
+     *
+     * @access public
+     *
+     * @return array
+     */
+    public static function getOrderStatus($key = '')
+    {
+        $proposal_status = array(
+            'pending'       => trans('lang.pending'),
+            'completed'     => trans('lang.completed'),
         );
         if (!empty($key) && array_key_exists($key, $proposal_status)) {
             return $proposal_status[$key];
@@ -2864,5 +3207,464 @@ class Helper extends Model
         } else {
             return $list;
         }
+    }
+
+    /**
+     * Get total proposals by status.
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getTotalProposalsByStatus($user_id, $status)
+    {
+        return Proposal::select('id', 'amount', 'updated_at')->where('freelancer_id', $user_id)
+            ->where('status', $status)->count();
+    }
+
+    /**
+     * Get selected slider
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getPageSlider($id)
+    {
+        $json = array();
+        $selected_page = Page::find($id);
+        if (Schema::hasTable('metas')) {
+            if (!empty($selected_page->meta) && $selected_page->meta->count() > 0) {
+                foreach ($selected_page->meta->toArray() as $key => $meta) {
+                    preg_match_all('!\d+!', $meta['meta_key'], $matches);
+                    $meta_key_modify = preg_replace('/\d/', '', $meta['meta_key']);
+                    if ($meta_key_modify == 'sliders') {
+                        $slider_section = Helper::getUnserializeData($meta['meta_value']);
+                        $json['style'] = !empty($slider_section['style']) ? $slider_section['style'] : '';
+                        $json['index'] = !empty($slider_section['parentIndex']) ? $slider_section['parentIndex'] : '';
+                    }
+                }
+            }
+        }
+        return $json;
+    }
+
+    /**
+     * Get Seeder Data
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getAboutSeeder()
+    {
+        $data = array();
+        $data['description'] = "<div class='wt-greetingcontent'>
+        <div class='wt-sectionhead'>
+        <div class='wt-sectiontitle'>
+        <h2>Greetings &amp; Welcome</h2>
+        <span>Start Today For a Great Future</span></div>
+        <div class='wt-description'>
+        <p>Dotem eiusmod tempor incune utnaem labore etdolore maigna aliqua eniina ilukita ylokem lokateise ination voluptate velite esse cillum dolore eu fugnulla pariatur lokaim urianewce anim id est laborumed.</p>
+        <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa officia deserunt mollit anim id est laborumed perspiciatis unde omnis isteatus error aluptatem accusantium doloremque laudantium.</p>
+        </div>
+        </div>
+        <div id='wt-statistics' class='wt-statistics'>
+        <div class='wt-statisticcontent wt-countercolor1'>
+        <h3 data-from='0' data-to='1500' data-speed='8000' data-refresh-interval='50'>1,500</h3>
+        <em>k</em>
+        <h4>Active Projects</h4>
+        </div>
+        <div class='wt-statisticcontent wt-countercolor2'>
+        <h3 data-from='0' data-to='99' data-speed='8000' data-refresh-interval='5.9'>99</h3>
+        <em>%</em>
+        <h4>Great Feedback</h4>
+        </div>
+        <div class='wt-statisticcontent wt-countercolor3'>
+        <h3 data-from='0' data-to='5000' data-speed='8000' data-refresh-interval='100'>5,000</h3>
+        <em>k</em>
+        <h4>Active Freelancers</h4>
+        </div>
+        </div>
+        </div>";
+        $data['sectionColor'] = '#f7f7f7';
+        $data['id'] = 4;
+        $data['parentIndex'] = 0;
+        return serialize($data);
+    }
+
+    /**
+     * Get Seeder Data
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getFirstHomeCat()
+    {
+        $data = array();
+        $data['title'] = 'Explore Categories';
+        $data['subtitle'] = 'Professional by categories';
+        $data['description'] = "<p><span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget leo rutrum, ullamcorper dolor eu, faucibus massa.</span></p>";
+        $data['id'] = 2;
+        $data['parentIndex'] = 1;
+        $data['sectionColor'] = '#ffffff';
+        return serialize($data);
+    }
+
+    /**
+     * Get Seeder Data
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getFirstHomeWelcome()
+    {
+        // $data = array();
+        // $data['welcome_background'] ='1579153406-1557484284-banner.jpg';
+        // $data['first_title'] ='Start As Company';
+        // $data['subtitle'] ='Picked Top Serviced For You';
+        // $data['description'] = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget leo rutrum, ullamcorper dolor eu, faucibus massa. Etiam placerat mattis pellentesque. Mauris eu mollis arcu. Nullam tincidunt auctor mattis. Donec pretium porta est ut ullamcorper.&nbsp;</p>";
+        // $data['id'] = 2;
+        // $data['parentIndex'] = 1;
+        // return serialize($data);
+    }
+
+    /**
+     * Get Seeder Data
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getFirstHomeSlider()
+    {
+        $data = array();
+        $data['style'] = 'style1';
+        $data['slider_image'] = array(
+            '0'    =>  'banner-img.jpg',
+        );
+        $data['inner_banner_image'] = '1579153511-img-01inner.png';
+        $data['floating_image01'] = '1579153511-img-02.png';
+        $data['floating_image02'] = '1579153511-img-03.png';
+        $data['title'] = 'Hire expert freelancers';
+        $data['subtitle'] = 'for any job, Online';
+        $data['description'] = '<p>Consectetur adipisicing elit sed dotem eiusmod tempor incuntes ut labore etdolore maigna aliqua enim.</p>';
+        $data['video_link'] = 'https://www.youtube.com/watch?v=J37W6DjqT3Q';
+        $data['video_title'] = 'See For Yourself!';
+        $data['video_description'] = 'How it works & experience the ultimate joy.';
+        $data['id'] = 1;
+        $data['parentIndex'] = 0;
+        return serialize($data);
+    }
+
+    /**
+     * Get Seeder Data
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getFirstHomeAPP()
+    {
+        $data = array();
+        $data['title'] = 'Limitless Experience';
+        $data['subtitle'] = 'Roam Around With Your Business';
+        $data['description'] = '<p>Dotem eiusmod tempor incune utnaem labore etdolore maigna aliqua enim poskina ilukita ylokem lokateise ination voluptate velit esse cillum dolore eu fugiat nulla pariatur lokaim urianewce.</p>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget leo rutrum, ullamcorper dolor eu, faucibus massa. Etiam placerat mattis pellentesque. Mauris eu mollis arcu. Nullam tincidunt auctor mattis. Donec pretium porta est ut ullamcorper.&nbsp;</p>';
+        $data['andriod_url'] = '#';
+        $data['ios_url'] = '#';
+        $data['style'] = 'style1';
+        $data['background_image'] = '';
+        $data['app_image'] = '1579153406-1558518016-1557484284-mobile-img.png';
+        $data['id'] = 5;
+        $data['parentIndex'] = 4;
+        $data['sectionColor'] = '#ffffff';
+        return serialize($data);
+    }
+
+    /**
+     * Get Seeder Data
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getSecondHomeFreelancer()
+    {
+        $data = array();
+        $data['title'] = 'Top Freelancers';
+        $data['subtitle'] = 'Start With Great Peoples';
+        $data['description'] = "<p><span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget leo rutrum, ullamcorper dolor eu, faucibus massa.</span></p>";
+        $data['id'] = 4;
+        $data['parentIndex'] = 3;
+        $data['sectionColor'] = '#ffffff';
+        return serialize($data);
+    }
+
+    /**
+     * Get Seeder Data
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getSecondHomeService()
+    {
+        $data = array();
+        $data['title'] = 'Explore Top Services';
+        $data['subtitle'] = 'Picked Top Serviced For You';
+        $data['description'] = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget leo rutrum, ullamcorper dolor eu, faucibus massa. Etiam placerat mattis pellentesque. Mauris eu mollis arcu. Nullam tincidunt auctor mattis. Donec pretium porta est ut ullamcorper.&nbsp;</p>";
+        $data['id'] = 6;
+        $data['parentIndex'] = 1;
+        $data['sectionColor'] = '#ffffff';
+        return serialize($data);
+    }
+
+    /**
+     * Get Seeder Data
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getSecondHomeWorkTab()
+    {
+        $data = array();
+        $data['background_image'] = '1579165004-img-05.jpg';
+        $data['first_tab_icon'] = '1579165004-img-01.png';
+        $data['second_tab_icon'] = '1579165004-img-02.png';
+        $data['third_tab_icon'] = '1579165004-img-03.png';
+        $data['title'] = 'How It Works';
+        $data['subtitle'] = 'We Made It Easy';
+        $data['description'] = '<p>Lorem ipsum dolor amet consectetur adipisicing eliteiuim sete eiusmod tempor incididunt ut labore etnalom dolore magna aliqua udiminimate veniam quis norud.</p>';
+        $data['first_tab_title'] = 'Professional';
+        $data['first_tab_subtitle'] = 'Search Best Online';
+        $data['second_tab_title'] = 'Appointment';
+        $data['second_tab_subtitle'] = 'Get Instant';
+        $data['third_tab_title'] = 'Feedback';
+        $data['third_tab_subtitle'] = 'Leave Your';
+        $data['id'] = 3;
+        $data['parentIndex'] = 2;
+        return serialize($data);
+    }
+
+    /**
+     * Get Seeder Data
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getSecondHomeSlider()
+    {
+        $data = array();
+        $data['style'] = 'style2';
+        $data['slider_image'] = array(
+            '0' => '1579164321-img-01.jpg',
+            '1' => '1579164321-img-02.jpg',
+            '2' => '1579164321-img-03.jpg',
+            '3' => '1579164321-img-04.jpg',
+        );
+        $data['title'] = 'Hire expert freelancers';
+        $data['subtitle'] = 'for any job, Online';
+        $data['description'] = 'Consectetur adipisicing elition sed dotem eiusmod tempor incuntes ut labore etdolore maigna aliqua enim adion minim veniam quistan neostrud exercitation.';
+        $data['video_link'] = 'https://youtu.be/B-ph2g5o2K4';
+        $data['video_title'] = 'See For Yourself!';
+        $data['video_description'] = 'How it works & experience the ultimate joy.';
+        $data['id'] = 1;
+        $data['parentIndex'] = 0;
+        return serialize($data);
+    }
+
+    /**
+     * Get Seeder Data
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getSecondHomeAPP()
+    {
+        $data = array();
+        $data['title'] = 'Introducing All New';
+        $data['subtitle'] = 'Our Native Mobile App';
+        $data['description'] = '<p>Lorem ipsum dolor amet consectetur adipisicing eliteiuim sete eiusmod tempor incididunt ut labore etnalom dolore magna aliqua udiminimate veniam quis norud.</p>';
+        $data['andriod_url'] = '#';
+        $data['ios_url'] = '#';
+        $data['style'] = 'style2';
+        $data['background_image'] = '1579165080-img-06.jpg';
+        $data['app_image'] = '1579165080-img-05.png';
+        $data['id'] = 5;
+        $data['parentIndex'] = 4;
+        $data['sectionColor'] = '#ffffff';
+        return serialize($data);
+    }
+
+    /**
+     * Get Seeder Data
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getSecondHomeArticle()
+    {
+        $data = array();
+        $data['title'] = 'Latest Articles';
+        $data['subtitle'] = 'Stay Updated With Our News';
+        $data['description'] = ' <p>Lorem ipsum dolor amet consectetur adipisicing eliteiuim sete eiusmod tempor incididunt ut labore etnalom dolore magna aliqua udiminimate veniam quis norud.</p>';
+        $data['id'] = 10;
+        $data['parentIndex'] = 5;
+        $data['sectionColor'] = '#ffffff';
+        return serialize($data);
+    }
+
+    /**
+     * Get Seeder Data
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getThirdHomeFreelancer()
+    {
+        $data = array();
+        $data['title'] = 'Top Freelancers';
+        $data['subtitle'] = 'Start With Great Peoples';
+        $data['description'] = "<p><span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget leo rutrum, ullamcorper dolor eu, faucibus massa.</span></p>";
+        $data['id'] = 4;
+        $data['parentIndex'] = 2;
+        $data['sectionColor'] = '#ffffff';
+        return serialize($data);
+    }
+
+    /**
+     * Get Seeder Data
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getThirdHomeService()
+    {
+        $data = array();
+        $data['title'] = 'Explore Top Services';
+        $data['subtitle'] = 'Picked Top Serviced For You';
+        $data['description'] = "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget leo rutrum, ullamcorper dolor eu, faucibus massa. Etiam placerat mattis pellentesque. Mauris eu mollis arcu. Nullam tincidunt auctor mattis. Donec pretium porta est ut ullamcorper.&nbsp;</p>";
+        $data['id'] = 5;
+        $data['parentIndex'] = 1;
+        $data['sectionColor'] = '#f7f7f7';
+        return serialize($data);
+    }
+
+    /**
+     * Get Seeder Data
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getThirdHomeWorkVideo()
+    {
+        $data = array();
+        $data['title'] = ' How It Works';
+        $data['subtitle'] = 'We Made It Easy';
+        $data['description'] = "<p>Lorem ipsum dolor amet consectetur adipisicing eliteiuim sete eiusmod tempor incididunt ut labore etnalom dolore magna aliqua udiminimate veniam quis norud.</p>";
+        $data['id'] = 3;
+        $data['parentIndex'] = 3;
+        $data['video'] = 'https://youtu.be/B-ph2g5o2K4';
+        $data['video_poster'] = '1579689887-img-01.png';
+        $data['sectionColor'] = '#f7f7f7';
+        return serialize($data);
+    }
+
+    /**
+     * Get Seeder Data
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getThirdHomeSlider()
+    {
+        $data = array();
+        $data['style'] = 'style3';
+        $data['slider_image'] = array(
+            '0' => '1579166079-img-04.jpg',
+            '1' => '1579166079-img-05.jpg',
+        );
+        $data['title'] = 'Buy expert’s Services';
+        $data['subtitle'] = 'for any job, Online';
+        $data['description'] = 'Consectetur adipisicing elition sed dotem eiusmod tempor incuntes ut labore etdolore maigna aliqua enim adion minim veniam quistan neostrud exercitation.';
+        $data['video_link'] = 'https://youtu.be/B-ph2g5o2K4';
+        $data['video_title'] = 'See For Yourself!';
+        $data['video_description'] = 'How it works & experience the ultimate joy.';
+        $data['id'] = 1;
+        $data['parentIndex'] = 0;
+        return serialize($data);
+    }
+
+    /**
+     * Get Seeder Data
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getThirdHomeAPP()
+    {
+        $data = array();
+        $data['title'] = 'Introducing All New';
+        $data['subtitle'] = 'Our Native Mobile App';
+        $data['description'] = '<p>Lorem ipsum dolor amet consectetur adipisicing eliteiuim sete eiusmod tempor incididunt ut labore etnalom dolore magna aliqua udiminimate veniam quis norud.</p>';
+        $data['andriod_url'] = '#';
+        $data['ios_url'] = '#';
+        $data['style'] = 'style2';
+        $data['background_image'] = '1579591173-img-06.jpg';
+        $data['app_image'] = '1579520549-1579165080-img-05.png';
+        $data['id'] = 7;
+        $data['parentIndex'] = 4;
+        $data['sectionColor'] = '#ffffff';
+        return serialize($data);
+    }
+
+    /**
+     * Get Seeder Data
+     *
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public static function getThirdHomeArticle()
+    {
+        $data = array();
+        $data['title'] = 'Latest Articles';
+        $data['subtitle'] = 'Stay Updated With Our News';
+        $data['description'] = ' <p>Lorem ipsum dolor amet consectetur adipisicing eliteiuim sete eiusmod tempor incididunt ut labore etnalom dolore magna aliqua udiminimate veniam quis norud.</p>';
+        $data['id'] = 6;
+        $data['parentIndex'] = 5;
+        $data['sectionColor'] = '#ffffff';
+        return serialize($data);
     }
 }
