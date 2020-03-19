@@ -56,6 +56,12 @@
                                 <span>{{ trans('lang.all_jobs') }}</span>
                             </a>
                         </li>
+                        <li>
+                            <a href="{{{ route('orderList') }}}">
+                                <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                                <span>{{ trans('lang.orders') }}</span>
+                            </a>
+                        </li>
                         @if (Helper::getAccessType() == 'both' || Helper::getAccessType() == 'services')
                             <li>
                                 <a href="{{{ route('allServices') }}}">
