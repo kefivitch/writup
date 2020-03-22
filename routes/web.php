@@ -36,6 +36,7 @@ Route::get(
         \Artisan::call('config:cache');
         \Artisan::call('cache:clear');
         \Artisan::call('config:clear');
+        \Artisan::call('view:clear');
         return redirect()->back();
     }
 );
