@@ -33,6 +33,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Class JobController
@@ -248,7 +249,6 @@ class JobController extends Controller
      */
     public function store(Request $request)
     {
-        //return $request;
         $json = array();
         $server = Helper::worketicIsDemoSiteAjax();
         if (!empty($server)) {
@@ -263,10 +263,37 @@ class JobController extends Controller
             $request,
             [
                 'title' => 'required',
+                'project_levels' => 'required',
+                'job_duration' => 'required',
+                'freelancer_type' => 'required',
+                'english_level' => 'required',
                 'project_cost' => 'required',
                 'description' => 'required',
             ]
         );
+        if (Schema::hasColumn('jobs', 'expiry_date')) {
+            if ($request['expiry_date'] == trans('lang.project_expiry')) {
+                $json['type'] = 'error';
+                $json['message'] = trans('lang.job_expiry_req');
+                return $json;
+            }
+            $expiry = Carbon::parse($request['expiry_date']);
+            if ($expiry->lessThan(Carbon::now())) {
+                $json['type'] = 'error';
+                $json['message'] = trans('lang.past_expiry_date');
+                return $json;
+            }
+            $this->validate($request, ['expiry_date' => 'required']);
+        }
+        if (!empty($request['latitude']) || !empty($request['longitude'])) {
+            $this->validate(
+                $request,
+                [
+                    'latitude' => ['regex:/^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}$/'],
+                    'longitude' => ['regex:/^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,6}$/'],
+                ]
+            );
+        }
         $package_item = Item::where('subscriber', Auth::user()->id)->first();
         $package = !empty($package_item) ? Package::find($package_item->product_id) : '';
         $option = !empty($package) ? unserialize($package->options) : '';
@@ -275,7 +302,7 @@ class JobController extends Controller
         $current_date = Carbon::now()->format('Y-m-d');
         $posted_jobs = $this->job::where('user_id', Auth::user()->id)->count();
         $posted_featured_jobs = Job::where('user_id', Auth::user()->id)->where('is_featured', 'true')->count();
-        $payment_settings = \App\SiteManagement::getMetaValue('commision');
+        $payment_settings = SiteManagement::getMetaValue('commision');
         $package_status = '';
         if (empty($payment_settings)) {
             $package_status = 'true';
@@ -355,7 +382,7 @@ class JobController extends Controller
                     $email_params = array();
                     $new_posted_job_template = DB::table('email_types')->select('id')->where('email_type', 'admin_email_new_job_posted')->get()->first();
                     $new_posted_job_template_employer = DB::table('email_types')->select('id')->where('email_type', 'employer_email_new_job_posted')->get()->first();
-                    if (!empty($new_posted_job_template->id) || !empty(new_posted_job_template_employer)) {
+                    if (!empty($new_posted_job_template->id) || !empty($new_posted_job_template_employer)) {
                         $template_data = EmailTemplate::getEmailTemplateByID($new_posted_job_template->id);
                         $template_data_employer = EmailTemplate::getEmailTemplateByID($new_posted_job_template_employer->id);
                         $email_params['job_title'] = $job->title;
@@ -407,9 +434,34 @@ class JobController extends Controller
             $request,
             [
                 'title' => 'required',
+                'project_levels' => 'required',
+                'english_level' => 'required',
                 'project_cost' => 'required',
             ]
         );
+        if (Schema::hasColumn('jobs', 'expiry_date')) {
+            if ($request['expiry_date'] == trans('lang.project_expiry')) {
+                $json['type'] = 'error';
+                $json['message'] = trans('lang.job_expiry_req');
+                return $json;
+            }
+            $expiry = Carbon::parse($request['expiry_date']);
+            if ($expiry->lessThan(Carbon::now())) {
+                $json['type'] = 'error';
+                $json['message'] = trans('lang.past_expiry_date');
+                return $json;
+            }
+            $this->validate($request, ['expiry_date' => 'required']);
+        }
+        if (!empty($request['latitude']) || !empty($request['longitude'])) {
+            $this->validate(
+                $request,
+                [
+                    'latitude' => ['regex:/^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}$/'],
+                    'longitude' => ['regex:/^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,6}$/'],
+                ]
+            );
+        }
         $id = $request['id'];
         $job_update = $this->job->updateJobs($request, $id);
         if ($job_update['type'] = 'success') {
@@ -436,8 +488,8 @@ class JobController extends Controller
         $job = $this->job::all()->where('slug', $slug)->first();
         if (!empty($job)) {
             $submitted_proposals = $job->proposals->where('status', '!=', 'cancelled')->pluck('freelancer_id')->toArray();
-            $employer_id = $job->employer->id;
-            $profile = User::find($employer_id)->profile;
+            $employer_id = !empty($job->employer) ? $job->employer->id : '';
+            $profile = !empty($employer_id) ? User::find($employer_id)->profile : '';
             $user_image = !empty($profile) ? $profile->avater : '';
             $profile_image = !empty($user_image) ? '/uploads/users/' . $job->employer->id . '/' . $user_image : 'images/user-login.png';
             $reasons = Helper::getReportReasons();
@@ -530,7 +582,7 @@ class JobController extends Controller
             $jobs = $this->job::where('title', 'like', '%' . $keyword . '%')->paginate(6)->setPath('');
             $pagination = $jobs->appends(
                 array(
-                    'keyword' => Input::get('keyword'),
+                    'keyword' => Input::get('keyword')
                 )
             );
         } else {
@@ -551,6 +603,7 @@ class JobController extends Controller
             );
         }
     }
+
     /**
      * Display a listing of the resource.
      *
