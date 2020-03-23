@@ -582,7 +582,7 @@ class JobController extends Controller
             $jobs = $this->job::where('title', 'like', '%' . $keyword . '%')->paginate(6)->setPath('');
             $pagination = $jobs->appends(
                 array(
-                    'keyword' => Input::get('keyword')
+                    'keyword' => Input::get('keyword'),
                 )
             );
         } else {
