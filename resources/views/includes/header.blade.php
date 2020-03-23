@@ -63,7 +63,11 @@
                                             @endif
                                         @endforeach
                                     @endif
-                                    
+                                    <li>
+                                        <a href="{{url('search-results?type=employer')}}">
+                                            {{{ trans('lang.view_employers') }}}
+                                        </a>
+                                    </li>
                                 @if ($type =='jobs' || $type == 'both')
                                         <li>
                                             <a href="{{url('search-results?type=job')}}" @if(Auth::check()) @if(App\User::getUserRoleType(Auth::user()->id)->role_type == 'freelancer') style=" border-radius:10px; background-color: #f89a1c; color : white;padding-right: 20px;padding-left: 20px;"@endif @endif>
