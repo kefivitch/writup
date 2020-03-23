@@ -66,15 +66,15 @@ $type = Helper::getAccessType();
                                     @endforeach
                                     @endif
 
-                                    @if(Auth::check())
-                                    @if(App\User::getUserRoleType(Auth::user()->id)->role_type == 'freelancer')
-                                    <li>
-                                        <a href="{{url('search-results?type=employer')}}">
-                                            {{{ trans('lang.view_employers') }}}
-                                        </a>
-                                    </li>
-                                    @endif
-                                    @endif
+                                  
+                                  
+                                <li>
+                                    <a href="{{url('search-results?type=freelancer')}}">
+                                        {{{ trans('lang.view_freelancers') }}}
+                                    </a>
+                                </li>
+                                  
+                                   
 
                                     @if ($type =='jobs' || $type == 'both')
                                     <li>
