@@ -263,10 +263,10 @@ class JobController extends Controller
             $request,
             [
                 'title' => 'required',
-                'project_levels' => 'required',
-                'job_duration' => 'required',
-                'freelancer_type' => 'required',
-                'english_level' => 'required',
+                // 'project_levels' => 'required',
+                // 'job_duration' => 'required',
+                // 'freelancer_type' => 'required',
+                // 'english_level' => 'required',
                 'project_cost' => 'required',
                 'description' => 'required',
             ]
