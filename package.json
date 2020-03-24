@@ -24,6 +24,8 @@
         "vue-template-compiler": "^2.6.10"
     },
     "dependencies": {
+        "@tinymce/tinymce-vue": "^3.2.0",
+        "ant-design-vue": "^1.4.12",
         "bootstrap-vue": "^2.0.0-rc.13",
         "cors": "^2.8.5",
         "express": "^4.16.4",
@@ -45,6 +47,7 @@
         "vue-sweetalert2": "^1.6.4",
         "vue2-dropzone": "^3.5.2",
         "vue2-google-maps": "^0.10.6",
-        "vuebar": "0.0.20"
+        "vuebar": "0.0.20",
+        "vuedraggable": "^2.23.2"
     }
 }

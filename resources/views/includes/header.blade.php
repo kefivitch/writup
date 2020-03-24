@@ -66,15 +66,19 @@ $type = Helper::getAccessType();
                                     @endforeach
                                     @endif
 
-                                  
-                                  
-                                <li>
-                                    <a href="{{url('search-results?type=freelancer')}}">
-                                        {{{ trans('lang.view_freelancers') }}}
-                                    </a>
-                                </li>
-                                  
-                                   
+                                    <li>
+                                        <a href="{{url('articles')}}">
+                                            {{{ trans('lang.articles') }}}
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a href="{{url('search-results?type=freelancer')}}">
+                                            {{{ trans('lang.view_freelancers') }}}
+                                        </a>
+                                    </li>
+
+
 
                                     @if ($type =='jobs' || $type == 'both')
                                     <li>

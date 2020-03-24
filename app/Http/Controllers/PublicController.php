@@ -13,45 +13,35 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Http\Request;
-use App\User;
-use App\Language;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\EmailVerificationMailable;
-use Illuminate\Support\Facades\Validator;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Support\Facades\Redirect;
-use Hash;
-use Auth;
-use DB;
-use App\Helper;
-use App\Profile;
+use App\Article;
 use App\Category;
+use App\DeliveryTime;
+use App\EmailTemplate;
+use App\Helper;
+use App\Job;
+use App\Language;
 use App\Location;
+use App\Mail\AdminEmailMailable;
+use App\Mail\GeneralEmailMailable;
+use App\Payout;
+use App\Profile;
+use App\ResponseTime;
+use App\Review;
+use App\Service;
+use App\SiteManagement;
 use App\Skill;
+use App\User;
+use Auth;
+use Carbon\Carbon;
+use DB;
+use Hash;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Session;
 use Storage;
-use App\Report;
-use App\Job;
-use App\Proposal;
-use App\EmailTemplate;
-use App\Mail\GeneralEmailMailable;
-use App\Mail\AdminEmailMailable;
-use App\SiteManagement;
-use App\Review;
-use Carbon\Carbon;
-use Illuminate\Support\Str;
-use Illuminate\Pagination\LengthAwarePaginator;
-use App\Payout;
-use Exception;
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Symfony\Component\Debug\Exception\FlattenException;
-use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
-use App\Service;
-use App\DeliveryTime;
-use App\ResponseTime;
 
 /**
  * Class PublicController
@@ -104,7 +94,6 @@ class PublicController extends Controller
                 'first_name' => 'required',
                 'last_name' => 'required',
                 'email' => 'required|email|unique:users',
-                'phone' => 'required|digits:8',
             ]
         );
     }
@@ -149,7 +138,7 @@ class PublicController extends Controller
             $user = User::find($id);
             if (!empty($request['code'])) {
                 if ($request['code'] === $user->verification_code) {
-                    $user->user_verified = 0;
+                    $user->user_verified = 1;
                     $user->verification_code = null;
                     $user->save();
                     $json['type'] = 'success';
@@ -218,7 +207,7 @@ class PublicController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    function getFile($type, $filename, $id)
+    public function getFile($type, $filename, $id)
     {
         if (!empty($type) && !empty($filename) && !empty($id)) {
             if (Storage::disk('local')->exists('uploads/' . $type . '/' . $id . '/' . $filename)) {
@@ -268,7 +257,7 @@ class PublicController extends Controller
                 $projects = !empty($profile->projects) ? unserialize($profile->projects) : array();
                 $experiences = !empty($profile->experience) ? unserialize($profile->experience) : array();
                 $education = !empty($profile->education) ? unserialize($profile->education) : array();
-                $freelancer_rating  = !empty($user->profile->ratings) ? Helper::getUnserializeData($user->profile->ratings) : 0;
+                $freelancer_rating = !empty($user->profile->ratings) ? Helper::getUnserializeData($user->profile->ratings) : 0;
                 $rating = !empty($freelancer_rating) ? $freelancer_rating[0] : 0;
                 $joining_date = !empty($profile->created_at) ? Carbon::parse($profile->created_at)->format('M d, Y') : '';
                 $jobs = Job::select('title', 'id')->get()->pluck('title', 'id');
@@ -276,19 +265,24 @@ class PublicController extends Controller
                 $badge = Helper::getUserBadge($user->id);
                 $feature_class = !empty($badge) ? 'wt-featured' : '';
                 $badge_color = !empty($badge) ? $badge->color : '';
-                $badge_img  = !empty($badge) ? $badge->image : '';
+                $badge_img = !empty($badge) ? $badge->image : '';
                 $amount = Payout::where('user_id', $user->id)->select('amount')->pluck('amount')->first();
                 $employer_projects = Auth::user() ? Helper::getEmployerJobs(Auth::user()->id) : array();
-                $currency_symbol  = !empty($payment_settings) && !empty($payment_settings[0]['currency']) ? Helper::currencyList($payment_settings[0]['currency']) : array();
+                $currency_symbol = !empty($payment_settings) && !empty($payment_settings[0]['currency']) ? Helper::currencyList($payment_settings[0]['currency']) : array();
                 $symbol = !empty($currency_symbol['symbol']) ? $currency_symbol['symbol'] : '$';
                 $settings = !empty(SiteManagement::getMetaValue('settings')) ? SiteManagement::getMetaValue('settings') : array();
                 $display_chat = !empty($settings[0]['chat_display']) ? $settings[0]['chat_display'] : false;
                 $payment_settings = SiteManagement::getMetaValue('commision');
                 $enable_package = !empty($payment_settings) && !empty($payment_settings[0]['enable_packages']) ? $payment_settings[0]['enable_packages'] : 'true';
+                $videos = !empty($profile->videos) ? Helper::getUnserializeData($profile->videos) : '';
+                $feedbacks = Review::select('feedback')->where('receiver_id', $user->id)->count();
+                $average_rating_count = !empty($feedbacks) ? $reviews->sum('avg_rating') / $feedbacks : 0;
                 if (file_exists(resource_path('views/extend/front-end/users/freelancer-show.blade.php'))) {
                     return View(
                         'extend.front-end.users.freelancer-show',
                         compact(
+                            'average_rating_count',
+                            'videos',
                             'services',
                             'profile',
                             'amount',
@@ -327,6 +321,8 @@ class PublicController extends Controller
                     return View(
                         'front-end.users.freelancer-show',
                         compact(
+                            'average_rating_count',
+                            'videos',
                             'services',
                             'profile',
                             'amount',
@@ -368,7 +364,7 @@ class PublicController extends Controller
                 $save_employer = !empty(auth()->user()->profile->saved_employers) ? unserialize(auth()->user()->profile->saved_employers) : array();
                 $save_jobs = !empty(auth()->user()->profile->saved_jobs) ? unserialize(auth()->user()->profile->saved_jobs) : array();
                 $currency = SiteManagement::getMetaValue('commision');
-                $symbol   = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
+                $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
                 $breadcrumbs_settings = SiteManagement::getMetaValue('show_breadcrumb');
                 $show_breadcrumbs = !empty($breadcrumbs_settings) ? $breadcrumbs_settings : 'true';
                 if (file_exists(resource_path('views/extend/front-end/users/employer-show.blade.php'))) {
@@ -486,14 +482,14 @@ class PublicController extends Controller
     public function getSearchResult($search_type = "")
     {
         $categories = array();
-        $locations  = array();
-        $languages  = array();
+        $locations = array();
+        $languages = array();
         $categories = Category::all();
-        $locations  = Location::all();
-        $languages  = Language::all();
-        $skills     = Skill::all();
-        $currency   = SiteManagement::getMetaValue('commision');
-        $symbol     = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
+        $locations = Location::all();
+        $languages = Language::all();
+        $skills = Skill::all();
+        $currency = SiteManagement::getMetaValue('commision');
+        $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
         $freelancer_skills = Helper::getFreelancerLevelList();
         $project_length = Helper::getJobDurationList();
         $keyword = !empty($_GET['s']) ? $_GET['s'] : '';
@@ -521,8 +517,8 @@ class PublicController extends Controller
         $search_response_time = !empty($_GET['response_time']) ? $_GET['response_time'] : array();
         $current_date = Carbon::now()->toDateTimeString();
         $currency = SiteManagement::getMetaValue('commision');
-        $symbol   = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
-        $inner_page  = SiteManagement::getMetaValue('inner_page_data');
+        $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
+        $inner_page = SiteManagement::getMetaValue('inner_page_data');
         $payment_settings = SiteManagement::getMetaValue('commision');
         $enable_package = !empty($payment_settings) && !empty($payment_settings[0]['enable_packages']) ? $payment_settings[0]['enable_packages'] : 'true';
         $breadcrumbs_settings = SiteManagement::getMetaValue('show_breadcrumb');
@@ -530,7 +526,7 @@ class PublicController extends Controller
         if (!empty($_GET['type'])) {
             if ($type == 'employer' || $type == 'freelancer') {
                 $users_total_records = User::count();
-                $search =  User::getSearchResult(
+                $search = User::getSearchResult(
                     $type,
                     $keyword,
                     $search_locations,
@@ -543,9 +539,9 @@ class PublicController extends Controller
                 );
                 $users = count($search['users']) > 0 ? $search['users'] : '';
                 $save_freelancer = !empty(auth()->user()->profile->saved_freelancer) ?
-                    unserialize(auth()->user()->profile->saved_freelancer) : array();
+                unserialize(auth()->user()->profile->saved_freelancer) : array();
                 $save_employer = !empty(auth()->user()->profile->saved_employers) ?
-                    unserialize(auth()->user()->profile->saved_employers) : array();
+                unserialize(auth()->user()->profile->saved_employers) : array();
                 if ($type === 'employer') {
                     $emp_list_meta_title = !empty($inner_page) && !empty($inner_page[0]['emp_list_meta_title']) ? $inner_page[0]['emp_list_meta_title'] : trans('lang.emp_listing');
                     $emp_list_meta_desc = !empty($inner_page) && !empty($inner_page[0]['emp_list_meta_desc']) ? $inner_page[0]['emp_list_meta_desc'] : trans('lang.emp_meta_desc');
@@ -720,13 +716,16 @@ class PublicController extends Controller
                 $job_list_meta_desc = !empty($inner_page) && !empty($inner_page[0]['job_list_meta_desc']) ? $inner_page[0]['job_list_meta_desc'] : trans('lang.job_meta_desc');
                 $show_job_banner = !empty($inner_page) && !empty($inner_page[0]['show_job_banner']) ? $inner_page[0]['show_job_banner'] : 'true';
                 $job_inner_banner = !empty($inner_page) && !empty($inner_page[0]['job_inner_banner']) ? $inner_page[0]['job_inner_banner'] : null;
+                $project_settings = !empty(SiteManagement::getMetaValue('project_settings')) ? SiteManagement::getMetaValue('project_settings') : array();
+                $completed_project_setting = !empty($project_settings) && !empty($project_settings['enable_completed_projects']) ? $project_settings['enable_completed_projects'] : 'true';
                 $results = Job::getSearchResult(
                     $keyword,
                     $search_categories,
                     $search_locations,
                     $search_skills,
                     $search_project_lengths,
-                    $search_languages
+                    $search_languages,
+                    $completed_project_setting
                 );
                 $jobs = $results['jobs'];
                 if (!empty($jobs)) {
@@ -795,6 +794,7 @@ class PublicController extends Controller
      */
     public function resetPasswordView($verification_code)
     {
+        dd($verification_code);
         if (!empty($verification_code)) {
             session()->put(['verification_code' => $verification_code]);
             if (file_exists(resource_path('views/extend/front-end/reset-password.blade.php'))) {
@@ -925,7 +925,7 @@ class PublicController extends Controller
      *
      * @access public
      *
-     * @return View
+     * @return \Illuminate\Http\Response
      */
     public function getFreelancerEducation(Request $request)
     {
@@ -947,7 +947,7 @@ class PublicController extends Controller
      *
      * @access public
      *
-     * @return View
+     * @return \Illuminate\Http\Response
      */
     public function getFreelancerService(Request $request)
     {
@@ -959,6 +959,78 @@ class PublicController extends Controller
             $json['user'] = $freelancer;
             $json['services'] = Helper::getUnserializeData($freelancer->services);
             return $json;
+        } else {
+            $json['type'] = 'error';
+            return $json;
+        }
+    }
+
+    /**
+     * get video
+     *
+     * @access public
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getVideo($video)
+    {
+        $json = array();
+        if (!empty($video)) {
+            $width = 367;
+            $height = 206;
+            $url = parse_url($video);
+            if (isset($url['host']) && ($url['host'] == 'vimeo.com' || $url['host'] == 'player.vimeo.com')) {
+                $content_exp = explode("/", $url);
+                $content_vimo = array_pop($content_exp);
+                $json['video_content'] = '<iframe width="' . intval($width) . '" height="' . intval($height) . '" src="https://player.vimeo.com/video/' . $content_vimo . '"
+        ></iframe>';
+            } else {
+                $json['video'] = '<iframe width="' . $width . '" height="' . $height . '" src="https://www.youtube.com/embed/' . str_replace("v=", '', $url['query']) . '" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+            }
+            $json['type'] = 'success';
+            return $json;
+        } else {
+            $json['type'] = 'error';
+            return $json;
+        }
+    }
+
+    /**
+     * Get article data
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getArticles()
+    {
+        $json = array();
+        $articles = Article::get()->toArray();
+        $aticle_list = array();
+        if (!empty($articles)) {
+            foreach ($articles as $key => $article) {
+                $article_obj = Article::find($article['id']);
+                $aticle_list[$key]['id'] = $article['id'];
+                $aticle_list[$key]['title'] = $article['title'];
+                $aticle_list[$key]['slug'] = $article['slug'];
+                $aticle_list[$key]['banner'] = asset(Helper::getImage('uploads/articles', $article['banner'], 'small-', 'small-default-article.png'));
+                $aticle_list[$key]['published_date'] = $article['created_at'];
+                $aticle_list[$key]['description'] = $article['description'];
+                $aticle_list[$key]['name'] = Helper::getUserName($article['user_id']);
+                $aticle_list[$key]['image'] = asset(Helper::getProfileImage($article['user_id']));
+                if (!empty($article_obj->categories) && $article_obj->categories->count() > 0) {
+                    foreach ($article_obj->categories as $cat_key => $category) {
+                        $aticle_list[$key]['cat'][$cat_key]['title'] = $category->title;
+                        $aticle_list[$key]['cat'][$cat_key]['slug'] = $category->slug;
+                    }
+                }
+            }
+            if (!empty($aticle_list)) {
+                $json['type'] = 'success';
+                $json['articles'] = $aticle_list;
+                return $json;
+            } else {
+                $json['type'] = 'error';
+                return $json;
+            }
         } else {
             $json['type'] = 'error';
             return $json;

@@ -66,6 +66,8 @@ Route::get(
         return Redirect::to('/');
     }
 );
+Route::get('articles/{category?}', 'ArticleController@articlesList')->name('articlesList');
+Route::get('article/{slug}', 'ArticleController@showArticle')->name('showArticle');
 
 Route::get('profile/{slug}', 'PublicController@showUserProfile')->name('showUserProfile');
 Route::get('categories', 'CategoryController@categoriesList')->name('categoriesList');
@@ -93,6 +95,25 @@ Route::post('user/add-wishlist', 'UserController@addWishlist');
 Route::group(
     ['middleware' => ['role:admin']],
     function () {
+        // Article Category Routes
+        Route::get('admin/article/categories', 'ArticleCategoryController@index')->name('articleCategories');
+        Route::get('admin/article/categories/edit-cats/{id}', 'ArticleCategoryController@edit')->name('editArticleCategories');
+        Route::post('admin/article/store-category', 'ArticleCategoryController@store');
+        Route::get('admin/article/categories/search', 'ArticleCategoryController@index');
+        Route::post('admin/article/categories/delete-cats', 'ArticleCategoryController@destroy');
+        Route::post('admin/article/categories/update-cats/{id}', 'ArticleCategoryController@update');
+        Route::post('admin/articles/categories/upload-temp-image', 'ArticleCategoryController@uploadTempImage');
+        Route::post('admin/article/delete-checked-cats', 'ArticleCategoryController@deleteSelected');
+// Articles Routes
+        Route::get('admin/articles', 'ArticleController@index')->name('articles');
+        Route::get('admin/articles/edit-article/{id}', 'ArticleController@edit')->name('editArticle');
+        Route::post('admin/articles/store-article', 'ArticleController@store');
+        Route::get('admin/articles/search', 'ArticleController@index');
+        Route::post('admin/articles/delete-article', 'ArticleController@destroy');
+        Route::post('admin/articles/update-article/{id}', 'ArticleController@update');
+        Route::post('admin/articles/upload-temp-image', 'ArticleController@uploadTempImage');
+        Route::post('admin/article/delete-checked-article', 'ArticleController@deleteSelected');
+
         Route::post('/verifyUser', 'UserController@verifyUser');
         Route::post('admin/clear-cache', 'SiteManagementController@clearCache');
         Route::get('admin/clear-allcache', 'SiteManagementController@clearAllCache');
@@ -362,6 +383,8 @@ Route::group(
         Route::get('user/get-payout-detail', 'UserController@getPayoutDetail');
     }
 );
+Route::get('get-articles', 'PublicController@getArticles');
+
 Route::post('job/get-wishlist', 'JobController@getWishlist');
 Route::get('dashboard/packages/{role}', 'PackageController@index');
 Route::get('package/get-purchase-package', 'PackageController@getPurchasePackage');
