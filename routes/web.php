@@ -42,22 +42,6 @@ Route::get(
     }
 );
 
-Route::get(
-    'abc',
-    function () {
-        \Artisan::call('migrate');
-        return redirect('/');
-    }
-);
-
-Route::get(
-    'seed',
-    function () {
-        \Artisan::call('db:seed');
-        return redirect('/');
-    }
-);
-
 // Home
 Route::get(
     '/',
