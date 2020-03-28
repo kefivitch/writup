@@ -12,21 +12,19 @@
  */
 namespace App\Http\Controllers\Auth;
 
-use App\User;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Foundation\Auth\RegistersUsers;
-use Auth;
-use App\Helper;
-use Illuminate\Http\Request;
-use Illuminate\Auth\Events\Registered;
-use Session;
-use DB;
-use App\SiteManagement;
 use App\EmailTemplate;
-use Illuminate\Support\Facades\Mail;
+use App\Helper;
+use App\Http\Controllers\Controller;
 use App\Mail\GeneralEmailMailable;
+use App\User;
+use Auth;
+use DB;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
+use Session;
 
 /**
  * Class RegisterController
@@ -43,7 +41,7 @@ class RegisterController extends Controller
     | validation and creation. By default this controller uses a trait to
     | provide this functionality without requiring any additional code.
     |
-    */
+     */
 
     use RegistersUsers;
 
@@ -53,7 +51,6 @@ class RegisterController extends Controller
      * @var string
      */
     protected $redirectTo = '/login';
-
 
     /**
      * Create a new controller instance.
@@ -109,7 +106,7 @@ class RegisterController extends Controller
         return Validator::make(
             $data,
             [
-                'phone'=>'digits:8|required',
+                'phone' => 'digits:8|required',
             ]
         );
     }
@@ -123,6 +120,7 @@ class RegisterController extends Controller
      */
     protected function create($request)
     {
+       
         $json = array();
         $user = new User();
         $random_number = Helper::generateRandomCode(4);
@@ -131,6 +129,8 @@ class RegisterController extends Controller
         session()->put(['user_id' => $user_id]);
         session()->put(['email' => $request['email']]);
         session()->put(['password' => $request['password']]);
+       
+
         if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
             $email_params = array();
             $template = DB::table('email_types')->select('id')
@@ -154,7 +154,7 @@ class RegisterController extends Controller
             $user = User::find($id);
             Auth::login($user);
             $json['email'] = 'not_configured';
-            $json['url'] = url($user->getRoleNames()->first().'/dashboard');
+            $json['url'] = url($user->getRoleNames()->first() . '/dashboard');
         }
         $json['type'] = 'success';
         return $json;
