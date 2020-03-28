@@ -982,7 +982,7 @@ class Helper extends Model
      *
      * @return array
      */
-    public static function getUserName($user_id)
+     public static function getUserName($user_id)
     {
         if (!empty($user_id)) {
             return User::find($user_id)->first_name . ' ' . User::find($user_id)->last_name;

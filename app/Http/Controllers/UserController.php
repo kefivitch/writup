@@ -169,7 +169,7 @@ class UserController extends Controller
      *
      * @return View
      */
-    public function requestPassword(Request $request)
+   public function requestPassword(Request $request)
     {
         $server_verification = Helper::worketicIsDemoSite();
         if (!empty($server_verification)) {
@@ -186,8 +186,8 @@ class UserController extends Controller
             $this->validate(
                 $request,
                 [
-                    'old_password' => 'required',
-                    'confirm_password' => 'required',
+                    'old_password'         => 'required',
+                    'confirm_password'     => 'required',
                     'confirm_new_password' => 'required',
                 ]
             );

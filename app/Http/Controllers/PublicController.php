@@ -13,7 +13,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Article;
 use App\Category;
 use App\DeliveryTime;
 use App\EmailTemplate;
@@ -139,7 +138,7 @@ class PublicController extends Controller
             $user = User::find($id);
             if (!empty($request['code'])) {
                 if ($request['code'] === $user->verification_code) {
-                    $user->user_verified = 1;
+                  $user->user_verified = 1;
                     $user->verification_code = null;
                     $user->save();
                     $json['type'] = 'success';
@@ -949,6 +948,42 @@ class PublicController extends Controller
             $json['user'] = $freelancer;
             $json['services'] = Helper::getUnserializeData($freelancer->services);
             return $json;
+        } else {
+            $json['type'] = 'error';
+            return $json;
+        }
+    }
+      public function getArticles()
+    {
+        $json = array();
+        $articles = Article::get()->toArray();
+        $aticle_list = array();
+        if (!empty($articles)) {
+            foreach ($articles as $key => $article) {
+                $article_obj = Article::find($article['id']);
+                $aticle_list[$key]['id'] = $article['id'];
+                $aticle_list[$key]['title'] = $article['title'];
+                $aticle_list[$key]['slug'] = $article['slug'];
+                $aticle_list[$key]['banner'] = asset(Helper::getImage('uploads/articles', $article['banner'], 'small-', 'small-default-article.png'));
+                $aticle_list[$key]['published_date'] = $article['created_at'];
+                $aticle_list[$key]['description'] = $article['description'];
+                $aticle_list[$key]['name'] = Helper::getUserName($article['user_id']);
+                $aticle_list[$key]['image'] = asset(Helper::getProfileImage($article['user_id']));
+                if (!empty($article_obj->categories) && $article_obj->categories->count() > 0) {
+                    foreach ($article_obj->categories as $cat_key => $category) {
+                        $aticle_list[$key]['cat'][$cat_key]['title'] = $category->title;
+                        $aticle_list[$key]['cat'][$cat_key]['slug'] = $category->slug;
+                    }
+                }
+            }
+            if (!empty($aticle_list)) {
+                $json['type'] = 'success';
+                $json['articles'] = $aticle_list;
+                return $json;
+            } else {
+                $json['type'] = 'error';
+                return $json;
+            }
         } else {
             $json['type'] = 'error';
             return $json;

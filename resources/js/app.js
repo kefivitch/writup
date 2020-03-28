@@ -375,6 +375,10 @@ if (document.getElementById("registration")) {
       first_name: '',
       last_name: '',
       phone:'',
+      password:'',
+      password_confirmation:'',
+      termsconditions:'',
+      role:'',
       form_step1: {
         email_error: '',
         is_email_error: false,
@@ -418,45 +422,46 @@ if (document.getElementById("registration")) {
         }
         console.log(role);
       },
-      checkStep1: function (e) {
+      checkStep1: function checkStep1(e) {
         this.form_step1.first_name_error = '';
         this.form_step1.is_first_name_error = false;
         this.form_step1.last_name_error = '';
         this.form_step1.is_last_name_error = false;
-        this.form_step1.email_error = '';
-        this.form_step1.is_email_error = false;
         this.form_step1.phone_error = '';
         this.form_step1.is_phone_error = false;
+        this.form_step1.email_error = '';
+        this.form_step1.is_email_error = false;
         var self = this;
-        let register_Form = document.getElementById('register_form');
-        let form_data = new FormData(register_Form);
-        axios.post(APP_URL + '/register/form-step1-custom-errors', form_data)
-          .then(function (response) {
-            self.next();
-          })
-          .catch(function (error) {
-            if (error.response.data.errors.first_name) {
-              self.form_step1.first_name_error = error.response.data.errors.first_name[0];
-              self.form_step1.is_first_name_error = true;
-            }
-            if (error.response.data.errors.last_name) {
-              self.form_step1.last_name_error = error.response.data.errors.last_name[0];
-              self.form_step1.is_last_name_error = true;
-            }
-            if (error.response.data.errors.phone) {
-              self.form_step1.phone_error = error.response.data.errors.phone[0];
-              self.form_step1.is_phone_error = true;
-            }
-            if (error.response.data.errors.email) {
-              self.form_step1.email_error = error.response.data.errors.email[0];
-              self.form_step1.is_email_error = true;
-            }
-          });
+        var register_Form = document.getElementById('register_form');
+        var form_data = new FormData(register_Form);
+        axios.post(APP_URL + '/register/form-step1-custom-errors', form_data).then(function (response) {
+          self.next();
+        }).catch(function (error) {
+          if (error.response.data.errors.first_name) {
+            self.form_step1.first_name_error = error.response.data.errors.first_name[0];
+            self.form_step1.is_first_name_error = true;
+          }
+
+          if (error.response.data.errors.last_name) {
+            self.form_step1.last_name_error = error.response.data.errors.last_name[0];
+            self.form_step1.is_last_name_error = true;
+          }
+
+          if (error.response.data.errors.phone) {
+            self.form_step1.phone_error = error.response.data.errors.phone[0];
+            self.form_step1.is_phone_error = true;
+          }
+
+          if (error.response.data.errors.email) {
+            self.form_step1.email_error = error.response.data.errors.email[0];
+            self.form_step1.is_email_error = true;
+          }
+        });
       },
-      checkStep2: function (error_message) {
+      checkStep2: function checkStep2(error_message) {
         this.error_message = error_message;
-        let register_Form = document.getElementById('register_form');
-        let form_data = new FormData(register_Form);
+        var register_Form = document.getElementById('register_form');
+        var form_data = new FormData(register_Form);
         this.form_step2.password_error = '';
         this.form_step2.is_password_error = false;
         this.form_step2.password_confirm_error = '';
@@ -464,24 +469,24 @@ if (document.getElementById("registration")) {
         this.form_step2.termsconditions_error = '';
         this.form_step2.is_termsconditions_error = false;
         var self = this;
-        axios.post(APP_URL + '/register/form-step2-custom-errors', form_data).
-          then(function (response) {
-            self.submitUser();
-          })
-          .catch(function (error) {
-            if (error.response.data.errors.password) {
-              self.form_step2.password_error = error.response.data.errors.password[0];
-              self.form_step2.is_password_error = true;
-            }
-            if (error.response.data.errors.password_confirmation) {
-              self.form_step2.password_confirm_error = error.response.data.errors.password_confirmation[0];
-              self.form_step2.is_password_confirm_error = true;
-            }
-            if (error.response.data.errors.termsconditions) {
-              self.form_step2.termsconditions_error = error.response.data.errors.termsconditions[0];
-              self.form_step2.is_termsconditions_error = true;
-            }
-          });
+        axios.post(APP_URL + '/register/form-step2-custom-errors', form_data).then(function (response) {
+          self.submitUser();
+        }).catch(function (error) {
+          if (error.response.data.errors.password) {
+            self.form_step2.password_error = error.response.data.errors.password[0];
+            self.form_step2.is_password_error = true;
+          }
+
+          if (error.response.data.errors.password_confirmation) {
+            self.form_step2.password_confirm_error = error.response.data.errors.password_confirmation[0];
+            self.form_step2.is_password_confirm_error = true;
+          }
+
+          if (error.response.data.errors.termsconditions) {
+            self.form_step2.termsconditions_error = error.response.data.errors.termsconditions[0];
+            self.form_step2.is_termsconditions_error = true;
+          }
+        });
       },
       submitUser: function () {
         this.loading = true;
@@ -492,33 +497,33 @@ if (document.getElementById("registration")) {
         form_data.append('last_name', this.last_name);
         form_data.append('phone', this.phone);
         var self = this;
-        axios.post(APP_URL + '/register', form_data)
-          .then(function (response) {
-            console.log(response.data.type);
+        axios.post(APP_URL + '/register', form_data).then(function (response) {
+          console.log('response',response.data.type);
+        
+          self.loading = false;
+
+          if (response.data.type == 'success') {
+            if (response.data.email == 'not_configured') {
+              window.location.replace(response.data.url);
+            } else {
+              self.next();
+            }
+          } else if (response.data.type == 'error') {
             self.loading = false;
-            if (response.data.type == 'success') {
-              if (response.data.email == 'not_configured') {
-                window.location.replace(response.data.url);
-              } else {
-                self.next();
-              }
-            } else if (response.data.type == 'error') {
-              self.loading = false;
-              self.custom_error = true;
-              if (response.data.email_error) self.form_errors.push(response.data.email_error);
-              if (response.data.password_error) self.form_errors.push(response.data.password_error);
-            }
-            else if (response.data.type == 'server_error') {
-              self.loading = false;
-              self.custom_error = true;
-              self.showError(response.data.message);
-            }
-          })
-          .catch(function (error) {
-            if (error.response.status == 500) {
-              self.showError(self.error_message);
-            }
-          });
+            self.custom_error = true;
+            if (response.data.email_error) self.form_errors.push(response.data.email_error);
+            if (response.data.password_error) self.form_errors.push(response.data.password_error);
+          } else if (response.data.type == 'server_error') {
+            self.loading = false;
+            self.custom_error = true;
+            self.showError(response.data.message);
+          }
+        }).catch(function (error) {
+          if (error.response.status == 500) {
+            console.log('response',error.response);
+            // self.showError(self.error_message);
+          }
+        });
       },
       verifyCode: function () {
         this.loading = true;

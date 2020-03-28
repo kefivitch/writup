@@ -119,10 +119,8 @@ $show_breadcrumbs = !empty($breadcrumbs_settings) ? $breadcrumbs_settings : 'tru
                                             </span>
                                         </div>
                                         <div class="form-group form-group-half">
-                                            <input type="text" name="phone" id="phone" class="form-control"
-                                                placeholder="{{{ trans('lang.phone') }}}"
-                                                v-bind:class="{ 'is-invalid': form_step1.is_phone_error }"
-                                                v-model="phone">
+                                            <input type="text" name="phone" id="phone" class="form-control" placeholder="{{{ trans('lang.phone') }}}"
+                                                v-bind:class="{ 'is-invalid': form_step1.is_phone_error }" v-model="phone">
                                             <span class="help-block" v-if="form_step1.phone_error">
                                                 <strong v-cloak>@{{form_step1.phone_error}}</strong>
                                             </span>
@@ -257,8 +255,7 @@ $show_breadcrumbs = !empty($breadcrumbs_settings) ? $breadcrumbs_settings : 'tru
                                                     v-cloak>{{trans('lang.register_termsconditions_error')}}</strong>
                                             </span>
                                         </span>
-                                        <a href="#" @click.prevent="prev()"
-                                            class="wt-btn">{{{ trans('lang.previous') }}}</a>
+                                        <a href="#" @click.prevent="prev()" class="wt-btn">{{{ trans('lang.previous') }}}</a>
                                         <a href="#" @click.prevent="checkStep2('{{ trans('lang.email_not_config') }}')"
                                             class="wt-btn">{{{ trans('lang.continue') }}}</a>
                                     </div>
@@ -344,3 +341,6 @@ $show_breadcrumbs = !empty($breadcrumbs_settings) ? $breadcrumbs_settings : 'tru
     </div>
 </div>
 @endsection
+<javascript>
+
+</javascript>

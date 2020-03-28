@@ -338,6 +338,7 @@ class User extends Authenticatable
                     ]
                 );
             }
+           
             return $user_id;
         }
     }
