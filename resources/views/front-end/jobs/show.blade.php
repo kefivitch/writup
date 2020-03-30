@@ -92,7 +92,7 @@
                                                 <h3>{{ trans('lang.project_detail') }}</h3>
                                             </div>
                                             <div class="wt-description">
-                                                @php echo htmlspecialchars_decode(stripslashes($job->description)); @endphp
+                                                {!!strip_tags($job->description)!!}
                                             </div>
                                         </div>
                                     @endif
