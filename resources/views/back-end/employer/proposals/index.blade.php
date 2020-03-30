@@ -16,7 +16,7 @@
                     @if (!empty($proposals))
                         @php
                             $user = \App\User::find($job->user_id);
-                            $user_name = $user->first_name.' '.$user->last_name;
+                            $user_name = $user->first_name.'.'.substr($user->last_name,1,1);
                             $verified_user = \App\User::select('user_verified')->where('id', $job->employer->id)->pluck('user_verified')->first();
                             $count = 0;
                             $received_proposal_count = 0;
@@ -188,7 +188,7 @@
                                                     $profile = \App\User::find($proposal->freelancer_id)->profile;
                                                     $user_image = !empty($profile) ? $profile->avater : '';
                                                     $profile_image = !empty($user_image) ? '/uploads/users/'.$proposal->freelancer_id.'/'.$user_image : 'images/user-login.png';
-                                                    $user_name = $user->first_name.' '.$user->last_name;
+                                                    $user_name = $user->first_name.'.'.substr($user->last_name,1,1);
                                                     $avg_rating = \App\Review::where('receiver_id', $proposal->freelancer_id)->sum('avg_rating');
                                                     $rating  = $avg_rating != 0 ? round($avg_rating/\App\Review::count()) : 0;
                                                     $reviews = \App\Review::where('receiver_id', $proposal->freelancer_id)->get();

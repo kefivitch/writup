@@ -184,7 +184,7 @@
                                                         @if ($job->employer->user_verified === 1)
                                                             <i class="fa fa-check-circle"></i>
                                                         @endif
-                                                        {{{$job->employer->first_name.' '.$job->employer->last_name}}}
+                                                        {{{$job->employer->first_name.'.'.substr($job->employer->last_name,1,1)}}}
                                                     </a>
                                                     <h2>{{{$job->title}}}</h2>
                                                 </div>

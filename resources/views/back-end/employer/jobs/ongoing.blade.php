@@ -18,7 +18,7 @@
                                         @php
                                             $accepted_proposal = array();
                                             $duration  =  \App\Helper::getJobDurationList($job->duration);
-                                            $user_name = $job->employer->first_name.' '.$job->employer->last_name;
+                                            $user_name = $job->employer->first_name.'.'.substr($job->employer->last_name,1,1);
                                             $accepted_proposal = \App\Job::find($job->id)->proposals()->where('status', 'hired')->first();
                                             $freelancer_name = \App\Helper::getUserName($accepted_proposal->freelancer_id);
                                             $profile = \App\User::find($accepted_proposal->freelancer_id)->profile;
