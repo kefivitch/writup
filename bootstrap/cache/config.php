@@ -2,10 +2,11 @@
   'app' => 
   array (
     'version' => 'v1.9',
-    'name' => 'Laravel',
+    'name' => 'Writup|Plateforme de freelance en rédaction de contenu',
+    'url' => 'http://localhost',
+    'site_name' => 'Writup',
     'env' => 'local',
     'debug' => true,
-    'url' => 'http://localhost',
     'asset_url' => NULL,
     'timezone' => 'UTC',
     'locale' => 'en',
@@ -255,7 +256,7 @@
         'connection' => 'cache',
       ),
     ),
-    'prefix' => 'laravel_cache',
+    'prefix' => 'writupplateforme_de_freelance_en_redaction_de_contenu_cache',
   ),
   'database' => 
   array (
@@ -802,7 +803,7 @@
       0 => 2,
       1 => 100,
     ),
-    'cookie' => 'laravel_session',
+    'cookie' => 'writupplateforme_de_freelance_en_redaction_de_contenu_session',
     'path' => '/',
     'domain' => NULL,
     'secure' => false,

@@ -9,6 +9,8 @@
     $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
 @endphp
 @section('title'){{ config('app.name') }} @stop
+@section('url'){{ config('app.url') }} @stop
+@section('site_name'){{ config('app.site_name') }} @stop
 @section('description', "$app_description")
 @section('content')
     @php

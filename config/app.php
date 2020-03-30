@@ -25,6 +25,8 @@ return [
     */
 
     'name' => env('APP_NAME', 'Laravel'),
+    'url' => env('APP_URL', 'https: //writup.test/'),
+    'site_name'=>('Writup'),
 
     /*
     |--------------------------------------------------------------------------
