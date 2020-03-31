@@ -31,7 +31,7 @@
                 <div class="wt-title">
                     <h2>
                         <a href="{{{ $role != 'admin' ? url($role.'/dashboard') : 'javascript:void()' }}}">
-                            {{{ !empty(Auth::user()) ? Helper::getUserName(Auth::user()->id) : 'No Name' }}}
+                            {{{ !empty(Auth::user()) ? $user->first_name.' '.$user->last_name : 'No Name' }}}
                         </a>
                     </h2>
                     <span>{{{ !empty(Auth::user()->profile->tagline) ? str_limit(Auth::user()->profile->tagline, 26, '') : Auth::user()->getRoleNames()->first() }}}</span>
