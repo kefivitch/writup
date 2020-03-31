@@ -13,25 +13,22 @@
 
 namespace App;
 
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Traits\HasRoles;
-use Spatie\Permission\Models\Role;
-use DB;
-use App\Payout;
-use Illuminate\Support\Facades\Schema;
-use App\Location;
-use App\Profile;
-use Auth;
-use App\Package;
 use App\Helper;
 use App\Job;
+use App\Location;
+use App\Package;
+use App\Payout;
+use App\Profile;
+use Auth;
 use Carbon\Carbon;
-use canResetPassword;
-use App\Notifications;
+use DB;
 use Event;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * Class User
@@ -52,7 +49,7 @@ class User extends Authenticatable
         'first_name', 'last_name', 'slug', 'email', 'password',
         'avatar', 'banner', 'tagline', 'description',
         'location_id', 'verification_code', 'address',
-        'longitude', 'latitude', 'phone'
+        'longitude', 'latitude', 'phone',
     ];
 
     /**
@@ -87,7 +84,6 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Article');
     }
-    
 
     /**
      * The skills that belong to the user.
@@ -302,11 +298,18 @@ class User extends Authenticatable
             $this->last_name = filter_var($request['last_name'], FILTER_SANITIZE_STRING);
             $this->phone = filter_var($request['phone'], FILTER_SANITIZE_STRING);
             $this->slug = filter_var($request['first_name'], FILTER_SANITIZE_STRING) . '-' .
-                filter_var($request['last_name'], FILTER_SANITIZE_STRING);
+            filter_var($request['last_name'], FILTER_SANITIZE_STRING);
             $this->email = filter_var($request['email'], FILTER_VALIDATE_EMAIL);
             $this->password = Hash::make($request['password']);
             $this->verification_code = $verification_code;
-            $this->user_verified = 0;
+            if ($request['role'] === "employer") {
+                $this->user_verified = 1;
+
+            } else {
+                $this->user_verified = 0;
+
+            }
+
             $this->assignRole($request['role']);
             if (!empty($request['locations'])) {
                 $location = Location::find($request['locations']);
@@ -334,11 +337,11 @@ class User extends Authenticatable
                     [
                         'invoice_id' => $trial_invoice->id, 'product_id' => $package->id, 'subscriber' => $user_id,
                         'item_name' => $package->title, 'item_price' => $package->cost, 'item_qty' => 1,
-                        "created_at" => \Carbon\Carbon::now(), 'updated_at' => \Carbon\Carbon::now()
+                        "created_at" => \Carbon\Carbon::now(), 'updated_at' => \Carbon\Carbon::now(),
                     ]
                 );
             }
-           
+
             return $user_id;
         }
     }
@@ -395,7 +398,7 @@ class User extends Authenticatable
     ) {
         $json = array();
         $user_id = array();
-        $user_by_role =  User::role($type)->select('id')->get()->pluck('id')->toArray();
+        $user_by_role = User::role($type)->select('id')->get()->pluck('id')->toArray();
         $users = !empty($user_by_role) ? User::whereIn('id', $user_by_role)->where('is_disabled', 'false') : array();
         $filters = array();
         if (!empty($users)) {
@@ -489,7 +492,7 @@ class User extends Authenticatable
         foreach ($filters as $key => $filter) {
             $pagination = $users->appends(
                 array(
-                    $key => $filter
+                    $key => $filter,
                 )
             );
         }
@@ -512,7 +515,7 @@ class User extends Authenticatable
                 'proposal_id' => $request['proposal_id'], 'user_id' => $user->id,
                 'reason' => $request['reason'], 'description' => $request['description'],
                 'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
-                'updated_at' => Carbon::now()->format('Y-m-d H:i:s')
+                'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
             ]
         );
         return 'success';
@@ -570,7 +573,7 @@ class User extends Authenticatable
         $json = array();
         if (!empty($request['refundable_user_id'])) {
             $payment_settings = SiteManagement::getMetaValue('commision');
-            $currency  = !empty($payment_settings) && !empty($payment_settings[0]['currency']) ? $payment_settings[0]['currency'] : 'USD';
+            $currency = !empty($payment_settings) && !empty($payment_settings[0]['currency']) ? $payment_settings[0]['currency'] : 'USD';
             $user = User::find($request['refundable_user_id']);
             $payout_id = !empty($user->profile->payout_id) ? $user->profile->payout_id : '';
             $payout_detail = !empty($user->profile->payout_settings) ? $user->profile->payout_settings : array();
@@ -580,7 +583,7 @@ class User extends Authenticatable
                 $payout->amount = $request['amount'];
                 $payout->currency = $currency;
                 if (!empty($payout_detail)) {
-                    $payment_details  = Helper::getUnserializeData($user->profile->payout_settings);
+                    $payment_details = Helper::getUnserializeData($user->profile->payout_settings);
                     if ($payment_details['type'] == 'paypal') {
                         if (Schema::hasColumn('payouts', 'email')) {
                             $payout->email = $payment_details['paypal_email'];

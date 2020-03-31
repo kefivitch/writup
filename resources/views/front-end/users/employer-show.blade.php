@@ -199,7 +199,13 @@
                                             </div>
                                             <div class="wt-viewjobholder">
                                                 <ul>
-                                                    <li><span><i class="wt-viewjobdollar">{{ !empty($symbol) ? $symbol['symbol'] : '$' }}</i>{{{$job->price}}}</span></li>
+                                                    <li><span><i class="wt-viewjobdollar">
+                                                        @if(!empty($symbol)) 
+                                                        {{$symbol['symbol']}} 
+                                                        @else   {{'$'}}
+                                                        @endif
+                                                       
+                                                    </i>{{{$job->price}}}</span></li>
                                                     @if (!empty($job->location->title))
                                                         <li><span><img src="{{{asset(App\Helper::getLocationFlag($job->location->flag))}}}" alt="{{{ trans('lang.location') }}}"> {{{ $job->location->title }}}</span></li>
                                                     @endif
