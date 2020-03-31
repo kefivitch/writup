@@ -39,7 +39,7 @@
                                         @php $user = \App\User::find($user_data['id']); @endphp
                                         @if ($user->getRoleNames()->first() != 'admin')
                                             <tr class="del-user-{{ $user->id }}">
-                                                <td>{{{ ucwords(\App\Helper::getUserName($user->id)) }}}</td>
+                                                <td>{{{ ucwords($user->first_name.' '.$user->last_name) }}}</td>
                                                 <td>{{{ $user->email }}}</td>
                                                 <td>@if ($user->user_verified)
                                                     OUI
@@ -51,7 +51,7 @@
                                                 <td>
                                                     <div class="wt-actionbtn">
                                                         <a href="javascript:void()" v-on:click.prevent="deleteUser({{$user->id}})" class="wt-deleteinfo wt-skillsaddinfo"><i class="fa fa-trash"></i></a>
-                                                        <a href="{{ url('profile/'.$user->slug) }}" class="wt-addinfo wt-skillsaddinfo"><i class="lnr lnr-eye"></i></a>
+                                                        <a href="{{ url('profile/'.ucwords($user->first_name.'-'.$user->last_name)) }}" class="wt-addinfo wt-skillsaddinfo"><i class="lnr lnr-eye"></i></a>
                                                         <a href="javascript:void()" onclick="verifyUser({{ $user->id }})" class=" wt-addinfo wt-skillsaddinfo" style="background-color: #4CAF50;"> <i class="lnr lnr-checkmark-circle"></i></a>
                                                     </div>
                                                 </td>
