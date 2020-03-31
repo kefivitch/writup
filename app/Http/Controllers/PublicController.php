@@ -138,7 +138,15 @@ class PublicController extends Controller
             $user = User::find($id);
             if (!empty($request['code'])) {
                 if ($request['code'] === $user->verification_code) {
-                    $user->user_verified = 0;
+                    $role_id = Helper::getRoleByUserID($id);
+                    if ($role_id === 2) {
+                        $user->user_verified = 1;
+
+                    } else {
+                        $user->user_verified = 0;
+
+                    }
+
                     $user->verification_code = null;
                     $user->save();
                     $json['type'] = 'success';
