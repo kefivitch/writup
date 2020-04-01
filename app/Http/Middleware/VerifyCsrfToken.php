@@ -19,6 +19,8 @@ class VerifyCsrfToken extends Middleware
      * @var array
      */
     protected $except = [
-        'post-payment','gpg-notifications'
+        'post-payment',
+        'error-payment',
+        'gpg-notifications'
     ];
 }

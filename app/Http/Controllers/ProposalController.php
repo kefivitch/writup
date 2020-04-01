@@ -176,11 +176,11 @@ class ProposalController extends Controller
                     $json['message'] = trans('lang.job_not_avail');
                     return $json;
                 }
-                if (intval($request['amount']) > $job->price) {
+               /* if (intval($request['amount']) > 0) {
                     $json['type'] = 'error';
                     $json['message'] = trans('lang.proposal_exceed');
                     return $json;
-                }
+                }*/
                 $package = DB::table('items')->where('subscriber', Auth::user()->id)->select('product_id')->first();
                 $proposals = $this->proposal::where('freelancer_id', Auth::user()->id)->count();
                 $settings = SiteManagement::getMetaValue('settings');

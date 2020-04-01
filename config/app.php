@@ -24,8 +24,8 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
-    'url' => env('APP_URL', 'https: //writup.test/'),
+    'name' => env('APP_NAME', 'Writup|Plateforme de freelance en rédaction de contenu'),
+    'url' => env('APP_URL', 'https://writup.net/'),
     'site_name'=>('Writup'),
 
     /*
@@ -238,7 +238,7 @@ return [
         'Password' => Illuminate\Support\Facades\Password::class,
         'Queue' => Illuminate\Support\Facades\Queue::class,
         'Redirect' => Illuminate\Support\Facades\Redirect::class,
-        'LRedis'    => 'Illuminate\Support\Facades\Redis',
+        'LRedis'    => Illuminate\Support\Facades\Redis::class,
         'Request' => Illuminate\Support\Facades\Request::class,
         'Response' => Illuminate\Support\Facades\Response::class,
         'Route' => Illuminate\Support\Facades\Route::class,
@@ -250,7 +250,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Form' => Collective\Html\FormFacade::class,
         'Html' => Collective\Html\HtmlFacade::class,
-        'Image' => 'Intervention\Image\Facades\Image',
+        'Image' => Intervention\Image\Facades\Image::class,
         'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
         'Zipper' => Chumper\Zipper\Zipper::class,
         'PayPal' => Srmklive\PayPal\Facades\PayPal::class,

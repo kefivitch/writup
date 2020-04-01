@@ -18,7 +18,7 @@ use App\Message;
 use DB;
 use App\User;
 use App\Helper;
-use Illuminate\Support\Facades\Auth;
+use Auth;
 use Carbon\Carbon;
 use App\SiteManagement;
 
