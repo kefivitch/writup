@@ -33,6 +33,10 @@
                                         {!! Form::text( 'title', e($page->title), ['class' =>'form-control', 'placeholder' => trans('lang.ph_page_title')] ) !!}
                                     </div>
                                     <div class="form-group">
+                                        {!! Form::text( 'title_balise', e($page->title_balise), ['class' =>'form-control', 'placeholder' => trans('lang.ph_page_title_balise')] )
+                                        !!}
+                                    </div>
+                                    <div class="form-group">
                                         {!! Form::textarea( 'content', e($page->body), ['class' =>'form-control wt-tinymceeditor', 'placeholder' => trans('lang.ph_desc')]) !!}
                                     </div>
                                     @if (empty($has_child))

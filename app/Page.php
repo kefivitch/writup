@@ -80,6 +80,8 @@ class Page extends Model
             $count = 0;
             $old_path = Helper::PublicPath() . '/uploads/pages/temp';
             $this->title = filter_var($request->title, FILTER_SANITIZE_STRING);
+            $this->title_balise = filter_var($request->title_balise, FILTER_SANITIZE_STRING);
+
             $this->slug = filter_var($request->title, FILTER_SANITIZE_STRING);
             $this->body = !empty($request->body) ? $request->body : 'null';
             if ($request->parent_id) {
@@ -339,6 +341,8 @@ class Page extends Model
                 $pages->slug = filter_var($request->title, FILTER_SANITIZE_STRING);
             }
             $pages->title = filter_var($request->title, FILTER_SANITIZE_STRING);
+            $pages->title_balise = filter_var($request->title_balise, FILTER_SANITIZE_STRING);
+
             $pages->body = !empty($request->body) ? $request->body : 'null';
             if ($request->parent_id == null) {
                 $pages->relation_type = 0;

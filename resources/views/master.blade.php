@@ -3,9 +3,12 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta charset="UTF-8">
+	@if (trim($__env->yieldContent('title')))
 	<title>@yield('title')</title>
-
+	@else
+	<title>{{ config('app.name') }}</title>
+	@endif
+	
 	<meta name="description" content="@yield('description')">
 	<meta name="keywords" content="@yield('keywords')">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
@@ -64,14 +67,14 @@
 	@endif
 	<script>
 		window.trans = <? php
-		$lang_files = File:: files(resource_path(). '/lang/'.App:: getLocale());
+			$lang_files = File:: files(resource_path(). '/lang/'.App:: getLocale());
 		$trans = [];
 		foreach($lang_files as $f) {
 			$filename = pathinfo($f)['filename'];
 			$trans[$filename] = trans($filename);
 		}
 		echo json_encode($trans);
-		?>;
+			?>;
 	</script>
 </head>
 

@@ -11,16 +11,15 @@
  */
 namespace App\Http\Controllers;
 
+use App\Helper;
 use App\Page;
+use App\SiteManagement;
+use Auth;
+use DB;
 use Illuminate\Http\Request;
-use View;
 use Illuminate\Support\Facades\Redirect;
 use Session;
-use DB;
-use Auth;
-use App\User;
-use App\Helper;
-use App\SiteManagement;
+use View;
 
 /**
  * Class PageController
@@ -102,6 +101,7 @@ class PageController extends Controller
             $this->validate(
                 $request, [
                     'title' => 'required|string',
+                    'title_balise' => 'required|string',
                     'content' => 'required',
                 ]
             );
@@ -127,9 +127,9 @@ class PageController extends Controller
     {
         if (!empty($slug)) {
             $page = $this->page->getPageData($slug);
-            $page_meta = SiteManagement::where('meta_key', 'seo-desc-'.$page->id)->select('meta_value')->pluck('meta_value')->first();
-            $page_banner = SiteManagement::where('meta_key', 'page-banner-'.$page->id)->select('meta_value')->pluck('meta_value')->first();
-            $show_banner = SiteManagement::where('meta_key', 'show-banner-'.$page->id)->select('meta_value')->pluck('meta_value')->first();
+            $page_meta = SiteManagement::where('meta_key', 'seo-desc-' . $page->id)->select('meta_value')->pluck('meta_value')->first();
+            $page_banner = SiteManagement::where('meta_key', 'page-banner-' . $page->id)->select('meta_value')->pluck('meta_value')->first();
+            $show_banner = SiteManagement::where('meta_key', 'show-banner-' . $page->id)->select('meta_value')->pluck('meta_value')->first();
             $breadcrumbs_settings = SiteManagement::getMetaValue('show_breadcrumb');
             $show_breadcrumbs = !empty($breadcrumbs_settings) ? $breadcrumbs_settings : 'true';
             $show_banner_image = false;
@@ -138,12 +138,12 @@ class PageController extends Controller
             } else {
                 $show_banner_image = $show_banner == 'true' ? true : false;
             }
-            $banner = !empty($page_banner) ? Helper::getBannerImage('uploads/pages/'.$page_banner) : 'images/bannerimg/img-02.jpg';
+            $banner = !empty($page_banner) ? Helper::getBannerImage('uploads/pages/' . $page_banner) : 'images/bannerimg/img-02.jpg';
             $meta_desc = !empty($page_meta) ? $page_meta : '';
             if (file_exists(resource_path('views/extend/front-end/pages/show.blade.php'))) {
-                return View::make('extend.front-end.pages.show', compact('page', 'slug', 'meta_desc', 'banner', 'show_banner', 'show_banner_image','show_breadcrumbs'));
+                return View::make('extend.front-end.pages.show', compact('page', 'slug', 'meta_desc', 'banner', 'show_banner', 'show_banner_image', 'show_breadcrumbs'));
             } else {
-                return View::make('front-end.pages.show', compact('page', 'slug', 'meta_desc', 'banner', 'show_banner', 'show_banner_image','show_breadcrumbs'));
+                return View::make('front-end.pages.show', compact('page', 'slug', 'meta_desc', 'banner', 'show_banner', 'show_banner_image', 'show_breadcrumbs'));
             }
         }
     }
@@ -163,9 +163,9 @@ class PageController extends Controller
             $parent_page = $this->page->getParentPages($id);
             $has_child = $this->page->pageHasChild($id);
             $child_parent_id = DB::table('child_pages')->select('parent_id')->where('child_id', $id)->get()->first();
-            $desc = SiteManagement::where('meta_key', 'seo-desc-'.$id)->select('meta_value')->pluck('meta_value')->first();
+            $desc = SiteManagement::where('meta_key', 'seo-desc-' . $id)->select('meta_value')->pluck('meta_value')->first();
             $seo_desc = !empty($desc) ? $desc : '';
-            $page_banner = SiteManagement::where('meta_key', 'page-banner-'.$id)->select('meta_value')->pluck('meta_value')->first();
+            $page_banner = SiteManagement::where('meta_key', 'page-banner-' . $id)->select('meta_value')->pluck('meta_value')->first();
             if (!empty($child_parent_id->parent_id)) {
                 $parent_selected_id = $child_parent_id->parent_id;
             } else {
@@ -197,8 +197,9 @@ class PageController extends Controller
         if (!empty($request)) {
             $this->validate(
                 $request, [
-                'title' => 'required|string',
-                'content' => 'required',
+                    'title' => 'required|string',
+                    'title_balise' => 'required|string',
+                    'content' => 'required',
                 ]
             );
             $parent_id = filter_var($request['parent_id'], FILTER_SANITIZE_NUMBER_INT);

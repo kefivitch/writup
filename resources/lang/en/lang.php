@@ -1038,6 +1038,7 @@ return [
     'ph_sales_tax' => 'Sales Tax',
     'ph_payout_id' => 'Payout ID',
     'ph_page_title' => 'Page Title',
+    'ph_page_title_balise' => 'Html Tag Title',
     'ph_search_help' => 'Searching Might Help',
     'ph_search_rate' => 'Search Rate',
     'ph_search_freelancer' => 'Search Freelancer',

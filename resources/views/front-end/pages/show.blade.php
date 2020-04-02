@@ -4,7 +4,7 @@
 @push('stylesheets')
     <link href="{{ asset('css/prettyPhoto.css') }}" rel="stylesheet">
 @endpush
-@section('title'){{ $page->title }} @stop
+@section('title'){{ $page->title_balise }} @stop
 @section('description', "$meta_desc")
 @section('content')
     @if ($show_banner_image == true)

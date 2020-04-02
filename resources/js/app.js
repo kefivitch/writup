@@ -765,57 +765,57 @@ if (document.getElementById("pages-list")) {
       showError(error) {
         return this.$toast.error(' ', error, this.notificationSystem.options.error);
       },
-      // submitPage: function (msg) {
-      //     let page_Form = document.getElementById('pages');
-      //     let form_data = new FormData(page_Form);
-      //     var description = tinyMCE.get('wt-tinymceeditor').getContent();
-      //     form_data.append('content', description);
-      //     var self = this;
-      //     axios.post(APP_URL + '/admin/store-page', form_data)
-      //         .then(function (response) {
-      //             if (response.data.type == 'success') {
-      //                 self.showMessage(msg);
-      //                 setTimeout(function () {
-      //                     window.location.replace(APP_URL + '/admin/pages');
-      //                 }, 4000)
-      //             } else {
-      //                 self.showError(response.data.message);
-      //             }
-      //         })
-      //         .catch(function (error) {
-      //             if (error.response.data.errors.title) {
-      //                 self.showError(error.response.data.errors.title[0]);
-      //             }
-      //             if (error.response.data.errors.content) {
-      //                 self.showError(error.response.data.errors.content[0]);
-      //             }
-      //         });
-      // },
-      // getPageOption: function () {
-      //     var segment_str = window.location.pathname;
-      //     var segment_array = segment_str.split('/');
-      //     var id = segment_array[segment_array.length - 1];
-      //     if (segment_str == '/admin/pages/edit-page/' + id) {
-      //         let self = this;
-      //         axios.post(APP_URL + '/admin/get-page-option', {
-      //             page_id: id
-      //         })
-      //             .then(function (response) {
-      //                 if (response.data.type == 'success') {
-      //                     if (response.data.show_page == 'true') {
-      //                         self.show_page = true;
-      //                     } else {
-      //                         self.show_page = false;
-      //                     }
-      //                     if (response.data.show_banner == 'true') {
-      //                         self.show_page_banner = true;
-      //                     } else {
-      //                         self.show_page_banner = false;
-      //                     }
-      //                 }
-      //             });
-      //     }
-      // },
+      submitPage: function (msg) {
+          let page_Form = document.getElementById('pages');
+          let form_data = new FormData(page_Form);
+          var description = tinyMCE.get('wt-tinymceeditor').getContent();
+          form_data.append('content', description);
+          var self = this;
+          axios.post(APP_URL + '/admin/store-page', form_data)
+              .then(function (response) {
+                  if (response.data.type == 'success') {
+                      self.showMessage(msg);
+                      setTimeout(function () {
+                          window.location.replace(APP_URL + '/admin/pages');
+                      }, 4000)
+                  } else {
+                      self.showError(response.data.message);
+                  }
+              })
+              .catch(function (error) {
+                  if (error.response.data.errors.title) {
+                      self.showError(error.response.data.errors.title[0]);
+                  }
+                  if (error.response.data.errors.content) {
+                      self.showError(error.response.data.errors.content[0]);
+                  }
+              });
+      },
+      getPageOption: function () {
+          var segment_str = window.location.pathname;
+          var segment_array = segment_str.split('/');
+          var id = segment_array[segment_array.length - 1];
+          if (segment_str == '/admin/pages/edit-page/' + id) {
+              let self = this;
+              axios.post(APP_URL + '/admin/get-page-option', {
+                  page_id: id
+              })
+                  .then(function (response) {
+                      if (response.data.type == 'success') {
+                          if (response.data.show_page == 'true') {
+                              self.show_page = true;
+                          } else {
+                              self.show_page = false;
+                          }
+                          if (response.data.show_banner == 'true') {
+                              self.show_page_banner = true;
+                          } else {
+                              self.show_page_banner = false;
+                          }
+                      }
+                  });
+          }
+      },
       selectAll: function () {
         this.is_show = !this.is_show;
         jQuery("#wt-pages").change(function () {

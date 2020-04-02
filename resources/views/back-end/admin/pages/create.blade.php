@@ -16,6 +16,9 @@
                                         {!! Form::text( 'title', null, ['class' =>'form-control', 'placeholder' => trans('lang.ph_page_title')] ) !!}
                                     </div>
                                     <div class="form-group">
+                                        {!! Form::text( 'title_balise', null, ['class' =>'form-control', 'placeholder' => trans('lang.ph_page_title_balise')] ) !!}
+                                    </div>
+                                    <div class="form-group">
                                         {!! Form::textarea( 'content', null, ['class' =>'form-control wt-tinymceeditor', 'id' => 'wt-tinymceeditor', 'placeholder' => trans('lang.ph_desc')]) !!}
                                     </div>
                                     @if ($parent_page->count() > 1)

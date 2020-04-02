@@ -911,6 +911,7 @@ return [
     'ph_sales_tax' => 'Taxe de vente',
     'ph_payout_id' => 'ID de paiement',
     'ph_page_title' => 'Titre de la page',
+    'ph_page_title_balise' => 'Balise Title',
     'ph_search_help' => 'La recherche pourrait aider',
     'ph_search_rate' => 'Taux de recherche',
     'ph_search_freelancer' => 'Recherche Freelancer',

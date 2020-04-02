@@ -617,17 +617,17 @@
   ),
   'mail' => 
   array (
-    'driver' => 'sendmail',
-    'host' => '',
-    'port' => '587',
+    'driver' => 'smtp',
+    'host' => 'smtp.mailtrap.io',
+    'port' => '2525',
     'from' => 
     array (
-      'address' => 'info@writup.net',
-      'name' => 'Writup.net',
+      'address' => 'from@example.com',
+      'name' => 'Example',
     ),
     'encryption' => 'tls',
-    'username' => 'info@writup.net',
-    'password' => 'info2019',
+    'username' => 'cf0faad3196b6e',
+    'password' => '96251778c26e40',
     'sendmail' => '/usr/sbin/sendmail -bs',
     'markdown' => 
     array (
