@@ -44,33 +44,31 @@ Route::get(
 );
 
 // Home
-Route::get(
-    '/',
-    function () {
-        if (Schema::hasTable('users')) {
-            if (file_exists(resource_path('views/extend/front-end/index.blade.php'))) {
-                return view('extend.front-end.index');
-            } else {
-                return view('front-end.index');
-            }
+if (empty(Request::segment(1))) {
+    if (Schema::hasTable('users') && Schema::hasTable('site_managements')) {
+        Route::get('/', 'HomeController@index')->name('home');
+    } else {
+        if (!empty(env('DB_DATABASE'))) {
+            Route::get('/',
+                function () {
+                    return Redirect::to('/install');
+                }
+            );
         } else {
-            if (!empty(env('DB_DATABASE'))) {
-                return Redirect::to('/install');
-            } else {
-                return trans('lang.configure_database');
-            }
+            return trans('lang.configure_database');
         }
     }
-)->name('home');
+}
+
 Route::get(
     '/home',
     function () {
         return Redirect::to('/');
     }
-);
+)->name('home');
+
 Route::get('articles/{category?}', 'ArticleController@articlesList')->name('articlesList');
 Route::get('article/{slug}', 'ArticleController@showArticle')->name('showArticle');
-
 Route::get('profile/{slug}', 'PublicController@showUserProfile')->name('showUserProfile');
 Route::get('categories', 'CategoryController@categoriesList')->name('categoriesList');
 Route::get('page/{slug}', 'PageController@show')->name('showPage');
@@ -106,7 +104,7 @@ Route::group(
         Route::post('admin/article/categories/update-cats/{id}', 'ArticleCategoryController@update');
         Route::post('admin/articles/categories/upload-temp-image', 'ArticleCategoryController@uploadTempImage');
         Route::post('admin/article/delete-checked-cats', 'ArticleCategoryController@deleteSelected');
-// Articles Routes
+        // Articles Routes
         Route::get('admin/articles', 'ArticleController@index')->name('articles');
         Route::get('admin/articles/edit-article/{id}', 'ArticleController@edit')->name('editArticle');
         Route::post('admin/articles/store-article', 'ArticleController@store');
@@ -244,6 +242,7 @@ Route::group(
         Route::post('admin/pages/delete-page', 'PageController@destroy');
         Route::post('admin/pages/update-page/{id}', 'PageController@update');
         Route::post('admin/delete-checked-pages', 'PageController@deleteSelected');
+
         //All Jobs
         Route::get('admin/jobs', 'JobController@jobsAdmin')->name('allJobs');
         Route::get('admin/jobs/search', 'JobController@jobsAdmin');
@@ -385,7 +384,10 @@ Route::group(
         Route::get('user/get-payout-detail', 'UserController@getPayoutDetail');
     }
 );
+Route::get('page/get-page-data/{id}', 'PageController@getPage');
+Route::get('get-categories', 'CategoryController@getCategories');
 Route::get('get-articles', 'PublicController@getArticles');
+Route::get('get-home-slider/{id}', 'PageController@getSlider');
 
 Route::post('job/get-wishlist', 'JobController@getWishlist');
 Route::get('dashboard/packages/{role}', 'PackageController@index');

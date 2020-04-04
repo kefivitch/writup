@@ -44,7 +44,13 @@ a,
 .wt-articles,
 .wt-articleimg > img,
 .wt-search-slider-nav .wt-next,
-.wt-search-slider-nav .wt-prev
+.wt-search-slider-nav .wt-prev,
+.wt-demo-sidebar,
+.wt-demo-img img,
+.wt-pagination ul li a,
+.wt-pagination ul li span,
+.wt-userlistinghold .wt-widgettag a,
+.wt-navdashboard > ul > li > a
 {
 	-webkit-transition: all 300ms ease-in-out;
 	-moz-transition: all 300ms ease-in-out;
@@ -56,7 +62,8 @@ a,
 .wt-categorycontent,
 .wt-categoryslidup,
 .wt-categorycontent figure,
-.wt-cattitle
+.wt-cattitle,
+.wt-section-create
 {
 	-webkit-transition: all 500ms ease-in-out;
 	-moz-transition: all 500ms ease-in-out;

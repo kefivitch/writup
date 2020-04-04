@@ -68,7 +68,7 @@ Breadcrumbs::for(
     'showPage', function ($trail, $page, $slug) {
         $trail->parent('home');
         if (!empty($page)) {
-            $trail->push($page->title, route('showPage', ['slug' => $slug]));
+            $trail->push($page['title'], route('showPage', ['slug' => $slug]));
         }
     }
 );
@@ -86,5 +86,3 @@ Breadcrumbs::for(
         $trail->push(trans('lang.profile'), route('showUserProfile', ['slug' => $slug]));
     }
 );
-
-

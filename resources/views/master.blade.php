@@ -1,5 +1,11 @@
 <!doctype html>
+<!--[if lt IE 7]>		<html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>			<html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>			<html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!-->
 <html class="no-js" lang="" dir="{{Helper::getTextDirection()}}">
+<!--<![endif]-->
+
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,7 +14,6 @@
 	@else
 	<title>{{ config('app.name') }}</title>
 	@endif
-	
 	<meta name="description" content="@yield('description')">
 	<meta name="keywords" content="@yield('keywords')">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
@@ -34,6 +39,7 @@
 	<link href="{{ asset('css/themify-icons.css') }}" rel="stylesheet">
 	<link href="{{ asset('css/jquery-ui-min.css') }}" rel="stylesheet">
 	<link href="{{ asset('css/linearicons.css') }}" rel="stylesheet">
+	@stack('sliderStyle')
 	<link href="{{ asset('css/main.css') }}" rel="stylesheet">
 	<link href="{{ asset('css/custom.css') }}" rel="stylesheet">
 	<link href="{{ asset('css/responsive.css') }}" rel="stylesheet">
@@ -67,14 +73,14 @@
 	@endif
 	<script>
 		window.trans = <? php
-			$lang_files = File:: files(resource_path(). '/lang/'.App:: getLocale());
+		$lang_files = File:: files(resource_path(). '/lang/'.App:: getLocale());
 		$trans = [];
 		foreach($lang_files as $f) {
 			$filename = pathinfo($f)['filename'];
 			$trans[$filename] = trans($filename);
 		}
 		echo json_encode($trans);
-			?>;
+		?>;
 	</script>
 </head>
 
@@ -83,29 +89,19 @@
 	<!--[if lt IE 8]>
 		<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 	<![endif]-->
-	<!-- Preloader Start -->
 	<div class="preloader-outer">
 		<div class="preloader-holder">
 			<div class="loader"></div>
 		</div>
 	</div>
-	<!-- Wrapper Start -->
 	<div id="wt-wrapper" class="wt-wrapper wt-haslayout">
-		<!-- Content Wrapper Start -->
 		<div class="wt-contentwrapper">
-			<!-- Header Start -->
 			@yield('header')
-			<!--Header End-->
-			<!--Main Start-->
+			@yield('slider')
 			@yield('main')
-			<!--Main End-->
-			<!--Footer Start-->
 			@yield('footer')
-			<!--Footer End-->
 		</div>
-		<!--Content Wrapper End-->
 	</div>
-	<!--Wrapper End-->
 	<script src="{{ asset('js/jquery-3.3.1.min.js') }}"></script>
 	<script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
 	@yield('bootstrap_script')
@@ -113,16 +109,13 @@
 	<script src="{{ asset('js/vendor/jquery-library.js') }}"></script>
 	<script src="{{ asset('js/scrollbar.min.js') }}"></script>
 	<script src="{{ asset('js/jquery-ui-min.js') }}"></script>
-
 	@stack('scripts')
 	<script>
 		jQuery(window).load(function () {
 			jQuery(".preloader-outer").delay(500).fadeOut();
 			jQuery(".pins").delay(500).fadeOut("slow");
 		});
-
 	</script>
-
 </body>
 
 </html>

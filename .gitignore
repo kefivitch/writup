@@ -4,7 +4,7 @@ npm-debug.log
 yarn-error.log
 /storage
 /.idea
-/.vscode
+/.vscode/
 /public/uploads
 # Laravel 4 specific
 bootstrap/compiled.php

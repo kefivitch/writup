@@ -46,6 +46,7 @@ class DatabaseSeeder extends Seeder
         $this->call(JobSkillSeeder::class);
         $this->call(JobCategorySeeder::class);
         $this->call(PageSeeder::class);
+        // $this->call(MetaSeeder::class);
         $this->call(ChildPageSeeder::class);
         $this->call(ProposalSeeder::class);
         $this->call(MessagesSeeder::class);
@@ -55,8 +56,10 @@ class DatabaseSeeder extends Seeder
         $this->call(ResponseTimeSeeder::class);
         $this->call(ServiceUserSeeder::class);
         $this->call(ServiceSeeder::class);
-        $this->call(ArticleSeeder::class);
         $this->call(ArticleCategoriesSeeder::class);
+        $this->call(ArticleSeeder::class);
         $this->call(ArticleCategorySeeder::class);
+        $this->call(ReviewSeeder::class);
+
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class Page.
  *
@@ -23,6 +24,25 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Page extends Model
 {
+    /**
+     * Pages can have multiple meta
+     *
+     * @return relation
+     */
+    public function meta()
+    {
+        return $this->morphMany('App\Meta', 'metable');
+    }
+
+    /**
+     * Posts can have multiple meta
+     *
+     * @return relation
+     */
+    public function metaValue($meta_key)
+    {
+        return $this->morphMany('App\Meta', 'metable')->where('meta_key', $meta_key)->select('id', 'meta_value')->first();
+    }
 
     /**
      * Fillables for the database
@@ -31,7 +51,7 @@ class Page extends Model
      *
      * @var array $fillable
      */
-    protected $fillable = array('title', 'slug', 'body');
+    protected $fillable = array('title', 'slug', 'body','title_balise');
 
     /**
      * Set slug attribute
@@ -81,7 +101,6 @@ class Page extends Model
             $old_path = Helper::PublicPath() . '/uploads/pages/temp';
             $this->title = filter_var($request->title, FILTER_SANITIZE_STRING);
             $this->title_balise = filter_var($request->title_balise, FILTER_SANITIZE_STRING);
-
             $this->slug = filter_var($request->title, FILTER_SANITIZE_STRING);
             $this->body = !empty($request->body) ? $request->body : 'null';
             if ($request->parent_id) {
@@ -342,7 +361,6 @@ class Page extends Model
             }
             $pages->title = filter_var($request->title, FILTER_SANITIZE_STRING);
             $pages->title_balise = filter_var($request->title_balise, FILTER_SANITIZE_STRING);
-
             $pages->body = !empty($request->body) ? $request->body : 'null';
             if ($request->parent_id == null) {
                 $pages->relation_type = 0;
@@ -520,7 +538,7 @@ class Page extends Model
                                             }
                                             $filename = time() . '-' . $work_tab;
                                             rename($old_path . '/' . $work_tab, $new_path . '/' . $filename);
-                                        } 
+                                        }
                                         $work_tab_section[$work_tab_key] = $filename;
                                     } elseif ($work_tab_key == 'description') {
                                         $work_tab_section[$work_tab_key] = str_replace('"', "'", $work_tab);
@@ -565,7 +583,7 @@ class Page extends Model
                 DB::table('site_managements')->insert(
                     [
                         'meta_key' => 'seo-desc-' . $id, 'meta_value' => $request['seo_desc'],
-                        "created_at" => Carbon::now(), "updated_at" => Carbon::now()
+                        "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
                     ]
                 );
             }
@@ -578,7 +596,7 @@ class Page extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'show-page-' . $id, 'meta_value' => $show_page,
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
                 ]
             );
             if ($request['show_page_banner'] == true) {
@@ -590,16 +608,16 @@ class Page extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'show-banner-' . $id, 'meta_value' => $show_banner,
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
                 ]
             );
-            
+
             if (!empty($page_banner)) {
                 DB::table('site_managements')->where('meta_key', '=', 'page-banner-' . $id)->delete();
                 DB::table('site_managements')->insert(
                     [
                         'meta_key' => 'page-banner-' . $id, 'meta_value' => $page_banner,
-                        "created_at" => Carbon::now(), "updated_at" => Carbon::now()
+                        "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
                     ]
                 );
             }
@@ -648,7 +666,6 @@ class Page extends Model
         } else {
             return DB::table('pages')->where('relation_type', '=', 0)->pluck('title', 'id')->prepend('Select parent', '');
         }
-
     }
 
     /**
@@ -688,6 +705,61 @@ class Page extends Model
                 ->select('pages.id', 'pages.title', 'child_pages.child_id')
                 ->where('child_pages.parent_id', '=', $page_id)
                 ->get()->all();
+        }
+    }
+
+    /**
+     * Get Slider
+     *
+     * @param int $page_id page ID
+     *
+     * @return array
+     */
+    public static function getPageSlider($meta)
+    {
+        if ($meta['style'] == 'style1') {
+            ob_start();
+            ?>
+            <div class="wt-haslayout wt-bannerholder" style="background-image:url(<?php url('/');?>)">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-5">
+                            <div class="wt-bannerimages">
+                                <figure class="wt-bannermanimg" data-tilt>
+                                    <img src="{{{ asset(Helper::getHomeBanner('inner_image')) }}}" alt="{{{ trans('lang.img') }}}">
+                                </figure>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-7">
+                            <div class="wt-bannercontent">
+                                <div class="wt-bannerhead">
+                                    <div class="wt-title">
+                                        <h1>
+                                            <span>{{{ Helper::getHomeBanner('title') }}}</span>
+                                            {{{ Helper::getHomeBanner('subtitle') }}}
+                                        </h1>
+                                    </div>
+                                    <div class="wt-description">
+                                        <p>{{{ Helper::getHomeBanner('description') }}}</p>
+                                    </div>
+                                </div>
+                                <search-form :widget_type="'home'" :placeholder="'{{ trans('lang.looking_for') }}'" :freelancer_placeholder="'{{ trans('lang.search_filter_list.freelancer') }}'" :employer_placeholder="'{{ trans('lang.search_filter_list.employers') }}'" :job_placeholder="'{{ trans('lang.search_filter_list.jobs') }}'" :service_placeholder="'{{ trans('lang.search_filter_list.services') }}'" :no_record_message="'{{ trans('lang.no_record') }}'">
+                                </search-form>
+                                <div class="wt-videoholder">
+                                    <div class="wt-videoshow">
+                                        <a data-rel="prettyPhoto[video]" href="{{{ Helper::getHomeBanner('video_url') }}}"><i class="fa fa-play"></i></a>
+                                    </div>
+                                    <div class="wt-videocontent">
+                                        <span>{{{ Helper::getHomeBanner('video_title') }}}<em>{{{ Helper::getHomeBanner('video_description') }}}</em></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<?php
+return ob_get_clean();
         }
     }
 }

@@ -12,13 +12,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper;
 use App\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Session;
 use View;
-use App\Helper;
 
 /**
  * Class LanguageController
@@ -58,7 +58,7 @@ class LanguageController extends Controller
             $langs = $this->language::where('title', 'like', '%' . $keyword . '%')->paginate(7)->setPath('');
             $pagination = $langs->appends(
                 array(
-                    'keyword' => Input::get('keyword')
+                    'keyword' => Input::get('keyword'),
                 )
             );
         } else {

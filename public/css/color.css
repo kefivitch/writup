@@ -22,7 +22,9 @@ a:active,
 .wt-postarticlemeta .wt-following span,
 .tg-qrcodefeat h3 span,
 .active-category,
-.wt-freelancers-content .dc-title span strong
+.wt-freelancers-content .dc-title span strong,
+.wt-bannerholderthree .wt-bannercontent .wt-title h1 em,
+.wt-bannerholderthree .wt-bannercontent .wt-videoholder .wt-videoshow a i
 
 { color: #ff5851; }
 /* Theme Background Color */
@@ -63,7 +65,8 @@ a:active,
 .la-section-settings .wt-location h6:after,
 .wt-forgotpassword-holder .card .card-body form .form-group button[type=submit],
 .wt-featuredtagvtwo,
-.wt-reasonbtn
+.wt-reasonbtn,
+.wt-headervfour .wt-nav .navbar-toggler
 { background:#ff5851; }
 /* Theme Border Color */
 input:focus,

@@ -13,12 +13,12 @@
 namespace App\Http\Controllers;
 
 use App\Category;
+use App\Helper;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Redirect;
 use Session;
 use View;
-use App\Helper;
 
 /**
  * Class Category Controller
@@ -60,7 +60,7 @@ class CategoryController extends Controller
             $cats = $this->category::where('title', 'like', '%' . $keyword . '%')->paginate(7)->setPath('');
             $pagination = $cats->appends(
                 array(
-                    'keyword' => Input::get('keyword')
+                    'keyword' => Input::get('keyword'),
                 )
             );
         } else {
@@ -91,7 +91,7 @@ class CategoryController extends Controller
         }
         $this->validate(
             $request, [
-                'category_title'    => 'required',
+                'category_title' => 'required',
             ]
         );
         $this->category->saveCategories($request);
@@ -244,6 +244,26 @@ class CategoryController extends Controller
         } else {
             $json['type'] = 'error';
             $json['message'] = trans('lang.something_wrong');
+            return $json;
+        }
+    }
+    /**
+     * get Categories
+     *
+     * @param mixed $request request attributes
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getCategories()
+    {
+        $json = array();
+        $categories = $this->category::latest()->get()->take(8);
+        if (!empty($categories)) {
+            $json['type'] = 'success';
+            $json['categories'] = $categories;
+            return $json;
+        } else {
+            $json['type'] = 'error';
             return $json;
         }
     }

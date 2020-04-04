@@ -14,9 +14,9 @@
                 <div class="wt-freelancers-holder wt-freelancers-home row" v-if="access_type == 'service' || access_type == 'both'">
                     <div class="col-12 col-sm-12 col-md-6 col-lg-4 float-left" v-for="(service_item, index) in serviceList" :key="index">
                         <div :class="'wt-freelancers-info ' +service_item.no_attachments">
-                            <div :class="'wt-freelancers ' +service_item.enable_slider" v-if="service_item.attachments && service_item.seller.length > 0">
+                            <div :class="'wt-freelancers ' +service_item.enable_slider" v-if="service_item.attachments">
                                 <figure class="item" v-for="(attachment, attachmentIndex) in service_item.attachments" :key="attachmentIndex">
-                                    <a :href="baseUrl+'/profile/'+service_item.seller[0].slug" v-if="service_item.seller[0].slug"><img :src="attachment" alt="img description" class="item"></a>
+                                    <a :href="baseUrl+'/profile/'+service_item.seller[0].slug"><img :src="attachment" alt="img description" class="item"></a>
                                 </figure>
                             </div>
                             <span class="wt-featuredtagvtwo" v-if="service_item.is_featured = 'true'">{{ trans('lang.featured') }}</span>
@@ -68,7 +68,6 @@ export default {
             .then(function(response) {
                 if (response.data.type == "success") {
                     self.serviceList =response.data.services
-                    console.log(self.serviceList)
                     setTimeout(function(){
                         var _wt_freelancerslider = jQuery('.wt-freelancerslider')
                         _wt_freelancerslider.owlCarousel({

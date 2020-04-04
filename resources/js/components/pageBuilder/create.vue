@@ -15,6 +15,9 @@
             <fieldset>
               <div class="form-group">
                 <input type="text" placeholder="Title" name="title" v-model="form.title" value="" class="form-control">
+              </div> 
+              <div class="form-group">
+                <input type="text" placeholder="Title balise" name="title_balise" v-model="form.title_balise" value="" class="form-control">
               </div>
             </fieldset>
             <draggable class="list-group dragArea" :list="sections" ref="sortable_section" group="section" @start="sortData" @change="updateSection">
@@ -239,6 +242,7 @@ export default {
       form: {
         sections:[],
         title:'',
+        title_balise:'',
         meta:{
           freelancers:[],
           cat:[],
@@ -339,6 +343,7 @@ export default {
         if(evt.added.element.section == 'freelancer_section') {
           var freelancer = {
             title: '',
+            title_balise:'',
             subtitle: '',
             description: '',
             sectionColor: '#ffffff',
