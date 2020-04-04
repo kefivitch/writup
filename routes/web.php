@@ -60,6 +60,12 @@ if (empty(Request::segment(1))) {
     }
 }
 
+// Route::get('/migrate',function(){
+// Artisan::call('migrate', [
+//     '--force' => true,
+// ]);
+// });
+
 Route::get(
     '/home',
     function () {

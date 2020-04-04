@@ -118,7 +118,7 @@ $slider = Helper::getPageSlider($page_id);
                                     alt="{{{ trans('lang.user_avatar') }}}">
                             </figure>
                             <div class="wt-username">
-                                <h3>{{{ Helper::getUserName(Auth::user()->id) }}}</h3>
+                                <h3>{{ $user->first_name}} {{ $user->last_name}}</h3>
                                 <span>{{{ !empty(Auth::user()->profile->tagline) ? str_limit(Auth::user()->profile->tagline, 26, '') : Helper::getAuthRoleName() }}}</span>
                             </div>
                             @if (file_exists(resource_path('views/extend/back-end/includes/profile-menu.blade.php')))
@@ -250,7 +250,7 @@ $slider = Helper::getPageSlider($page_id);
                                     alt="{{{ trans('lang.user_avatar') }}}">
                             </figure>
                             <div class="wt-username">
-                                <h3>{{{ Helper::getUserName(Auth::user()->id) }}}</h3>
+                                <h3>{{ $user->first_name}} {{ $user->last_name}}</h3>
                                 <span>{{{ !empty(Auth::user()->profile->tagline) ? str_limit(Auth::user()->profile->tagline, 26, '') : Helper::getAuthRoleName() }}}</span>
                             </div>
                             @if (file_exists(resource_path('views/extend/back-end/includes/profile-menu.blade.php')))
@@ -393,7 +393,7 @@ $slider = Helper::getPageSlider($page_id);
                                     alt="{{{ trans('lang.user_avatar') }}}">
                             </figure>
                             <div class="wt-username">
-                                <h3>{{{ Helper::getUserName(Auth::user()->id) }}}</h3>
+                                <h3>{{ $user->first_name}} {{ $user->last_name}}</h3>
                                 <span>{{{ !empty(Auth::user()->profile->tagline) ? str_limit(Auth::user()->profile->tagline, 26, '') : Helper::getAuthRoleName() }}}</span>
                             </div>
                             @if (file_exists(resource_path('views/extend/back-end/includes/profile-menu.blade.php')))
