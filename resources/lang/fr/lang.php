@@ -88,6 +88,7 @@ return [
     'access_type_warning' => 'Vous devez importer mis à jour pour activer cette option',
     'site_access_type' => 'Type d\'accès au site',
     'show_service_banner' => 'Bannière de service',
+    'cancel' => 'Annuler',
     'browse_services' => 'Parcourir les services',
     'ph_search_langs' => 'Rechercher des langues',
     'ph_search_response_time' => 'Temps de réponse de la recherche',

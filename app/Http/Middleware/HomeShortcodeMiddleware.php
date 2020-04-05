@@ -23,7 +23,7 @@ class HomeShortcodeMiddleware
                     <input type="text" name="job" class="form-control" placeholder="I’m looking for">
                     <div class="wt-formoptions">
                         <div class="wt-dropdown">
-                            <span>In: <em class="selected-search-type">Freelancers </em><i class="lnr lnr-chevron-down"></i></span>
+                            <span>{{trans('lang.in')}}: <em class="selected-search-type">Freelancers </em><i class="lnr lnr-chevron-down"></i></span>
                         </div>
                         <div class="wt-radioholder">
                             <span class="wt-radio">
