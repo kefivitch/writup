@@ -45,7 +45,7 @@
                 </div>
             </div>
         </div>
-        <div class="wt-widget wt-effectiveholder">
+        <!-- <div class="wt-widget wt-effectiveholder">
             <div class="wt-widgettitle">
                 <h2>{{ trans('lang.no_of_employee') }}</h2>
             </div>
@@ -64,7 +64,7 @@
                     </fieldset>
                 </div>
             </div>
-        </div>
+        </div> -->
         <div class="wt-widget wt-effectiveholder">
             <div class="wt-widgetcontent">
                 <div class="wt-applyfilters">
