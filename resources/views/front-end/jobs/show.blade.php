@@ -92,7 +92,7 @@
                                                 <h3>{{ trans('lang.project_detail') }}</h3>
                                             </div>
                                             <div class="wt-description">
-                                                {!!strip_tags($job->description)!!}
+                                                {{{ $job->description }}}
                                             </div>
                                         </div>
                                     @endif

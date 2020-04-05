@@ -29,7 +29,7 @@ return [
     'paypal_payout_id_text' => 'You need to add your PayPal ID below in the text field. For more about',
     'payout_id_create_acc' => 'Créer un compte',
     'user_payout_not_set' => 'User have not set his payout settings yet.',
-    'payout_settings_note' => 'All the earning will be sent to below selected payout method',
+    'payout_settings_note' => 'Tous les gains seront envoyés à la méthode de paiement sélectionnée ci-dessous',
     'emp_payout_settings_note' => 'Vous pouvez sélectionner l\'une des options ci-dessous pour les paiements concernant les remboursements. Vous obtiendrez tout le montant du remboursement dans le compte de paiement sélectionné',
     'emp_payout_settings_note1'=>'Espéce - Virement bancaire',
     'status_updated' => 'Statut mis à jour',
