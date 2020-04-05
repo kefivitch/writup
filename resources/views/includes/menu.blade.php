@@ -45,8 +45,11 @@
                 </a>
             </li>
             <li>
-                <a href="{{url('search-results?type=employer')}}">
+                <!-- <a href="{{url('search-results?type=employer')}}">
                     {{{ trans('lang.view_employers') }}}
+                </a> -->
+                <a href="{{url('search-results?type=cmdExpress')}}">
+                    {{{ trans('lang.cmdExpress') }}}
                 </a>
             </li>
             @if ($type =='jobs' || $type == 'both')

@@ -13,7 +13,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Article;
 use App\Category;
+use App\ArticleCategory;
 use App\DeliveryTime;
 use App\EmailTemplate;
 use App\Helper;
@@ -48,7 +50,25 @@ use Storage;
  */
 class PublicController extends Controller
 {
+    /**
+     * Defining scope of variable
+     *
+     * @access public
+     * @var    array $article
+     */
+    protected $article;
 
+    /**
+     * Create a new controller instance.
+     *
+     * @param mixed $article get article model
+     *
+     * @return void
+     */
+    public function __construct(Article $article)
+    {
+        $this->article = $article;
+    }
     /**
      * User Login Function
      *
@@ -708,6 +728,29 @@ class PublicController extends Controller
                         )
                     );
                 }
+            } elseif ($type == 'cmdExpress') {
+                $cats = ArticleCategory::all()->toArray();
+                $latest_article = $this->article->latest()->take(3)->get();
+                $inner_page = SiteManagement::getMetaValue('inner_page_data');
+                $article_inner_banner = !empty($inner_page) && !empty($inner_page[0]['article_inner_banner']) ? $inner_page[0]['article_inner_banner'] : null;
+                $show_article_banner = !empty($inner_page) && !empty($inner_page[0]['show_article_banner']) ? $inner_page[0]['show_article_banner'] : 'true';
+                if (!empty($category)) {
+                    $selected_category = ArticleCategory::where('slug', $category)->first();
+                    if (!empty($selected_category->articles) && $selected_category->articles->count() > 0) {
+                        foreach ($selected_category->articles as $category_article) {
+                            $id[] = $category_article->id;
+                        }
+                        $articles = $this->article::whereIn('id', $id)->paginate(4);
+                    } else {
+                        $articles = '';
+                    }
+                } else {
+                    $articles = $this->article->paginate(4);
+                }
+                $show_service_banner = !empty($inner_page) && !empty($inner_page[0]['show_service_banner']) ? $inner_page[0]['show_service_banner'] : 'true';
+                $service_inner_banner = !empty($inner_page) && !empty($inner_page[0]['service_inner_banner']) ? $inner_page[0]['service_inner_banner'] : null;
+                return view('front-end.order.index', compact('show_service_banner', 'service_inner_banner','cats', 'articles', 'latest_article','article_inner_banner','show_article_banner'));
+
             } else {
                 $Jobs_total_records = Job::count();
                 $job_list_meta_title = !empty($inner_page) && !empty($inner_page[0]['job_list_meta_title']) ? $inner_page[0]['job_list_meta_title'] : trans('lang.job_listing');
