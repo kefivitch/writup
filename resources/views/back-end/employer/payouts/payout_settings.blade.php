@@ -23,7 +23,10 @@
                                 <div class="wt-description">
                                     <p>{{ trans('lang.emp_payout_settings_note') }}</p>
                                 </div>
-                                <form class="wt-formtheme wt-payout-settings la-payout-settings" @submit.prevent="submitPayoutsDetail({{Auth::user()->id}})" id="profile_payout_detail">
+                                <div class="wt-description">
+                                    <h3>{{trans('lang.emp_payout_settings_note1')}}</h3>
+                                </div>
+                                <!-- <form class="wt-formtheme wt-payout-settings la-payout-settings" @submit.prevent="submitPayoutsDetail({{Auth::user()->id}})" id="profile_payout_detail">
                                     @if( !empty($payrols) )
                                         @foreach ($payrols as $pay_key	=> $payrol)
                                             @php
@@ -68,7 +71,7 @@
                                             <button type="submit" class="wt-btn wt-payrols-settings" data-id="<?php echo $payrol['id']; ?>">submit</button>
                                         </div>
                                     </fieldset>
-                                </form>
+                                </form> -->
                             </div>
                         </div>
                     </div>

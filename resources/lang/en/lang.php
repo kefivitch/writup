@@ -58,6 +58,7 @@ return [
     'user_payout_not_set' => 'User have not set his payout settings yet.',
     'payout_settings_note' => 'All the earning will be sent to below selected payout method',
     'emp_payout_settings_note' => 'You can select one of the below option for the payments regarding the refunds. You will get all the refund amount in selected payment account',
+    'emp_payout_settings_note1'=>'Cash - Bank transfer',
     'status_updated' => 'Status Updated',
     'method' => 'Method',
     'computer_generated_slip' => 'This is a computer generated payout slip',

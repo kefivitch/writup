@@ -47,7 +47,7 @@
                                 {{ $payouts->links('pagination.custom') }}
                             @endif
                         </div>
-                    </div
+                    </div>
                 </div>
             </div>
         </div>
