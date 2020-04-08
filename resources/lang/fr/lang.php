@@ -206,6 +206,8 @@ return [
     'register_location_error' => 'Le champ de localisation est obligatoire',
     'register_password_error' => 'Le mot de passe est obligatoire',
     'register_password_confirmation_error' => 'Le champ de confirmation du mot de passe est obligatoire',
+    'nbr_words' => 'Nombre de mots à faire rédiger',
+    'mailSent' => 'E-mail envoyé avec succès',
     'register_termsconditions_error' => 'S\'il vous plaît accepter les termes et conditions',
     'location_title' => 'Le titre de l\'emplacement est requis',
     'manage_account' => 'Gérer son compte',
@@ -1119,6 +1121,6 @@ return [
     'delivery_time_updated' => 'Délai de livraison mis à jour',
     'response_time_updated' => 'Temps de réponse mis à jour',
     'show_page_banner' => 'Montrer la bannière de la page',
-    'quoteRequest' => 'Demande de devis',
+    'quote_request' => 'Demande de devis',
     'quote_request_note' => 'Décrivez vos besoins en rédaction, nos conseillers reviendrons rapidement vers vous pour vous accompagner dans votre projet.',
 ];

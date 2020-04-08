@@ -14,8 +14,8 @@
 namespace App\Http\Controllers;
 
 use App\Article;
-use App\Category;
 use App\ArticleCategory;
+use App\Category;
 use App\DeliveryTime;
 use App\EmailTemplate;
 use App\Helper;
@@ -749,7 +749,7 @@ class PublicController extends Controller
                 }
                 $show_service_banner = !empty($inner_page) && !empty($inner_page[0]['show_service_banner']) ? $inner_page[0]['show_service_banner'] : 'true';
                 $service_inner_banner = !empty($inner_page) && !empty($inner_page[0]['service_inner_banner']) ? $inner_page[0]['service_inner_banner'] : null;
-                return view('front-end.order.index', compact('show_service_banner', 'service_inner_banner','cats', 'articles', 'latest_article','article_inner_banner','show_article_banner'));
+                return view('front-end.order.index', compact('show_service_banner', 'service_inner_banner', 'cats', 'articles', 'latest_article', 'article_inner_banner', 'show_article_banner'));
 
             } else {
                 $Jobs_total_records = Job::count();
@@ -1036,5 +1036,52 @@ class PublicController extends Controller
             $json['type'] = 'error';
             return $json;
         }
+    }
+    public function sendCmd(Request $request)
+    {
+
+        if (!empty($request)) {
+            $this->validate(
+                $request,
+                [
+                    'fullName' => 'required|string',
+                    'email' => 'required|email',
+                    'phone' => 'required|digits:8',
+                    'nbr_words' => 'required',
+                    'file' => 'required|mimes:jpeg,bmp,png,gif,svg,pdf',
+                    'description' => 'required|string',
+                ]
+            );
+            $file = $request->file('file');
+
+            Mail::send(
+                'emails.sendCmd',
+                [
+                    'email' => $request->email,
+                    'phone' => $request->phone,
+                    'nbr_words' => $request->nbr_words,
+                    'description' => $request->description,
+
+                ],
+                function ($message) use ($file, $request) {
+                    $message->to("info@writup.net", "WritUp");
+                    $message->from($request->email, $request->fullName);
+                    $message->subject("Commande Express");
+                    $message->attach($file->getRealPath(), array(
+                        'as' => $file->getClientOriginalName(), // If you want you can chnage original name to custom name
+                        'mime' => $file->getMimeType())
+                    );
+                }
+            );
+            Session::flash('success', trans('lang.mailSent'));
+            return Redirect::back();
+            return Redirect::to('/');
+
+        } else {
+            Session::flash('error', trans('lang.something_wrong'));
+            return Redirect::back();
+
+        }
+
     }
 }

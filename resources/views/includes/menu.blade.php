@@ -44,14 +44,7 @@
                     {{{ trans('lang.view_freelancers') }}}
                 </a>
             </li>
-            <li>
-                <!-- <a href="{{url('search-results?type=employer')}}">
-                    {{{ trans('lang.view_employers') }}}
-                </a> -->
-                <a href="{{url('search-results?type=cmdExpress')}}">
-                    {{{ trans('lang.cmdExpress') }}}
-                </a>
-            </li>
+           
             @if ($type =='jobs' || $type == 'both')
             <li>
                 <a href="{{url('search-results?type=job')}}">
@@ -66,6 +59,14 @@
                 </a>
             </li>
             @endif
+            <li>
+                <!-- <a href="{{url('search-results?type=employer')}}">
+                                {{{ trans('lang.view_employers') }}}
+                            </a> -->
+                <a href="{{url('search-results?type=cmdExpress')}}">
+                    {{{ trans('lang.cmdExpress') }}}
+                </a>
+            </li>
         </ul>
     </div>
 </nav>

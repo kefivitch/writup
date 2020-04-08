@@ -72,6 +72,7 @@ Route::get(
         return Redirect::to('/');
     }
 )->name('home');
+Route::post('sendOrder', 'PublicController@sendCmd')->name('cmdExpress');
 
 Route::get('articles/{category?}', 'ArticleController@articlesList')->name('articlesList');
 Route::get('article/{slug}', 'ArticleController@showArticle')->name('showArticle');
