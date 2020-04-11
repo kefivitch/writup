@@ -42,7 +42,7 @@
 																	{{{ $user_name }}}</a>
 																@endif
 																@if (!empty($job->title))
-																	<h2><a href="{{{ url('job/'.$job->slug) }}}">{!! $job->title !!}</a></h2>
+																	<h2><a href="{{{ url('job/'.$job->slug) }}}">{{{ $job->title }}}</a></h2>
 																@endif
 															</div>
 														@endif
@@ -58,11 +58,11 @@
 																@if (!empty($job->location->title))
 																	<li><span><img src="{{{asset(Helper::getLocationFlag($job->location->flag))}}}" alt="{{ trans('lang.img') }}"> {{{ $job->location->title }}}</span></li>
 																@endif
-																@if (!empty($job->mots))
-																<li><a href="javascript:void(0);" class="wt-clicksavefolder"><i class="far fa-folder"></i> {{{ trans('lang.mots') }}} {{{ $job->mots }}}</a></li>
+																@if (!empty($job->project_type))
+																<li><a href="javascript:void(0);" class="wt-clicksavefolder"><i class="far fa-folder"></i> {{{ trans('lang.type') }}} {{{ $project_type }}}</a></li>
 																@endif
-																@if (!empty($job->deadline))
-																	<li><span class="wt-dashboradclock"><i class="far fa-clock"></i> {{ trans('lang.deadline') }} {{{ $job->deadline }}}</span></li>
+																@if (!empty($job->duration))
+																	<li><span class="wt-dashboradclock"><i class="far fa-clock"></i> {{ trans('lang.duration') }} {{{ $duration }}}</span></li>
 																@endif
 															</ul>
 														@endif
