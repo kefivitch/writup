@@ -1064,11 +1064,11 @@ class PublicController extends Controller
 
                 ],
                 function ($message) use ($file, $request) {
-                    $message->to("info@writup.net", "WritUp");
+                    $message->to("writup.contact@gmail.com", "WritUp");
                     $message->from($request->email, $request->fullName);
                     $message->subject("Commande Express");
                     $message->attach($file->getRealPath(), array(
-                        'as' => $file->getClientOriginalName(), // If you want you can chnage original name to custom name
+                        'as' => $file->getClientOriginalName(), 
                         'mime' => $file->getMimeType())
                     );
                 }
