@@ -181,7 +181,7 @@
                                 @endif
                             </div>
                             <div class="form-group wt-btnarea">
-                                <button type="submit" class=" wt-btn">
+                                <button type="submit" class=" wt-btn" style="background-color: #2b2e3e;">
                                     {{ trans('lang.btn_submit') }}
                                 </button>
                             </div>
