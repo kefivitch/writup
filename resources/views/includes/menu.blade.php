@@ -61,7 +61,7 @@
             @endif
           
             <div class="wt-loginarea" style="border-left:none">
-            <a href="{{url('search-results?type=cmdExpress')}}" class="wt-btn" >
+            <a href="{{url('search-results?type=cmdExpress')}}" class="wt-btn"  style="background-color: #2b2e3e;" >
                 {{{ trans('lang.cmdExpress') }}}</a>
             </div>
             <!-- <li>
