@@ -59,14 +59,17 @@
                 </a>
             </li>
             @endif
-            <li>
-                <!-- <a href="{{url('search-results?type=employer')}}">
+          
+            <div class="wt-loginarea" style="border-left:none">
+            <a href="{{url('search-results?type=cmdExpress')}}" class="wt-btn" >
+                {{{ trans('lang.cmdExpress') }}}</a>
+            </div>
+            <!-- <li>
+                <a href="{{url('search-results?type=employer')}}">
                                 {{{ trans('lang.view_employers') }}}
-                            </a> -->
-                <a href="{{url('search-results?type=cmdExpress')}}">
-                    {{{ trans('lang.cmdExpress') }}}
-                </a>
-            </li>
+                            </a>
+               
+            </li> -->
         </ul>
     </div>
 </nav>
