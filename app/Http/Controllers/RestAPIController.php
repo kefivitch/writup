@@ -1388,7 +1388,7 @@ class RestAPIController extends Controller
         if (!empty($id)) {
             $user = User::find($id);
             $json['first_name'] = !empty($user->first_name) ? $user->first_name : '';
-            $json['last_name'] = !empty($user->last_name) ? substr($user->last_name,1,1) : '';
+            $json['last_name'] = !empty($user->last_name) ? substr($user->last_name,0,1) : '';
             $json['tag_line'] = !empty($user->profile->tagline) ? $user->profile->tagline : '';
             $json['address'] = !empty($user->profile->address) ? $user->profile->address : '';
             $json['latitude'] =  !empty($user->profile->latitude) ? $user->profile->latitude : '';

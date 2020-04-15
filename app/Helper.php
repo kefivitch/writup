@@ -985,7 +985,7 @@ class Helper extends Model
      public static function getUserName($user_id)
     {
         if (!empty($user_id)) {
-            return User::find($user_id)->first_name . ' .' . ucfirst(substr(User::find($user_id)->last_name,1,1));
+            return User::find($user_id)->first_name . ' .' . ucfirst(substr(User::find($user_id)->last_name,0,1));
         } else {
             return '';
         }

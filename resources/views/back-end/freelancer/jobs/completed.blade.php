@@ -13,7 +13,7 @@
                                 @php
                                     $job = \App\Job::where('id', $job_id->job_id)->first();
                                     $duration  =  \App\Helper::getJobDurationList($job->duration);
-                                    $user_name = $job->employer->first_name.' '.substr($job->employer->last_name,1,1);
+                                    $user_name = $job->employer->first_name.' '.substr($job->employer->last_name,0,1);
                                     $verified_user = \App\User::select('user_verified')->where('id', $job->employer->id)->pluck('user_verified')->first();
                                     $project_type  = Helper::getProjectTypeList($job->project_type);
                                 @endphp

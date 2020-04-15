@@ -49,7 +49,7 @@
                                         <div class="wt-userlistingcontent">
                                             <div class="wt-contenthead">
                                                 <div class="wt-title">
-                                                    <a href="{{{ url('profile/'.$job->employer->slug) }}}">@if($verified_user === 1)<i class="fa fa-check-circle"></i>@endif {{{$job->employer->first_name.'.'.substr($job->employer->last_name,1,1)}}}</a>
+                                                    <a href="{{{ url('profile/'.$job->employer->slug) }}}">@if($verified_user === 1)<i class="fa fa-check-circle"></i>@endif {{{$job->employer->first_name.'.'.substr($job->employer->last_name,0,1)}}}</a>
                                                     <h2>{!! $job->title !!}</h2>
                                                 </div>
                                                 <div class="wt-description">

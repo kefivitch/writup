@@ -19,7 +19,7 @@
 											@php
 												$image = '';
 												$duration  =  \App\Helper::getJobDurationList($job->duration);
-												$user_name = $job->employer->first_name.'.'.substr($job->employer->last_name,1,1);
+												$user_name = $job->employer->first_name.'.'.substr($job->employer->last_name,0,1);
 												$proposals = \App\Proposal::where('job_id', $job->id)->where('status', '!=', 'cancelled')->get();
 												$employer_img = \App\Profile::select('avater')->where('user_id', $job->employer->id)->first();
 												$image = !empty($employer_img->avater) ? '/uploads/users/'.$job->employer->id.'/'.$employer_img->avater : '';

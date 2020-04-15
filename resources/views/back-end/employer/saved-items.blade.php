@@ -25,7 +25,7 @@
                                             @php
                                                 $job = \App\Job::where('id', $job_id)->first();
                                                 $duration  =  Helper::getJobDurationList($job->duration);
-                                                $user_name = $job->employer->first_name.'.'.substr($job->employer->last_name,1,1);
+                                                $user_name = $job->employer->first_name.'.'.substr($job->employer->last_name,0,1);
                                                 $project_type  = Helper::getProjectTypeList($job->project_type);
                                             @endphp
                                             <div class="wt-userlistinghold wt-featured wt-dashboradsaveditems">
