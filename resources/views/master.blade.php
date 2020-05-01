@@ -109,11 +109,13 @@
 	<script src="{{ asset('js/vendor/jquery-library.js') }}"></script>
 	<script src="{{ asset('js/scrollbar.min.js') }}"></script>
 	<script src="{{ asset('js/jquery-ui-min.js') }}"></script>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-165296588-1"></script>
 	<script>
 		window.dataLayer = window.dataLayer || [];
 		function gtag() { dataLayer.push(arguments); }
 		gtag('js', new Date());
+
 		gtag('config', 'UA-165296588-1');
 	</script>
 	@stack('scripts')
