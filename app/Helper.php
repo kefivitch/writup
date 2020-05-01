@@ -982,10 +982,10 @@ class Helper extends Model
      *
      * @return array
      */
-     public static function getUserName($user_id)
+    public static function getUserName($user_id)
     {
         if (!empty($user_id)) {
-            return User::find($user_id)->first_name . ' .' . ucfirst(substr(User::find($user_id)->last_name,0,1));
+            return User::find($user_id)->first_name . ' .' . ucfirst(substr(User::find($user_id)->last_name, 0, 1));
         } else {
             return '';
         }
@@ -1709,6 +1709,14 @@ class Helper extends Model
     public static function currencyList($code = "")
     {
         $currency_array = array(
+            'TND' => array(
+                'numeric_code' => 788,
+                'code' => 'TND',
+                'name' => 'Dinar Tunisien',
+                'symbol' => 'TND',
+                'fraction_name' => 'Cent[D]',
+                'decimals' => 3,
+            ),
             'USD' => array(
                 'numeric_code' => 840,
                 'code' => 'USD',
