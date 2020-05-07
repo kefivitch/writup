@@ -4,9 +4,12 @@
     </div>
     <div class="wt-widgetcontent">
         <ul class="wt-socialiconssimple">
-            <li class="wt-facebook">
-                <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(Request::fullUrl()) }}" class="social-share">
-                <i class="fa fa fa-facebook-f"></i>{{ trans('lang.share_fb') }}</a>
+            <li id="fb-root">
+            
+            <div class="fb-share-button" data-href="{{ urlencode(Request::fullUrl()) }}" data-layout="button_count"
+                data-size="large"><a target="_blank"
+                    href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(Request::fullUrl()) }}" src="sdkpreparse"
+                    class="fb-xfbml-parse-ignore">{{ trans('lang.share_fb') }}</a></div>
             </li>
             <li class="wt-twitter">
                 <a href="https://twitter.com/intent/tweet?url={{ urlencode(Request::fullUrl()) }}" class="social-share">
