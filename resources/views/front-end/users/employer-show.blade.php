@@ -1,6 +1,12 @@
 @extends(file_exists(resource_path('views/extend/front-end/master.blade.php')) ?
 'extend.front-end.master':
  'front-end.master', ['body_class' => 'wt-innerbgcolor'] )
+<meta property="og:image" content="https://writup.net/uploads/settings/general/LogoBanner.png" />
+<meta property="og:url" content="https://writup.net" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="{{ (Request::fullUrl()) }}" />
+<meta property="og:description" content="{{ (Request::fullUrl()) }}" />
+<meta property="og:site_name" content="@yield('site_name')" />
 @section('title'){{ $user_name }} | {{ $tagline }} @stop
 @section('description', "$desc")
 @section('content')
@@ -111,12 +117,10 @@
                                 </div>
                                 <div class="wt-widgetcontent">
                                     <ul class="wt-socialiconssimple">
-                                        <li id="fb-root">
-                                        
-                                        <div class="fb-share-button" data-href="{{ urlencode(Request::fullUrl()) }}" data-layout="button_count"
-                                            data-size="large"><a target="_blank"
-                                                href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(Request::fullUrl()) }}" src="sdkpreparse"
-                                                class="fb-xfbml-parse-ignore">{{ trans('lang.share_fb') }}</a></div>
+                                        <li>
+                                            <div class="fb-share-button" data-href="{{ (Request::fullUrl()) }}" data-layout="button_count" data-size="large"><a
+                                                    target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ (Request::fullUrl()) }}"
+                                                    src="sdkpreparse" class="fb-xfbml-parse-ignore">{{ trans('lang.share_fb') }}</a></div>
                                         </li>
                                         <li class="wt-twitter">
                                             <a href="https://twitter.com/intent/tweet?url={{ urlencode(Request::fullUrl()) }}" class="social-share">

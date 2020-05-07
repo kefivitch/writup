@@ -15,16 +15,16 @@
 	<title>{{ config('app.name') }}</title>
 	@endif
 	<meta name="description" content="@yield('description')">
-	<meta name="keywords" content="@yield('keywords')">
+	<meta name="keywords" content="{{ env('APP_KEYWORDS') }}">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<!-- Meta OG -->
 	@php $logo = !empty($setting[0]['logo']) ? Helper::getHeaderLogo($setting[0]['logo']) : '/images/logo.png'; @endphp
-	@if (!empty($logo) || Schema::hasTable('site_managements'))
-	<meta property="og:image" content="{{{ asset($logo) }}}">
-	@endif
+	@if (!empty($logo) || Schema::hasTable('site_managements'))@endif
+	<meta property="og:image"  content="https://writup.net/uploads/settings/general/LogoBanner.png"/>
+	
 
-	<meta property="og:url" content="@yield('url')" />
-	<meta property="og:type" content="Freelance" />
+	<meta property="og:url" content="https://writup.net" />
+	<meta property="og:type" content="website" />
 	<meta property="og:title" content="@yield('title')" />
 	<meta property="og:description" content="Writup est une plateforme de freelance en rédaction de contenu:On met en relation ceux qui ont besoin d'un contenu avec des rédacteurs de qualité" />
 	<meta property="og:site_name" content="@yield('site_name')" />
@@ -126,6 +126,7 @@
 			jQuery(".pins").delay(500).fadeOut("slow");
 		});
 	</script>
+	<div id="fb-root"></div>
 	<script async defer crossorigin="anonymous"
 		src="https://connect.facebook.net/fr_FR/sdk.js#xfbml=1&version=v7.0"></script>
 </body>
