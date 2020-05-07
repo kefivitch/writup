@@ -1,12 +1,6 @@
 @extends(file_exists(resource_path('views/extend/front-end/master.blade.php')) ?
 'extend.front-end.master':
  'front-end.master', ['body_class' => 'wt-innerbgcolor'] )
-<meta property="og:image" content="https://writup.net/uploads/settings/general/LogoBanner.png" />
-<meta property="og:url" content="https://writup.net" />
-<meta property="og:type" content="website" />
-<meta property="og:title" content="{{ (Request::fullUrl()) }}" />
-<meta property="og:description" content="{{ (Request::fullUrl()) }}" />
-<meta property="og:site_name" content="@yield('site_name')" />
 @section('title'){{ $user_name }} | {{ $tagline }} @stop
 @section('description', "$desc")
 @section('content')
@@ -117,11 +111,9 @@
                                 </div>
                                 <div class="wt-widgetcontent">
                                     <ul class="wt-socialiconssimple">
-                                        <li>
-                                            <div class="fb-share-button" data-href="{{ (Request::fullUrl()) }}" data-layout="button_count" data-size="large"><a
-                                                    target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ (Request::fullUrl()) }}"
-                                                    src="sdkpreparse" class="fb-xfbml-parse-ignore">{{ trans('lang.share_fb') }}</a></div>
-                                        </li>
+                                    <li class="wt-facebook">
+                                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(Request::fullUrl()) }}" class="social-share">
+                                            <i class="fa fa fa-facebook-f"></i>{{ trans('lang.share_fb') }}</a></li>
                                         <li class="wt-twitter">
                                             <a href="https://twitter.com/intent/tweet?url={{ urlencode(Request::fullUrl()) }}" class="social-share">
                                             <i class="fa fab fa-twitter"></i>{{ trans('lang.share_twitter') }}</a>
@@ -256,27 +248,27 @@
     </div>
 @endsection
 @push('scripts')
-    <script>
-        var popupMeta = {
-            width: 400,
-            height: 400
+<script>
+    var popupMeta = {
+        width: 400,
+        height: 400
+    }
+    $(document).on('click', '.social-share', function (event) {
+        event.preventDefault();
+
+        var vPosition = Math.floor(($(window).width() - popupMeta.width) / 2),
+            hPosition = Math.floor(($(window).height() - popupMeta.height) / 2);
+
+        var url = $(this).attr('href');
+        var popup = window.open(url, 'Social Share',
+            'width=' + popupMeta.width + ',height=' + popupMeta.height +
+            ',left=' + vPosition + ',top=' + hPosition +
+            ',location=0,menubar=0,toolbar=0,status=0,scrollbars=1,resizable=1');
+
+        if (popup) {
+            popup.focus();
+            return false;
         }
-        $(document).on('click', '.social-share', function(event){
-            event.preventDefault();
-
-            var vPosition = Math.floor(($(window).width() - popupMeta.width) / 2),
-                hPosition = Math.floor(($(window).height() - popupMeta.height) / 2);
-
-            var url = $(this).attr('href');
-            var popup = window.open(url, 'Social Share',
-                'width='+popupMeta.width+',height='+popupMeta.height+
-                ',left='+vPosition+',top='+hPosition+
-                ',location=0,menubar=0,toolbar=0,status=0,scrollbars=1,resizable=1');
-
-            if (popup) {
-                popup.focus();
-                return false;
-            }
-        })
-    </script>
+    })
+</script>
 @endpush

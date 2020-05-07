@@ -21,13 +21,14 @@
 	@php $logo = !empty($setting[0]['logo']) ? Helper::getHeaderLogo($setting[0]['logo']) : '/images/logo.png'; @endphp
 	@if (!empty($logo) || Schema::hasTable('site_managements'))@endif
 	<meta property="og:image"  content="https://writup.net/uploads/settings/general/LogoBanner.png"/>
-	
-
 	<meta property="og:url" content="https://writup.net" />
 	<meta property="og:type" content="website" />
-	<meta property="og:title" content="@yield('title')" />
-	<meta property="og:description" content="Writup est une plateforme de freelance en rédaction de contenu:On met en relation ceux qui ont besoin d'un contenu avec des rédacteurs de qualité" />
-	<meta property="og:site_name" content="@yield('site_name')" />
+		@if (trim($__env->yieldContent('title')))
+		<meta property="og:title" content="@yield('title')" />
+		@else
+		<meta property="og:title" content="{{ config('app.name') }}" />
+		@endif
+	<meta property="og:description" content="@yield('description')" />
 	<!-- End Meta OG -->
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -126,9 +127,7 @@
 			jQuery(".pins").delay(500).fadeOut("slow");
 		});
 	</script>
-	<div id="fb-root"></div>
-	<script async defer crossorigin="anonymous"
-		src="https://connect.facebook.net/fr_FR/sdk.js#xfbml=1&version=v7.0"></script>
+	
 </body>
 
 </html>
