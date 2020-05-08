@@ -4,8 +4,12 @@
 @push('stylesheets')
 <link href="{{ asset('css/owl.carousel.min.css') }}" rel="stylesheet">
 @endpush
-{{-- @section('title'){{ $f_list_meta_title }} @stop
-@section('description', $f_list_meta_desc) --}}
+@php $value= str_limit(strip_tags($article->description), $limit = 90, $end = '...') @endphp
+@php $image= asset(Helper::getImage('uploads/articles', $article->banner, 'large-', 'large-default-article.png')) @endphp
+
+@section('title')  {{ $article->title }} @stop
+@section('description', "$value")
+@section('image', "$image")
 @section('content')
 @if ($show_article_banner == 'true')
 <div class="wt-haslayout wt-innerbannerholder"
@@ -36,6 +40,11 @@
                         <div class="wt-title">
                             <h2>{{$article->title}}</h2>
                         </div>
+                       
+                       
+                           
+                       
+                         
                         <ul class="wt-postarticlemeta">
                             <li>
                                 <a href="javascript:void(0);">
@@ -53,8 +62,26 @@
                         <div class="wt-description">
                             @php echo htmlspecialchars_decode(stripslashes($article->description)); @endphp
                         </div>
+                        
+                      
                     </div>
+                    
+                        <div class="wt-widgetcontent">
+                        {!!Share::currentPage()->facebook()->twitter()->pinterest()!!}
+                        <div id="social-links">
+                            <ul>
+                                <div class="wt-widgetcontent">
+                                    <ul class="wt-socialiconssimple">
+                                        <a href="https://plus.google.com/share?url={{ urlencode(Request::fullUrl()) }}" class="social-share">
+                                            <i class="fa fab fa-google-plus-g"></i></a>
+                                    </ul>
+                                </div>
+                            </ul>
+                        </div>
+                        </div>
+                  
                 </div>
+                
             </div>
         </div>
     </div>

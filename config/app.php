@@ -178,6 +178,7 @@ return [
         Chumper\Zipper\ZipperServiceProvider::class,
         Srmklive\PayPal\Providers\PayPalServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
+        Jorenvh\Share\Providers\ShareServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -257,5 +258,6 @@ return [
         'Helper' => App\Helper::class,
         'Stripe' => Cartalyst\Stripe\Laravel\Facades\Stripe::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
+        'Share' => Jorenvh\Share\ShareFacade::class,
     ],
 ];

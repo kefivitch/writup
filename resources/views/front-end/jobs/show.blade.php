@@ -2,7 +2,8 @@
 'extend.front-end.master':
  'front-end.master', ['body_class' => 'wt-innerbgcolor'] )
 @section('title'){!! $job->title !!} @stop
-@section('description', "$job->description")
+
+@section('description'){!!strip_tags($job->description)!!}@stop
 @section('content')
     @php $breadcrumbs = Breadcrumbs::generate('jobDetail',$job->slug); @endphp
     <div class="wt-haslayout wt-innerbannerholder">

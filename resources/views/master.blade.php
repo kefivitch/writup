@@ -18,9 +18,13 @@
 	<meta name="keywords" content="{{ env('APP_KEYWORDS') }}">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<!-- Meta OG -->
-	@php $logo = !empty($setting[0]['logo']) ? Helper::getHeaderLogo($setting[0]['logo']) : '/images/logo.png'; @endphp
-	@if (!empty($logo) || Schema::hasTable('site_managements'))@endif
-	<meta property="og:image"  content="https://writup.net/uploads/settings/general/LogoBanner.png"/>
+	@if (trim($__env->yieldContent('image')))
+	<meta property="og:image" content="@yield('image')" />
+	@else
+		<meta property="og:image" content="https://writup.net/uploads/settings/general/LogoBanner.png" />
+	@endif
+
+
 	<meta property="og:url" content="https://writup.net" />
 	<meta property="og:type" content="website" />
 		@if (trim($__env->yieldContent('title')))
@@ -104,7 +108,9 @@
 			@yield('footer')
 		</div>
 	</div>
+	
 	<script src="{{ asset('js/jquery-3.3.1.min.js') }}"></script>
+	<script src="{{ asset('js/share.js') }}"></script>
 	<script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
 	@yield('bootstrap_script')
 	<script src="{{ asset('js/app.js') }}"></script>
