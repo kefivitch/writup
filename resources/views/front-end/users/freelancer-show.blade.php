@@ -5,9 +5,11 @@
     <link href="{{ asset('css/owl.carousel.min.css') }}" rel="stylesheet">
 @endpush
 @php $image= asset($avatar)  @endphp
+@php $url=urlencode(Request::fullUrl())@endphp
 @section('image', "$image")
-@section('title'){{ $user_name }} | {{ $tagline }} @stop
+@section('title'){{ $user_name }}  @stop
 @section('description', "$desc")
+@section('url',"$url")
 @section('content')
     <div class="wt-haslayout wt-innerbannerholder wt-innerbannerholdervtwo" style="background-image: url({{{ asset(Helper::getUserProfileBanner($user->id)) }}});">
         <div class="container">
@@ -422,8 +424,11 @@
                                    
 <ul class="wt-socialiconssimple">
     <li class="wt-facebook">
-        <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(Request::fullUrl()) }}" class="social-share">
-            <i class="fa fa fa-facebook-f"></i>{{ trans('lang.share_fb') }}</a></li>
+        <div class="fb-share-button" data-href="{{ urlencode(Request::fullUrl()) }}" data-layout="button"
+            data-size="small"><a target="_blank"
+                href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(Request::fullUrl()) }}&amp;src=sdkpreparse"
+                class="fb-xfbml-parse-ignore">{{ trans('lang.share_fb') }}</a></div>
+    </li>
     </li>
     <li class="wt-twitter">
         <a href="https://twitter.com/intent/tweet?url={{ urlencode(Request::fullUrl()) }}" class="social-share">
@@ -529,15 +534,18 @@
             width: 400,
             height: 400
         }
-        $(document).on('click', '.social-share', function (event) {
+        jQuery(document).on('click', '.fb-share-button', function (event) {
             event.preventDefault();
+
             var vPosition = Math.floor(($(window).width() - popupMeta.width) / 2),
                 hPosition = Math.floor(($(window).height() - popupMeta.height) / 2);
+
             var url = $(this).attr('href');
             var popup = window.open(url, 'Social Share',
                 'width=' + popupMeta.width + ',height=' + popupMeta.height +
                 ',left=' + vPosition + ',top=' + hPosition +
                 ',location=0,menubar=0,toolbar=0,status=0,scrollbars=1,resizable=1');
+
             if (popup) {
                 popup.focus();
                 return false;

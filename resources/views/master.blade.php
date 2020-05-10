@@ -18,21 +18,24 @@
 	<meta name="keywords" content="{{ env('APP_KEYWORDS') }}">
 	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<!-- Meta OG -->
-	@if (trim($__env->yieldContent('image')))
-	<meta property="og:image" content="@yield('image')" />
-	@else
-		<meta property="og:image" content="https://writup.net/uploads/settings/general/LogoBanner.png" />
-	@endif
-
-
-	<meta property="og:url" content="https://writup.net" />
+	<meta property="fb:app_id" content="257220868970414" />
+	<meta property="og:locale" content="fr_FR">
+	<meta property="og:site_name" content="Writup">
 	<meta property="og:type" content="website" />
+	<meta property="og:url" content="@yield('url')" />
 		@if (trim($__env->yieldContent('title')))
 		<meta property="og:title" content="@yield('title')" />
 		@else
 		<meta property="og:title" content="{{ config('app.name') }}" />
 		@endif
+	
+	
 	<meta property="og:description" content="@yield('description')" />
+	@if (trim($__env->yieldContent('image')))
+	<meta property="og:image" content="@yield('image')" />
+	@else
+		<meta property="og:image" content="https://writup.net/uploads/settings/general/LogoBanner.png" />
+	@endif
 	<!-- End Meta OG -->
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -112,6 +115,10 @@
 	<script src="{{ asset('js/jquery-3.3.1.min.js') }}"></script>
 	<script src="{{ asset('js/share.js') }}"></script>
 	<script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
+	// FB
+	<div id="fb-root"></div>
+	<script async defer crossorigin="anonymous"
+		src="https://connect.facebook.net/fr_FR/sdk.js#xfbml=1&version=v7.0&appId=257220868970414&autoLogAppEvents=1"></script>
 	@yield('bootstrap_script')
 	<script src="{{ asset('js/app.js') }}"></script>
 	<script src="{{ asset('js/vendor/jquery-library.js') }}"></script>

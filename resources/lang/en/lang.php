@@ -399,7 +399,10 @@ return [
     'payment_settings' => 'Payment Settings',
     'view_detail' => 'View Details',
     'view_reason' => 'View Reason',
+    'show_page_title' => 'Show Page Title',
+    'slider_section' => 'Section curseur',
     'add_page' => 'Add Page',
+    'add_sections' => 'Add Sections',
     'page_deleted' => 'Page Deleted',
     'page_updated' => 'Page Updated',
     'page_created' => 'Page Created',
@@ -1248,3 +1251,4 @@ return [
         'gpb' => 'Greater British Pound',
     ],
 ];
+
