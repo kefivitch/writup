@@ -115,7 +115,6 @@
 	<script src="{{ asset('js/jquery-3.3.1.min.js') }}"></script>
 	<script src="{{ asset('js/share.js') }}"></script>
 	<script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
-	// FB
 	<div id="fb-root"></div>
 	<script async defer crossorigin="anonymous"
 		src="https://connect.facebook.net/fr_FR/sdk.js#xfbml=1&version=v7.0&appId=257220868970414&autoLogAppEvents=1"></script>

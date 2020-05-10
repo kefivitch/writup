@@ -13,17 +13,19 @@ class CreateMetasTable extends Migration
      */
     public function up()
     {
-        Schema::create('metas', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('meta_key');
-            $table->text('meta_value')->nullable();
-            $table->morphs('metable');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('metas')) {
+            Schema::create('metas', function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('meta_key');
+                $table->text('meta_value')->nullable();
+                $table->morphs('metable');
+                $table->timestamps();
+            });
 
-        Artisan::call('db:seed', [
-            '--class' => MetaSeeder::class,
-        ]);
+            Artisan::call('db:seed', [
+                '--class' => MetaSeeder::class,
+            ]);
+        }
 
     }
 

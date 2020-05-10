@@ -116,9 +116,9 @@
                                 <div class="wt-widgetcontent">
                                    <ul class="wt-socialiconssimple">
                                         <li class="wt-facebook">
-                                        <div class="fb-share-button" data-href="{{ urlencode(Request::fullUrl()) }}"
+                                        <div class="fb-share-button" data-href="{{ (Request::fullUrl()) }}"
                                         data-layout="button" data-size="small"><a target="_blank"
-                                            href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(Request::fullUrl()) }}&amp;src=sdkpreparse"
+                                            href="https://www.facebook.com/sharer/sharer.php?u={{ (Request::fullUrl()) }}&amp;src=sdkpreparse"
                                             class="fb-xfbml-parse-ignore">{{ trans('lang.share_fb') }}</a></div>
                                         </li>
                                     
