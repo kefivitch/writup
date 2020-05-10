@@ -691,6 +691,15 @@ return [
     'project_length' => 'Project Length',
     'all_pages' => 'All Pages',
     'add_pages' => 'Add Page',
+    'cat_section' => 'Category Section',
+    'welcome_section' => 'Welcome Section',
+    'app_section' => 'APP Section',
+    'service_section' => 'Service Section',
+    'work_video_section' => 'How it work video section',
+    'work_tab_section' => 'How it work tab section',
+    'freelancer_section' => 'Freelancer section',
+    'description_section' => 'Description Section',
+    'article_section' => 'Article Section',
     'home_page_settings' => 'Home Page Settings',
     'settings' => 'Settings',
     'profile_settings' => 'Profile Settings',
@@ -1251,4 +1260,3 @@ return [
         'gpb' => 'Greater British Pound',
     ],
 ];
-
