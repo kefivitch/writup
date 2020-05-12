@@ -47,6 +47,7 @@ export default {
     },
     methods:{
         getArrayIndex (array, attr, value) {
+            console.log(array)
             for (var i = 0; i < array.length; i += 1) {
                 if (array[i][attr] == value) {
                 return i
@@ -59,6 +60,7 @@ export default {
         },
     },
     created: function() {
+        console.log('created')
         var index = this.getArrayIndex(this.freelancers, 'id', this.element_id)
         if (this.freelancers[index]) {
             this.freelancer = this.freelancers[index]
