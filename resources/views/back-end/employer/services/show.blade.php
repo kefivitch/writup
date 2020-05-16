@@ -112,7 +112,7 @@
                                                     </div>
                                                     <div class="wt-proposalfeedback">
                                                         <span class="wt-stars"><span style="width: {{ $stars }}%;"></span></span>
-                                                        <span class="wt-starcontent">{{{ $rating }}}<sub>{{ trans('lang.5') }}</sub> <em>({{{ $feedbacks }}} {{ trans('lang.feedbacks') }})</em></span>
+                                                        <span class="wt-starcontent">{{{ round($average_rating_count) }}}<sub>{{ trans('lang.5') }}</sub> <em>({{{ $feedbacks }}} {{ trans('lang.feedbacks') }})</em></span>
                                                     </div>													
                                                 </div>
                                             @endif

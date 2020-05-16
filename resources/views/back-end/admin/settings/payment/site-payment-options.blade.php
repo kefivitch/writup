@@ -1,6 +1,6 @@
 <div class="wt-location wt-tabsinfo">
     <div class="wt-tabscontenttitle">
-            <h2>{{{ trans('lang.site_payment_option') }}}</h2>
+        <h2>{{{ trans('lang.site_payment_option') }}}</h2>
     </div>
     <div class="wt-settingscontent">
         <div class="wt-settingscontent la-settingsradio">

@@ -44,6 +44,10 @@ use Illuminate\Pagination\Paginator;
 use App\Report;
 use Intervention\Image\Facades\Image;
 use App\Payout;
+use App\Service;
+use App\DeliveryTime;
+use App\ResponseTime;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * Class RestAPIController
@@ -372,12 +376,13 @@ class RestAPIController extends Controller
     public function userLogout(Request $request)
     {
         $json = array();
-        if (auth()->user()) {
-            auth()->logout();
-            return response()->json($json, 200);
-        } else {
-            return response()->json(['error' => 'UnAuthorized'], 203);
-        }
+        auth()->logout();
+        // if (auth()->user()) {
+        //     auth()->logout();
+        //     return response()->json($json, 200);
+        // } else {
+        //     return response()->json(['error' => 'UnAuthorized'], 203);
+        // }
     }
 
     /**
@@ -879,45 +884,47 @@ class RestAPIController extends Controller
             $jobs = $jobs->orderBy('updated_at', 'desc')->paginate($post_per_page);
         }
         if (!empty($user) && $user->count() > 0) {
-            foreach ($jobs as $key => $job) {
-                $saved_jobs = !empty($user->profile->saved_jobs) ?
-                    unserialize($user->profile->saved_jobs) : array();
-                $json[$key]['favorit'] = in_array($job->id, $saved_jobs) ? 'yes' : '';
-                $json[$key]['job_id'] = !empty($job->id) ? $job->id : '';
-                $json[$key]['status'] = !empty($job->status) ? $job->status : '';
-                $json[$key]['link'] = url('job/' . $job->slug);
-                $json[$key]['amount'] = $symbol . '&nbsp;' . $job->price;
-                $user_object = User::find($job->user_id);
-                $json[$key]['_is_verified'] = !empty($user_obj->id) && $user_obj->user_verified === 1  ? "yes" : "no";
-                $json[$key]['featured_url'] = !empty($job->is_featured) && $job->is_featured === 'true' ? "" . url('images/featured.png') . "" : '';
-                $json[$key]['featured_color'] = !empty($job->is_featured) && $job->is_featured === 'true' ? "#f1c40f" : '';
-                $json[$key]['location']['_country'] = !empty($job->location->title) ? $job->location->title : '';
-                $json[$key]['location']['flag'] = !empty($job->location->flag) ? url('/uploads/locations/' . $job->location->flag) : '';
-                $json[$key]['project_level']['level_title'] = !empty($job->id) ? Helper::getProjectLevel($job->project_level) : '';
-                $json[$key]['project_level']['level_sign'] = 0;
-                $json[$key]['project_type'] = !empty($job->project_type) ? $job->project_type : '';
-                $json[$key]['project_duration'] = !empty($job->duration) ? Helper::getJobDurationList($job->duration) : '';
-                $attachments = !empty($job->attachments) ? unserialize($job->attachments) : array();
-                $doc = array();
-                if (!empty($attachments)) {
-                    $docs_count = 0;
-                    foreach ($attachments as $attach_key => $attachment) {
-                        $docs_count++;
-                        $doc[$docs_count]['document_name'] = !empty($attachment) ? $attachment : '';
-                        $doc[$docs_count]['url'] = !empty($attachment) ? "" . route('getfile', ['type'=>'jobs','attachment'=>$attachment,'id'=>$job->user_id]) . "" : '';
+            if (!empty($jobs)) {
+                foreach ($jobs as $key => $job) {
+                    $saved_jobs = !empty($user->profile->saved_jobs) ?
+                        unserialize($user->profile->saved_jobs) : array();
+                    $json[$key]['favorit'] = in_array($job->id, $saved_jobs) ? 'yes' : '';
+                    $json[$key]['job_id'] = !empty($job->id) ? $job->id : '';
+                    $json[$key]['status'] = !empty($job->status) ? $job->status : '';
+                    $json[$key]['link'] = url('job/' . $job->slug);
+                    $json[$key]['amount'] = $symbol . '&nbsp;' . $job->price;
+                    $user_object = User::find($job->user_id);
+                    $json[$key]['_is_verified'] = !empty($user_obj->id) && $user_obj->user_verified === 1  ? "yes" : "no";
+                    $json[$key]['featured_url'] = !empty($job->is_featured) && $job->is_featured === 'true' ? "" . url('images/featured.png') . "" : '';
+                    $json[$key]['featured_color'] = !empty($job->is_featured) && $job->is_featured === 'true' ? "#f1c40f" : '';
+                    $json[$key]['location']['_country'] = !empty($job->location->title) ? $job->location->title : '';
+                    $json[$key]['location']['flag'] = !empty($job->location->flag) ? url('/uploads/locations/' . $job->location->flag) : '';
+                    $json[$key]['project_level']['level_title'] = !empty($job->id) ? Helper::getProjectLevel($job->project_level) : '';
+                    $json[$key]['project_level']['level_sign'] = 0;
+                    $json[$key]['project_type'] = !empty($job->project_type) ? $job->project_type : '';
+                    $json[$key]['project_duration'] = !empty($job->duration) ? Helper::getJobDurationList($job->duration) : '';
+                    $attachments = !empty($job->attachments) ? unserialize($job->attachments) : array();
+                    $doc = array();
+                    if (!empty($attachments)) {
+                        $docs_count = 0;
+                        foreach ($attachments as $attach_key => $attachment) {
+                            $docs_count++;
+                            $doc[$docs_count]['document_name'] = !empty($attachment) ? $attachment : '';
+                            $doc[$docs_count]['url'] = !empty($attachment) ? "" . route('getfile', ['type'=>'jobs','attachment'=>$attachment,'id'=>$job->user_id]) . "" : '';
+                        }
                     }
+                    $json[$key]['attanchents']    = array_values($doc);
+                    $skills = $job->skills->toArray();
+                    $skills_args  = array();
+                    foreach ($skills as $skill_key => $skill) {
+                        $skills_args[$skill_key]['skill_val'] = !empty($skill['pivot']['skill_rating']) ? $skill['pivot']['skill_rating'] : '';
+                        $skills_args[$skill_key]['skill_name'] = !empty($skill['title']) ? $skill['title'] : '';
+                    }
+                    $json[$key]['skills'] = $skills_args;
+                    $json[$key]['employer_name'] = !empty($user_object->id) ? Helper::getUserName($user_object->id) : '';
+                    $json[$key]['project_title'] = !empty($job->title) ? $job->title : '';
+                    $json[$key]['project_content'] = !empty($job->id) ? $job->description : '';
                 }
-                $json[$key]['attanchents']    = array_values($doc);
-                $skills = $job->skills->toArray();
-                $skills_args  = array();
-                foreach ($skills as $skill_key => $skill) {
-                    $skills_args[$skill_key]['skill_val'] = !empty($skill['pivot']['skill_rating']) ? $skill['pivot']['skill_rating'] : '';
-                    $skills_args[$skill_key]['skill_name'] = !empty($skill['title']) ? $skill['title'] : '';
-                }
-                $json[$key]['skills'] = $skills_args;
-                $json[$key]['employer_name'] = !empty($user_object->id) ? Helper::getUserName($user_object->id) : '';
-                $json[$key]['project_title'] = !empty($job->title) ? $job->title : '';
-                $json[$key]['project_content'] = !empty($job->id) ? $job->description : '';
             }
             return Response::json($json, 200);
         } else {
@@ -1364,6 +1371,24 @@ class RestAPIController extends Controller
                     return Response::json($json, 203);
                 }
             }
+            // departments 
+            if ($type === 'departments') {
+                $departments    = Department::all();
+                if (!empty($departments)) {
+                    $count = 0;
+                    foreach ($departments as $value => $list) {
+                        $json[$count]['id'] = !empty($list) ? $list['id']  : '';
+                        $json[$count]['title'] = !empty($list) ? $list['title']  : '';
+                        $json[$count]['slug'] = !empty($list) ? $list['slug']  : '';
+                        $count++;
+                    }
+                    return Response::json($json, 200);
+                } else {
+                    $json['type']        = 'error';
+                    $json['message']    = trans('lang.no_record');
+                    return Response::json($json, 203);
+                }
+            }
         } else {
             $json['type']        = 'error';
             $json['message']    = trans('lang.no_list');
@@ -1737,6 +1762,484 @@ class RestAPIController extends Controller
             $json['type'] = 'error';
             $json['message'] = trans('lang.need_to_purchase_pkg');
             return Response::json($json, 203);
+        }
+    }
+
+    /**
+     * Get services API
+     *
+     * @access public
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getServices()
+    {
+        $json = array();
+        $services = Service::query();
+        $post_per_page = !empty($_GET['show_users']) ? $_GET['show_users'] : 10;
+        $page_number = !empty($_GET['page_number']) ? $_GET['page_number'] : 1;
+        $profile_id = !empty($_GET['profile_id']) ? $_GET['profile_id'] : '';
+        $user = !empty($profile_id) ? User::find($profile_id) : new User();
+        $type = !empty($_GET['listing_type']) ? $_GET['listing_type'] : '';
+        $currency   = SiteManagement::getMetaValue('commision');
+        $curr_symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
+        $symbol = !empty($curr_symbol) ? $curr_symbol['symbol'] : '$';
+        Paginator::currentPageResolver(
+            function () use ($page_number) {
+                return $page_number;
+            }
+        );
+        if ($type === 'latest') {
+            $services = $services->latest()->paginate($post_per_page);
+        } elseif ($type === 'favorite') {
+            $saved_services = !empty($user->profile->saved_services) ?
+                unserialize($user->profile->saved_services) : array();
+            if (!empty($saved_services)) {
+                $services =  $services->whereIn('id', $saved_services)->paginate($post_per_page);
+            } else {
+                $json['type']     = 'error';
+                $json['message']  = trans('lang.no_jobs_list');
+                return Response::json($json, 203);
+            }
+        } elseif ($type === 'search') {
+            $keyword = !empty($_GET['keyword']) ? $_GET['keyword'] : '';
+            $search_categories = !empty($_GET['categories']) ? $_GET['categories'] : array();
+            $search_languages = !empty($_GET['language']) ? $_GET['language'] : '';
+            $search_locations = !empty($_GET['location']) ? $_GET['location'] : array();
+            $search_delivery_time = !empty($_GET['delivery_time']) ? $_GET['delivery_time'] : array();
+            $search_response_time = !empty($_GET['response_time']) ? $_GET['response_time'] : array();
+            $json = array();
+            $service_id = array();
+            $filters = array();
+            $filters['type'] = 'service';
+            if (!empty($keyword)) {
+                $filters['s'] = $keyword;
+                $services->where('title', 'like', '%' . $keyword . '%');
+            };
+            if (!empty($search_categories)) {
+                $filters['category'] = $search_categories;
+                foreach ($search_categories as $key => $search_category) {
+                    $categor_obj = Category::where('slug', $search_category)->first();
+                    $category = Category::find($categor_obj->id);
+                    if (!empty($category->services)) {
+                        $category_services = $category->services->pluck('id')->toArray();
+                        foreach ($category_services as $id) {
+                            $service_id[] = $id;
+                        }
+                    }
+                }
+                $services->whereIn('id', $service_id);
+            }
+            if (!empty($search_locations)) {
+                $filters['locations'] = $search_locations;
+                $locations = Location::select('id')->whereIn('slug', $search_locations)->get()->pluck('id')->toArray();
+                $services->whereIn('location_id', $locations);
+            }
+            if (!empty($search_languages)) {
+                $filters['languages'] = $search_languages;
+                $languages = Language::whereIn('slug', $search_languages)->get();
+                foreach ($languages as $key => $language) {
+                    if (!empty($language->services[$key]->id)) {
+                        $service_id[] = $language->services[$key]->id;
+                    }
+                }
+                $services->whereIn('id', $service_id);
+            }
+            if (!empty($search_delivery_time)) {
+                $filters['delivery_time'] = $search_delivery_time;
+                $delivery_time = DeliveryTime::select('id')->whereIn('slug', $search_delivery_time)->get()->pluck('id')->toArray();
+                $services->whereIn('delivery_time_id', $delivery_time);
+            }
+            if (!empty($search_response_time)) {
+                $filters['response_time'] = $search_response_time;
+                $response_time = ResponseTime::select('id')->whereIn('slug', $search_response_time)->get()->pluck('id')->toArray();
+                $services->whereIn('response_time_id', $response_time);
+            }
+            $services = $services->orderByRaw("is_featured DESC, updated_at DESC")->paginate($post_per_page);
+        }
+        if (!empty($user) && $user->count() > 0) {
+            foreach ($services as $key => $service) {
+                $service_reviews = $service->seller->count() > 0 ? Helper::getServiceReviews($service->seller[0]->id, $service->id) : ''; 
+                $attachments = Helper::getUnserializeData($service->attachments);
+                $total_orders = Helper::getServiceCount($service->id, 'hired');
+                if ($service->seller->count() > 0) {
+                    if (!empty($attachments)) {
+                        foreach ($attachments as $attachment_key => $attachment) {
+                            $json[$key]['attachment'][$attachment_key]['image'] = asset(Helper::getImageWithSize('uploads/services/'.$service->seller[0]->id, $attachment, 'medium', true));
+                        }
+                    } else {
+                        $json[$key]['attachment'] =array();
+                    }
+                } else {
+                    $json[$key]['attachment'] =array();
+                }
+                $json[$key]['featured'] = $service->is_featured == 'true' ? trans('lang.featured') : '';
+                $json[$key]['profile_image'] = $service->seller->count() > 0 ? asset(Helper::getProfileImage($service->seller[0]->id)) : '';
+                $json[$key]['user_name'] = $service->seller->count() > 0 ? Helper::getUserName($service->seller[0]->id) : '';
+                $json[$key]['profile_link'] = $service->seller->count() > 0 ? url('profile/'.$service->seller[0]->slug) : '';
+                $json[$key]['link'] = url('service/'.$service->slug);
+                $json[$key]['title'] = $service->title;
+                $json[$key]['id'] = $service->id;
+                $json[$key]['slug'] = $service->slug;
+                $json[$key]['currency_symbol'] = (!empty($symbol['symbol'])) ? $symbol['symbol'] : '$';
+                $json[$key]['price'] = $service->price;
+                $json[$key]['starting_from_text'] = trans('lang.starting_from');
+                if (!empty($service_reviews)) {
+                    $json[$key]['rating'] = $service_reviews->sum('avg_rating') != 0 ? round($service_reviews->sum('avg_rating') / $service_reviews->count()) : 0;
+                } else {
+                    $json[$key]['rating'] = 0;
+                }
+                $json[$key]['reviews'] = !empty($service_reviews) ? $service_reviews->count() : '';
+                $json[$key]['total_orders'] = $total_orders;
+            }
+            return Response::json($json, 200);
+        } else {
+            $json['type']        = 'error';
+            $json['message']    = trans('lang.no_record');
+            return Response::json($json, 203);
+        }
+        return $json;
+    }
+
+    /**
+     * Get services API
+     *
+     * @access public
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getService()
+    {
+        $json = array();
+        $id = !empty($_GET['id']) ? $_GET['id'] : '';
+        $profile_id = !empty($_GET['profile_id']) ? $_GET['profile_id'] : '';
+        $user = !empty($profile_id) ? User::find($profile_id) : new User();
+        $currency   = SiteManagement::getMetaValue('commision');
+        $curr_symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
+        $symbol = !empty($curr_symbol) ? $curr_symbol['symbol'] : '$';
+        $service = !empty($id) ? Service::find($id) : '';
+        $delivery_time = DeliveryTime::where('id', $service->delivery_time_id)->first();
+        $response_time = ResponseTime::where('id', $service->response_time_id)->first();
+        $reasons = Helper::getReportReasons();
+        if (!empty($service)) {
+            $seller = !empty($service->seller) && $service->seller->count() > 0 ? $service->seller->first() : '';
+            $reviews = !empty($seller) ? Helper::getServiceReviews($seller->id, $service->id) : '';
+            if (!empty($reviews)) {
+                $rating  = $reviews->sum('avg_rating') != 0 ? round($reviews->sum('avg_rating') / $reviews->count()) : 0;
+            } else {
+                $rating = 0;
+            }
+            $total_orders = Helper::getServiceCount($service->id, 'hired');
+            $attachments = !empty($seller) ? Helper::getUnserializeData($service->attachments) : '';
+            $save_services = !empty(auth()->user()->profile->saved_services) ? unserialize(auth()->user()->profile->saved_services) : array();
+            $key = 'set_service_view';
+            $json['views'] = $service->views;
+            $json['delivery_time'] = $delivery_time->title;
+            $json['delivery_time_text'] = trans('lang.delivery_time');
+            $json['sales'] = Helper::getServiceCount($service->id, 'completed');
+            $json['sales_text'] = trans('lang.sales');
+            $json['response_time'] = $response_time->title;
+            $json['response_time_text'] = trans('lang.response_time');
+            $json['profile_banner'] = !empty($seller) ? asset(Helper::getUserProfileBanner($seller->id, 'small')) : '';
+            $json['profile_image'] = !empty($seller) ? asset(Helper::getProfileImage($seller->id)) : '';
+            $json['seller_link'] = !empty($seller) ? url('profile/'.$seller->slug) : '';
+            $json['seller_name'] = !empty($seller) ? Helper::getUserName($seller->id) : '';
+            $json['member_since'] = !empty($seller) ? Carbon::parse($seller->created_at)->format('Y-m-d') : '';
+            $json['member_since_text'] = trans('lang.member_since');
+            $json['seller_slug'] = !empty($seller) ? $seller->slug : '';
+            $json['seller_slug'] = !empty($seller) ? $seller->slug : '';
+            $json['featured'] = $service->is_featured == 'true' ? trans('lang.featured') : '';
+            $json['link'] = url('service/'.$service->slug);
+            $json['title'] = $service->title;
+            $json['description'] = htmlspecialchars_decode(stripslashes($service->description));
+            $json['id'] = $service->id;
+            $json['slug'] = $service->slug;
+            $json['currency_symbol'] = (!empty($symbol['symbol'])) ? $symbol['symbol'] : '$';
+            $json['price'] = $service->price;
+            $json['starting_from_text'] = trans('lang.starting_from');
+            $json['total_orders'] = $total_orders;
+            $json['rating'] = $rating;
+            $json['total_rating'] = !empty($reviews) ? $reviews->count() : '';
+            $json['feedback_text'] = trans('lang.feedbacks');
+            $json['queue_text'] = trans('lang.in_queue');
+            $json['review_text'] = trans('lang.reviews');
+            if (!empty($reviews) && $reviews->count() != 0) {
+                foreach ($reviews as $key => $review) {
+                    $user = User::find($review->user_id);
+                    $stars  = $review->avg_rating != 0 ? $review->avg_rating/5*100 : 0;
+                    $json['reviews'][$key]['user_image'] =  asset(Helper::getProfileImage($review->user_id));
+                    $json['reviews'][$key]['id'] =  asset(Helper::getProfileImage($user->id));
+                    $json['reviews'][$key]['slug'] =  asset(Helper::getProfileImage($user->slug));
+                    $json['reviews'][$key]['verified'] =  $user->user_verified == 1 ? true : ''  ;
+                    $json['reviews'][$key]['user_name'] =  Helper::getUserName($review->user_id);
+                    $json['reviews'][$key]['service_title'] =  $service->title;
+                    $json['reviews'][$key]['location'] =  !empty($service->location) ? asset(Helper::getLocationFlag($service->location->flag)) : '';
+                    $json['reviews'][$key]['location_title'] =  !empty($service->location) ? $service->location->title : '';
+                    $json['reviews'][$key]['publish_date'] =  Carbon::parse($service->created_at)->format('M Y') .'-'. Carbon::parse($service->updated_at)->format('M Y');
+                    $json['reviews'][$key]['stars'] =  $stars;
+                    $json['feedback'][$key]['stars'] =  !empty($review->feedback) ? $review->feedback : '';
+                }
+            }
+            if (!empty($attachments)) {
+                foreach ($attachments as $attachment_key => $attachment) {
+                    $json[$key]['attachment'][$attachment_key]['image'] = asset(Helper::getImageWithSize('uploads/services/'.$service->seller[0]->id, $attachment, 'medium', true));
+                }
+            } else {
+                $json[$key]['attachment'] =array();
+            }
+        } else {
+            $json['type']        = 'error';
+            $json['message']    = trans('lang.no_record');
+            return Response::json($json, 203);
+        }
+        return $json;
+    }
+
+    /**
+     * Create a new user instance after a valid registration.
+     *
+     * @param array $request returns request
+     *
+     * @return \App\User
+     */
+    protected function createUser(Request $request)
+    {
+        $json = array();
+        if (empty($request['first_name'])) {
+            $json['error']['first_name'] = 'First name is required';
+        }
+        if (empty($request['last_name'])) {
+            $json['error']['last_name'] = 'last name is required';
+        }
+        if (empty($request['email'])) {
+            $json['error']['email'] = 'Email is required';
+        } else {
+            $email = DB::table('users')->where('email', $request['email'])->count();
+            if ($email > 0) {
+                $json['error']['email'] = 'User already exist.';
+            }
+        }
+        if (!empty($request['password']) && !empty($request['password_confirmation'])) {
+            if ($request['password'] != $request['password_confirmation']) {
+                $json['error']['password'] = 'The password confirmation does not match.';
+            }
+        } else {
+            if (empty($request['password'])) {
+                $json['error']['password'] = 'Password is required';
+            } 
+            if (empty($request['password_confirmation'])) {
+                $json['error']['password_confirmation'] = 'Conrfirmation Password is required';
+            } 
+        }
+        if (empty($request['role'])) {
+            $json['error']['role'] = 'Role is required';
+        }
+        if (!empty($json['error'])) {
+            return Response::json($json, 203);
+        }        
+        $user = new User();
+        $random_number = Helper::generateRandomCode(4);
+        $verification_code = strtoupper($random_number);
+        $user_id = $user->storeUser($request, $verification_code);
+        if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
+            $email_params = array();
+            $template = DB::table('email_types')->select('id')
+                ->where('email_type', 'verification_code')->get()->first();
+            if (!empty($template->id)) {
+                $template_data = EmailTemplate::getEmailTemplateByID($template->id);
+                $email_params['verification_code'] = $user->verification_code;
+                $email_params['name'] = Helper::getUserName($user->id);
+                $email_params['email'] = $user->email;
+                Mail::to($user->email)
+                    ->send(
+                        new GeneralEmailMailable(
+                            'verification_code',
+                            $template_data,
+                            $email_params
+                        )
+                    );
+            }
+        }
+        $id = $user_id;
+        $json['message'] = trans('lang.verify_code_note');
+        return Response::json($json, 200);
+    }
+
+    /**
+     * Store a newly created service in storage.
+     *
+     * @param \Illuminate\Http\Request $request request attributes
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function postService(Request $request)
+    {
+        $json = array();
+        $server = Helper::worketicIsDemoSiteAjax();
+        if (!empty($server)) {
+            $response['message'] = $server->getData()->message;
+            return $response;
+        }
+        if (Helper::getAccessType() == 'jobs') {
+            $json['type'] = 'error';
+            $json['message'] = trans('lang.service_warning');
+            return $json;
+        }
+        $service = new Service();
+        // $this->validate(
+        //     $request,
+        //     [
+        //         'title' => 'required',
+        //         'delivery_time'    => 'required',
+        //         'service_price'    => 'required',
+        //         'response_time'    => 'required',
+        //         'english_level'    => 'required',
+        //         'description'    => 'required',
+        //     ]
+        // );
+        if (empty($request['title'])) {
+            $json['error']['title'] = 'title is required';
+        }
+        if (empty($request['delivery_time'])) {
+            $json['error']['delivery_time'] = 'delivery time is required';
+        }
+        if (empty($request['service_price'])) {
+            $json['error']['service_price'] = 'price is required';
+        }
+        if (empty($request['response_time'])) {
+            $json['error']['response_time'] = 'response time is required';
+        }
+        if (empty($request['english_level'])) {
+            $json['error']['english_level'] = 'english level is required';
+        }
+        if (empty($request['description'])) {
+            $json['error']['description'] = 'description is required';
+        }
+        // if (!empty($request['latitude']) || !empty($request['longitude'])) {
+        //     $this->validate(
+        //         $request,
+        //         [
+        //             'latitude' => ['regex:/^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}$/'],
+        //             'longitude' => ['regex:/^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,6}$/'],
+        //         ]
+        //     );
+        // }
+        $current_user = $request['user_id'];
+        $user = User::find($current_user);
+        $package_item = Item::where('subscriber', $current_user)->first();
+        $package = !empty($package_item) ? Package::find($package_item->product_id) : '';
+        $option = !empty($package) ? unserialize($package->options) : '';
+        $expiry = !empty($option) ? $package_item->created_at->addDays($option['duration']) : '';
+        $expiry_date = !empty($expiry) ? Carbon::parse($expiry)->format('Y-m-d') : '';
+        $current_date = Carbon::now()->format('Y-m-d');
+        $posted_services = $user->services->count();
+        $posted_featured_services = $user->services->where('is_featured', 'true')->count();
+        $payment_settings = SiteManagement::getMetaValue('commision');
+        $package_status = '';
+        if (empty($payment_settings)) {
+            $package_status = 'true';
+        } else {
+            $package_status = !empty($payment_settings[0]['enable_packages']) ? $payment_settings[0]['enable_packages'] : 'true';
+        }
+        if ($package_status === 'true') {
+            if (!empty($package->count()) && $current_date > $expiry_date) {
+                $json['type'] = 'error';
+                $json['message'] = trans('lang.need_to_purchase_pkg');
+                return $json;
+            }
+
+            if ($request['is_featured'] == 'true') {
+                if (!empty($option['no_of_featured_services']) && $posted_featured_services >= intval($option['no_of_featured_services'])) {
+                    $json['type'] = 'error';
+                    $json['message'] = trans('lang.sorry_can_only_feature')  . ' ' . $option['no_of_featured_services'] . ' ' . trans('lang.services_acc_to_pkg');
+                    return $json;
+                }
+            }
+            if (!empty($option['no_of_services']) && $posted_services >= intval($option['no_of_services'])) {
+                $json['type'] = 'error';
+                $json['message'] = trans('lang.sorry_cannot_submit') . ' ' . $option['no_of_services'] . ' ' . trans('lang.services_acc_to_pkg');
+                return $json;
+            } else {
+                $image_size = array(
+                    'small',
+                    'medium'
+                );
+                $service_post = $service->storeService($request, $image_size);
+                if ($service_post['type'] == 'success') {
+                    $json['type'] = 'success';
+                    $json['progress'] = trans('lang.service_publishing');
+                    $json['message'] = trans('lang.service_post_success');
+                    // Send Email
+                    $user = User::find($current_user);
+                    //send email to admin
+                    if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
+                        $service = $service::where('id', $service_post['new_service'])->first();
+                        $email_params = array();
+                        $email_params['service_title'] = $service->title;
+                        $email_params['posted_service_link'] = url('/service/' . $service->slug);
+                        $email_params['name'] = Helper::getUserName($current_user);
+                        $email_params['link'] = url('profile/' . $user->slug);
+                        $template_data = Helper::getAdminServicePostedEmailContent();
+                        Mail::to(config('mail.username'))
+                            ->send(
+                                new AdminEmailMailable(
+                                    'admin_email_new_service_posted',
+                                    $template_data,
+                                    $email_params
+                                )
+                            );
+                    }
+                    return $json;
+                } elseif ($service_post['type'] == 'error') {
+                    $json['type'] = 'error';
+                    $json['message'] = trans('lang.need_to_purchase_pkg');
+                    return $json;
+                } elseif ($service_post['type'] == 'service_warning') {
+                    $json['type'] = 'error';
+                    $json['message'] = trans('lang.not_authorize');
+                    return $json;
+                }
+            }
+        } else {
+            $image_size = array(
+                'small',
+                'medium'
+            );
+            $service_post = $service->storeService($request, $image_size);
+            if ($service_post['type'] == 'success') {
+                $json['type'] = 'success';
+                $json['progress'] = trans('lang.service_publishing');
+                $json['message'] = trans('lang.service_post_success');
+                // Send Email
+                $user = User::find($current_user);
+                //send email to admin
+                if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
+                    $service = $service::where('id', $service_post['new_service'])->first();
+                    $email_params = array();
+                    $email_params['service_title'] = $service->title;
+                    $email_params['posted_service_link'] = url('/service/' . $service->slug);
+                    $email_params['name'] = Helper::getUserName($current_user);
+                    $email_params['link'] = url('profile/' . $user->slug);
+                    $template_data = Helper::getAdminServicePostedEmailContent();
+                    Mail::to(config('mail.username'))
+                        ->send(
+                            new AdminEmailMailable(
+                                'admin_email_new_service_posted',
+                                $template_data,
+                                $email_params
+                            )
+                        );
+                }
+                return $json;
+            } elseif ($service_post['type'] == 'error') {
+                $json['type'] = 'error';
+                $json['message'] = trans('lang.need_to_purchase_pkg');
+                return $json;
+            } elseif ($service_post['type'] == 'service_warning') {
+                $json['type'] = 'error';
+                $json['message'] = trans('lang.not_authorize');
+                return $json;
+            }
         }
     }
 }

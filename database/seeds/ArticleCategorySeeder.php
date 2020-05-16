@@ -2,6 +2,8 @@
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
 
 class ArticleCategorySeeder extends Seeder
 {
@@ -29,7 +31,7 @@ class ArticleCategorySeeder extends Seeder
                 [
                     'article_id' => 3,
                     'article_category_id' => 3,
-                ],
+                ]
             ]
         );
     }

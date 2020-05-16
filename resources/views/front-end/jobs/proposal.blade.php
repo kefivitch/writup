@@ -107,9 +107,9 @@
                             </div>
                             {!! Form::open(['url' => url('proposal/submit-proposal'), 'class' =>'wt-haslayout', 'id' => 'send-propsal',  '@submit.prevent'=>'submitJobProposal('.$job->id.', '.Auth::user()->id.')']) !!}
                                 <div class="wt-proposalamount accordion">
-                                    <div class="form-group"> 
+                                    <div class="form-group">
                                         <span>( <i>{{ !empty($symbol) ? $symbol['symbol'] : '$' }}</i> )</span>
-                                        {!! Form::input('number', 'amount', null, ['class' => 'form-control', 'min' => 1, 'placeholder' => trans('lang.ph_proposal_amount'), 'v-model'=>'proposal.amount',"id"=>"amount", "onkeyup"=>"calcul();" ])!!}
+                                        {!! Form::input('number', 'amount', null, ['class' => 'form-control', 'min' => 1, 'placeholder' => trans('lang.ph_proposal_amount'), 'v-model'=>'proposal.amount', 'v-on:keyup' => "calculate_amount('$commision')" ])!!}
                                         <a href="javascript:void(0);" class="collapsed" id="headingOne" data-toggle="collapse"
                                             data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                                             <i class="lnr lnr-chevron-up"></i>
@@ -118,41 +118,16 @@
                                     </div>
                                     <ul class="wt-totalamount collapse show" id="collapseOne" aria-labelledby="headingOne">
                                         <li v-cloak>
-                                            <h3>( <i>{{ !empty($symbol) ? $symbol['symbol'] : '$' }}</i> ) <em id="writupServ">- 00</em></h3>
+                                            <h3>( <i>{{ !empty($symbol) ? $symbol['symbol'] : '$' }}</i> ) <em>- @{{this.proposal.deduction}}</em></h3>
                                             <span><strong>“ {{{ trans('lang.worketic') }}} ”</strong> {{{ trans('lang.service_fee') }}}
-                                                {{-- nahkiw aal commission writup --}}
                                                 <i class="fa fa-exclamation-circle template-content tipso_style" data-tipso="Plus Member"></i>
                                             </span>
                                         </li>
                                         <li v-cloak>
-                                            <h3>( <i>{{ !empty($symbol) ? $symbol['symbol'] : '$' }}</i> ) <em id="tva">- 00</em></h3>
+                                            <h3>( <i>{{ !empty($symbol) ? $symbol['symbol'] : '$' }}</i> ) <em>@{{this.proposal.total}}</em></h3>
                                             <span>
-                                                {{-- nahkiw TVA --}}
-                                                Montant HT + TVA (19%)
-                                                <i class="fa fa-exclamation-circle template-content tipso_style" data-tipso="Plus Member"></i>
-                                            </span>
-                                        </li>
-                                        <li v-cloak>
-                                            <h3>( <i>{{ !empty($symbol) ? $symbol['symbol'] : '$' }}</i> ) <em id="rs">- 00</em></h3>
-                                            <span>
-                                                {{-- nahkiw TVA --}}
-                                                Montant TTC - Retunue à la source (5%)
-                                                <i class="fa fa-exclamation-circle template-content tipso_style" data-tipso="Plus Member"></i>
-                                            </span>
-                                        </li>
-                                        <li v-cloak>
-                                            <h3>( <i>{{ !empty($symbol) ? $symbol['symbol'] : '$' }}</i> ) <em id="dt">- 00</em></h3>
-                                            <span>
-                                                {{-- nahkiw TVA --}}
-                                                Montant + Droit de timbre
-                                                <i class="fa fa-exclamation-circle template-content tipso_style" data-tipso="Plus Member"></i>
-                                            </span>
-                                        </li>
-                                        <li v-cloak>
-                                            <h3>( <i>{{ !empty($symbol) ? $symbol['symbol'] : '$' }}</i> ) <em id="total">- 00</em></h3>
-                                            <span>
-                                                {{-- nahkiw aal montant final --}}
-                                                Net à recevoir
+                                                {{{ trans('lang.receiving_amount') }}} <strong>“ {{{ trans('lang.receiving_amount') }}} ”</strong>
+                                                {{{ trans('lang.fee_deduction') }}}
                                                 <i class="fa fa-exclamation-circle template-content tipso_style" data-tipso="Plus Member"></i>
                                             </span>
                                         </li>
@@ -183,14 +158,7 @@
                                         </div>
                                     </div>
                                     <div class="wt-btnarea">
-                                        @if (Auth::user()->user_verified == 1)
-                                            {!! Form::submit(trans('lang.btn_send'), ['class' => 'wt-btn']) !!}
-                                        @else
-                                            <div class="text-danger text-center">
-                                                Votre compte n'est pas activé. Vous ne pouvez pas postuler à un offre.
-                                            </div>  
-                                        @endif
-                                        
+                                        {!! Form::submit(trans('lang.btn_send'), ['class' => 'wt-btn']) !!}
                                     </div>
                                 </div>
                             {!! form::close(); !!}
@@ -200,27 +168,4 @@
             </div>
         </div>
     </div>
-    <script>
-        function calcul(){
-            var val = document.getElementById('amount').value;
-            //alert(val);
-            var servWritup = Math.round(parseInt(val)*0.15*1000)/1000;
-            document.getElementById('writupServ').innerHTML = servWritup;
-            amount = val-servWritup;
-            //TVA
-            var tva = Math.round(parseInt(amount)*0.19*1000)/1000;
-            document.getElementById('tva').innerHTML = tva;
-            amount = amount+tva;
-            //RS
-            var rs = Math.round(amount*0.05*1000)/1000;
-            document.getElementById('rs').innerHTML = rs;
-            amount = amount-rs;
-            //Timbre
-            var dt = 0.6;
-            document.getElementById('dt').innerHTML = dt;
-            amount = amount + 0.6;
-
-            document.getElementById('total').innerHTML = Math.round(amount*1000)/1000;
-        }
-    </script>
 @endsection

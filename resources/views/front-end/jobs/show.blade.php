@@ -14,7 +14,6 @@
                     <div class="wt-title"><h2>{{ trans('lang.job_detail') }}</h2></div>
                     @if (!empty($show_breadcrumbs) && $show_breadcrumbs === 'true')
                         @if (count($breadcrumbs))
-
                             <ol class="wt-breadcrumb">
                                 @foreach ($breadcrumbs as $breadcrumb)
                                     @if ($breadcrumb->url && !$loop->last)
@@ -48,36 +47,42 @@
                                         <span class="wt-featuredtag"><img src="{{{ asset('images/featured.png') }}}" alt="{{ trans('lang.img') }}" data-tipso="Plus Member" class="template-content tipso_style"></span>
                                     @endif
                                     @if (
-                                        
+                                        !empty($job->professional_level) ||
                                         !empty($job->title) ||
-                                        !empty($location['title'])  
+                                        !empty($location['title'])  ||
+                                        !empty($job->project_type) ||
+                                        !empty($job->duration)
                                         )
                                         <div class="wt-proposalhead">
                                             @if (!empty($job->title))
-                                                <h2>{!! $job->title !!}</h2>
+                                                <h2>{{{ $job->title }}}</h2>
                                             @endif
                                             @if (
-                                                
+                                                !empty($job->professional_level) ||
                                                 !empty($location['title'])  ||
-                                                !empty($job->price) 
+                                                !empty($job->price) ||
+                                                !empty($job->duration)
                                                 )
                                                 <ul class="wt-userlisting-breadcrumb wt-userlisting-breadcrumbvtwo">
+                                                    @if (!empty($job->project_level))
+                                                        <li><span><i class="fa fa-dollar-sign wt-viewjobdollar"></i> {{{Helper::getProjectLevel($job->project_level)}}}</span></li>
+                                                    @endif
                                                     @if (!empty($job->location->title))
                                                         <li><span><img src="{{{asset(Helper::getLocationFlag($job->location->flag))}}}" alt="{{ trans('lang.img') }}"> {{{ $job->location->title }}}</span></li>
                                                     @endif
-                                                    @if (!empty($job->mots))
-                                                        <li><span class="wt-clicksavefolder"><i class="far fa-folder wt-viewjobfolder"></i> {{{$job->mots}}} Mots</span></li>
+                                                    @if (!empty($job->project_type))
+                                                        <li><span class="wt-clicksavefolder"><i class="far fa-folder wt-viewjobfolder"></i> {{ trans('lang.type') }} {{{$project_type}}}</span></li>
                                                     @endif
-                                                    @if (!empty($job->deadline))
-                                                        <li><span class="wt-dashboradclock"><i class="far fa-clock wt-viewjobclock"></i> {{{ date("d/m/Y H:i", strtotime("$job->deadline")) }}}</span></li>
+                                                    @if (!empty($job->duration))
+                                                        <li><span class="wt-dashboradclock"><i class="far fa-clock wt-viewjobclock"></i> {{ trans('lang.duration') }} {{{ Helper::getJobDurationList($job->duration) }}}</span></li>
                                                     @endif
-                                                    @if (!empty($job->price))
+                                                    {{-- @if (!empty($job->price))
                                                         <li>
                                                             <span>
-                                                                <i class="wt-budget">$</i> {{{ $job->price }}}  <i >{{ !empty($symbol['symbol']) ? $symbol['symbol'] : '$' }}</i>
+                                                                <i class="wt-budget">{{ !empty($symbol['symbol']) ? $symbol['symbol'] : '$' }}</i> {{{ $job->price }}}
                                                             </span>
                                                         </li>
-                                                    @endif
+                                                    @endif --}}
                                                 </ul>
                                             @endif
                                         </div>
@@ -93,7 +98,7 @@
                                                 <h3>{{ trans('lang.project_detail') }}</h3>
                                             </div>
                                             <div class="wt-description">
-                                            {!!strip_tags($job->description)!!}
+                                                @php echo htmlspecialchars_decode(stripslashes($job->description)); @endphp
                                             </div>
                                         </div>
                                     @endif
@@ -109,7 +114,7 @@
                                             </div>
                                         </div>
                                     @endif
-                                    @if (!empty($attachments) && $job->show_attachments === 'true')
+                                    @if (!empty($attachments) && $job->show_attachments === 'true' && !empty($job->employer))
                                         <div class="wt-attachments">
                                             <div class="wt-title">
                                                 <h3>{{ trans('lang.attachments') }}</h3>

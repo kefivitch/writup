@@ -144,6 +144,37 @@
             @include('back-end.admin.settings.inner-pages.service_inner_banner')
         @endif
     </div>
+    <div class="wt-location wt-tabsinfo">
+        <div class="wt-tabscontenttitle">
+            <h2>{{{ trans('lang.article_listing') }}}</h2>
+        </div>
+        <div class="wt-settingscontent">
+            <div class="wt-description"><p>{{ trans('lang.seo_meta_title') }}</p></div>
+            <div class="wt-formtheme wt-userform">
+                <div class="form-group">
+                    {!! Form::text('inner_page[0][article_list_meta_title]', $article_meta_title, array('class' => 'form-control')) !!}
+                </div>
+            </div>
+        </div>
+        <div class="wt-settingscontent">
+            <div class="wt-description"><p>{{ trans('lang.seo_meta_desc') }}</p></div>
+            <div class="wt-formtheme wt-userform">
+                <div class="form-group">
+                    {!! Form::textarea('inner_page[0][article_list_meta_desc]', $article_meta_desc, array('class' => 'form-control')) !!}
+                </div>
+            </div>
+        </div>
+        <div class="wt-settingscontent la-settingsradio">
+            <div class="wt-description"><p>{{ trans('lang.show_article_banner') }}</p></div>
+            <switch_button v-model="show_article_banner">{{{ trans('lang.show_hide_banner') }}}</switch_button>
+            <input type="hidden" :value="show_article_banner" name="inner_page[0][show_article_banner]">
+        </div>
+        @if (file_exists(resource_path('views/extend/back-end/admin/settings/inner-pages/article_inner_banner.blade.php')))
+            @include('extend.back-end.admin.settings.inner-pages.article_inner_banner')
+        @else
+            @include('back-end.admin.settings.inner-pages.article_inner_banner')
+        @endif
+    </div>
     <div class="wt-updatall la-updateall-holder">
         <i class="ti-announcement"></i>
         <span>{{{ trans('lang.save_changes_note') }}}</span>

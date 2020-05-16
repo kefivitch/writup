@@ -79,17 +79,6 @@
       'Image' => 'Intervention\\Image\\Facades\\Image',
     ),
   ),
-  'jorenvanhocht/laravel-share' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Jorenvh\\Share\\Providers\\ShareServiceProvider',
-    ),
-    'aliases' => 
-    array (
-      'Share' => 'Jorenvh\\Share\\ShareFacade',
-    ),
-  ),
   'laravel/nexmo-notification-channel' => 
   array (
     'providers' => 

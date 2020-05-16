@@ -31,7 +31,7 @@
                     <div class="wt-proposalholder wt-haslayout">
                         <div class="proposalhead">
                             <h3>{{ trans('lang.raise_dispute_text') }}</h3>
-                            <a href="{{{ url('job/'.$job->slug) }}}">{!! $job->title !!}</a>
+                            <a href="{{{ url('job/'.$job->slug) }}}">{{{ $job->title }}}</a>
                         </div>
                         <div class="wt-proposalamount-holder">
                             {!! Form::open([

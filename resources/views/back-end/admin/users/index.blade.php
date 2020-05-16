@@ -28,8 +28,6 @@
                                     <tr>
                                         <th>{{{ trans('lang.user_name') }}}</th>
                                         <th>{{{ trans('lang.ph_email') }}}</th>
-                                        <th>{{{ trans('Vérifié') }}}</th>
-                                        <th>{{{ trans('lang.phone') }}}</th>
                                         <th>{{{ trans('lang.role') }}}</th>
                                         <th>{{{ trans('lang.action') }}}</th>
                                     </tr>
@@ -39,20 +37,13 @@
                                         @php $user = \App\User::find($user_data['id']); @endphp
                                         @if ($user->getRoleNames()->first() != 'admin')
                                             <tr class="del-user-{{ $user->id }}">
-                                                <td>{{{ ucwords($user->first_name.' '.$user->last_name) }}}</td>
+                                                <td>{{{ ucwords(\App\Helper::getUserName($user->id)) }}}</td>
                                                 <td>{{{ $user->email }}}</td>
-                                                <td>@if ($user->user_verified)
-                                                    OUI
-                                                    @else
-                                                    NON
-                                                @endif</td>
-                                                <td>{{{ $user->phone }}}</td>
                                                 <td>{{ $user->getRoleNames()->first() }}</td>
                                                 <td>
                                                     <div class="wt-actionbtn">
                                                         <a href="javascript:void()" v-on:click.prevent="deleteUser({{$user->id}})" class="wt-deleteinfo wt-skillsaddinfo"><i class="fa fa-trash"></i></a>
-                                                        <a href="{{ url('profile/'.ucwords($user->first_name.'-'.$user->last_name)) }}" class="wt-addinfo wt-skillsaddinfo"><i class="lnr lnr-eye"></i></a>
-                                                        <a href="javascript:void()" onclick="verifyUser({{ $user->id }})" class=" wt-addinfo wt-skillsaddinfo" style="background-color: #4CAF50;"> <i class="lnr lnr-checkmark-circle"></i></a>
+                                                        <a href="{{ url('profile/'.$user->slug) }}" class="wt-addinfo wt-skillsaddinfo"><i class="lnr lnr-eye"></i></a>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -75,14 +66,4 @@
             </div>
         </div>
     </section>
-    <script>
-        function verifyUser(user_id) {
-            axios.post('/verifyUser', {
-                user_id: user_id
-            })
-            .then(function (response) {
-                location.reload();
-            });
-        }
-    </script>
 @endsection

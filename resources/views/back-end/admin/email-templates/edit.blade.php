@@ -38,7 +38,7 @@
                                         {!! Form::text( 'subject', e($template->subject), ['class' =>'form-control', 'placeholder' => trans('lang.subject')] ) !!}
                                     </div>
                                 <div class="form-group">
-                                        {!! Form::textarea('email_content', $template->content, array('class' => 'wt-tinymceeditor', 'id' => 'wt-tinymceeditor', 'placeholder' => trans('lang.add_template_content')) ) !!}
+                                    {!! Form::textarea('email_content', $template->content, array('class' => 'wt-tinymceeditor', 'id' => 'wt-tinymceeditor', 'placeholder' => trans('lang.add_template_content')) ) !!}
                                 </div>
                                 <div class="form-group wt-btnarea">
                                     {!! Form::submit(trans('lang.update_email_template'), ['class' => 'wt-btn']) !!}

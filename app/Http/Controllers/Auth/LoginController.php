@@ -59,6 +59,11 @@ class LoginController extends Controller
             } else {
                 $user_id = Auth::user()->id;
                 $user_role_type = User::getUserRoleType($user_id);
+                if (empty($user_role_type)) {
+                    Session::flash('error', trans('Unfortunately you have been logged out due to in-sufficient role privileges for you account, For Further details contact to administrator'));
+                    Auth::logout();
+                    return Redirect::to('/');
+                }
                 $user_role = $user_role_type->role_type;
                 if ($user_role === 'freelancer') {
                     return Redirect::to('freelancer/dashboard');

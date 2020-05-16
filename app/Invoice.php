@@ -42,4 +42,17 @@ class Invoice extends Model
     {
         return $this->hasMany(Item::class, 'invoice_id');
     }
+
+    
+    /**
+     * Items
+     *
+     * @access public
+     *
+     * @return array
+     */
+    public function order()
+    {
+        return $this->hasOne(Order::class, 'invoice_id');
+    }
 }

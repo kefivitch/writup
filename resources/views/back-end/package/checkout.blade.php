@@ -8,7 +8,7 @@
                         <div class="loader"></div>
                     </div>
                 </div>
-                <div class="wt-dashboardbox">
+                <div class="wt-dashboardbox wt-submitorder">
                 @if (Session::has('message'))
                     <div class="flash_msg">
                         <flash_messages :message_class="'success'" :time ='5' :message="'{{{ Session::get('message') }}}'" v-cloak></flash_messages>
@@ -34,35 +34,42 @@
                         session()->put(['type' => 'package']);
                     @endphp
                     <table class="sj-checkouttable">
-                         <thead>
-                              <tr>
+                        <thead>
+                            <tr>
                                 <th>{{ trans('lang.item_title') }}</th>
-                                <th>{{trans('lang.details')}}</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
+                            <th>{{trans('lang.details')}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
                                 <td>
                                     <div class="sj-producttitle">
                                         <div class="sj-checkpaydetails">
                                             <h4>{{{$package->title}}}</h4>
                                             <span>{{{$package->subtitle}}}</span>
                                         </div>
-                                    </td>
-                                    <td>{{ !empty($symbol['symbol']) ? $symbol['symbol'] : '$' }}{{{$package->cost}}}</td>
-                                  </tr>
-                                  <tr>
-                                    <td>{{ trans('lang.duration') }}</td>
-                                    <td>{{{Helper::getPackageDurationList($options['duration'])}}}</td>
-                                </tr>
+                                    </div>
+                                </td>
+                                <td>{{ !empty($symbol['symbol']) ? $symbol['symbol'] : '$' }}{{{$package->cost}}}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ trans('lang.duration') }}</td>
+                                <td>{{{Helper::getPackageDurationList($options['duration'])}}}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ trans('lang.total') }}</td>
+                                <td>{{ !empty($symbol['symbol']) ? $symbol['symbol'] : '$' }}{{{$package->cost}}}</td>
+                            </tr>
+                            @if ($mode == 'false')
                                 <tr>
-                                    <td>{{ trans('lang.total') }}</td>
-                                    <td>{{ !empty($symbol['symbol']) ? $symbol['symbol'] : '$' }}{{{$package->cost}}}</td>
+                                    <td>{{ trans('lang.status') }}</td>
+                                    <td>{{ trans('lang.pending') }}</td>
                                 </tr>
-                                </tbody>
-                        </table>
-                    </div>
-                    @if (!empty($payment_gateway))
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+                    @if ($mode == 'true' && !empty($payment_gateway))
                         <div class="sj-checkpaymentmethod">
                             <div class="sj-title">
                                 <h3>{{ trans('lang.select_pay_method') }}</h3>
@@ -84,6 +91,14 @@
                                     </li>
                                 @endforeach
                             </ul>
+                        </div>
+                    @else
+                        <div class="sj-checkpaymentmethod">
+                            <div class="form-group wt-btnarea">
+                                <a class="wt-btn" href="javascript:;" v-on:click.prevent="generateOrder('{{$package->id}}')">
+                                    {{ trans('lang.pay_order')}} 
+                                </a>
+                            </div>
                         </div>
                     @endif
                 </div>

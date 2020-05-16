@@ -19,6 +19,9 @@
                                 <a class="{{{ \Request::route()->getName()==='settings/#wt-general'? 'active': '' }}}" data-toggle="tab" href="#wt-general">{{ trans('lang.general_settings') }}</a>
                             </li>
                             <li class="nav-item">
+                                <a class="{{{ \Request::route()->getName()==='settings/#wt-homepage'? 'active': '' }}}" data-toggle="tab" href="#wt-homepage">{{ trans('lang.homepage_settings') }}</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="{{{ \Request::route()->getName()==='settings/#wt-email'? 'active': '' }}}" data-toggle="tab" href="#wt-email">{{ trans('lang.email_settings') }}</a>
                             </li>
                             <li class="nav-item">
@@ -51,6 +54,15 @@
                             <li class="nav-item">
                                 <a class="{{{ \Request::route()->getName()==='settings/#wt-chat-settings'? 'active': '' }}}" data-toggle="tab" href="#wt-chat-settings">{{ trans('lang.chat_settings') }}</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="{{{ \Request::route()->getName()==='settings/#wt-project-settings'? 'active': '' }}}" data-toggle="tab" href="#wt-project-settings">{{ trans('lang.project_settings') }}</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="{{{ \Request::route()->getName()==='settings/#wt-bank-account-settings'? 'active': '' }}}" data-toggle="tab" href="#wt-bank-account-settings">{{ trans('lang.bank_detail') }}</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="{{{ \Request::route()->getName()==='settings/#wt-offline-order-settings'? 'active': '' }}}" data-toggle="tab" href="#wt-offline-order-settings">{{ trans('lang.offline_order_settings') }}</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="wt-tabscontent tab-content">
@@ -59,6 +71,13 @@
                                 @include('extend.back-end.admin.settings.general.index')
                             @else
                                 @include('back-end.admin.settings.general.index')
+                            @endif
+                        </div>
+                        <div class="wt-securityhold tab-pane la-general-setting" id="wt-homepage">
+                            @if (file_exists(resource_path('views/extend/back-end/admin/settings/homepage/index.blade.php')))
+                                @include('extend.back-end.admin.settings.homepage.index')
+                            @else
+                                @include('back-end.admin.settings.homepage.index')
                             @endif
                         </div>
                         <div class="wt-securityhold tab-pane la-email-setting" id="wt-email">
@@ -146,6 +165,27 @@
                                 @include('extend.back-end.admin.settings.chat-settings.index')
                             @else
                                 @include('back-end.admin.settings.chat-settings.index')
+                            @endif
+                        </div>
+                        <div class="wt-securityhold tab-pane la-footer-setting" id="wt-project-settings">
+                            @if (file_exists(resource_path('views/extend/back-end/admin/settings/project-settings/index.blade.php')))
+                                @include('extend.back-end.admin.settings.project-settings.index')
+                            @else
+                                @include('back-end.admin.settings.project-settings.index')
+                            @endif
+                        </div>
+                        <div class="wt-securityhold tab-pane la-footer-setting" id="wt-bank-account-settings">
+                            @if (file_exists(resource_path('views/extend/back-end/admin/settings/bank-account/index.blade.php')))
+                                @include('extend.back-end.admin.settings.bank-account.index')
+                            @else
+                                @include('back-end.admin.settings.bank-account.index')
+                            @endif
+                        </div>
+                        <div class="wt-securityhold tab-pane la-footer-setting" id="wt-offline-order-settings">
+                            @if (file_exists(resource_path('views/extend/back-end/admin/settings/offline-order/index.blade.php')))
+                                @include('extend.back-end.admin.settings.offline-order.index')
+                            @else
+                                @include('back-end.admin.settings.offline-order.index')
                             @endif
                         </div>
                     </div>

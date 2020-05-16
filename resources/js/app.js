@@ -36,7 +36,12 @@ Vue.filter('two_digits', function (value) {
     return value.toString();
 });
 
-
+Vue.use(VueGoogleMaps, {
+    load: {
+        key: Map_key,
+        libraries: 'places',
+    },
+})
 Vue.use(VueIziToast);
 Vue.use(SmoothScrollbar)
 Vue.use(VueSweetalert2);
@@ -369,7 +374,6 @@ if (document.getElementById("registration")) {
             user_email: '',
             first_name: '',
             last_name: '',
-            phone:'',
             form_step1: {
                 email_error: '',
                 is_email_error: false,
@@ -377,8 +381,6 @@ if (document.getElementById("registration")) {
                 is_first_name_error: false,
                 last_name_error: '',
                 is_last_name_error: false,
-                phone_error: '',
-                is_phone_error: false,
             },
             form_step2: {
                 locations_error: '',
@@ -420,8 +422,6 @@ if (document.getElementById("registration")) {
                 this.form_step1.is_last_name_error = false;
                 this.form_step1.email_error = '';
                 this.form_step1.is_email_error = false;
-                this.form_step1.phone_error = '';
-                this.form_step1.is_phone_error = false;
                 var self = this;
                 let register_Form = document.getElementById('register_form');
                 let form_data = new FormData(register_Form);
@@ -437,10 +437,6 @@ if (document.getElementById("registration")) {
                         if (error.response.data.errors.last_name) {
                             self.form_step1.last_name_error = error.response.data.errors.last_name[0];
                             self.form_step1.is_last_name_error = true;
-                        }
-                        if (error.response.data.errors.phone) {
-                            self.form_step1.phone_error = error.response.data.errors.phone[0];
-                            self.form_step1.is_phone_error = true;
                         }
                         if (error.response.data.errors.email) {
                             self.form_step1.email_error = error.response.data.errors.email[0];
@@ -485,7 +481,6 @@ if (document.getElementById("registration")) {
                 form_data.append('email', this.user_email);
                 form_data.append('first_name', this.first_name);
                 form_data.append('last_name', this.last_name);
-                form_data.append('phone', this.phone);
                 var self = this;
                 axios.post(APP_URL + '/register', form_data)
                     .then(function (response) {
@@ -755,57 +750,57 @@ if (document.getElementById("pages-list")) {
             showError(error) {
                 return this.$toast.error(' ', error, this.notificationSystem.options.error);
             },
-            submitPage: function (msg) {
-                let page_Form = document.getElementById('pages');
-                let form_data = new FormData(page_Form);
-                var description = tinyMCE.get('wt-tinymceeditor').getContent();
-                form_data.append('content', description);
-                var self = this;
-                axios.post(APP_URL + '/admin/store-page', form_data)
-                    .then(function (response) {
-                        if (response.data.type == 'success') {
-                            self.showMessage(msg);
-                            setTimeout(function () {
-                                window.location.replace(APP_URL + '/admin/pages');
-                            }, 4000)
-                        } else {
-                            self.showError(response.data.message);
-                        }
-                    })
-                    .catch(function (error) {
-                        if (error.response.data.errors.title) {
-                            self.showError(error.response.data.errors.title[0]);
-                        }
-                        if (error.response.data.errors.content) {
-                            self.showError(error.response.data.errors.content[0]);
-                        }
-                    });
-            },
-            getPageOption: function () {
-                var segment_str = window.location.pathname;
-                var segment_array = segment_str.split('/');
-                var id = segment_array[segment_array.length - 1];
-                if (segment_str == '/admin/pages/edit-page/' + id) {
-                    let self = this;
-                    axios.post(APP_URL + '/admin/get-page-option', {
-                        page_id: id
-                    })
-                        .then(function (response) {
-                            if (response.data.type == 'success') {
-                                if (response.data.show_page == 'true') {
-                                    self.show_page = true;
-                                } else {
-                                    self.show_page = false;
-                                }
-                                if (response.data.show_banner == 'true') {
-                                    self.show_page_banner = true;
-                                } else {
-                                    self.show_page_banner = false;
-                                }
-                            }
-                        });
-                }
-            },
+            // submitPage: function (msg) {
+            //     let page_Form = document.getElementById('pages');
+            //     let form_data = new FormData(page_Form);
+            //     var description = tinyMCE.get('wt-tinymceeditor').getContent();
+            //     form_data.append('content', description);
+            //     var self = this;
+            //     axios.post(APP_URL + '/admin/store-page', form_data)
+            //         .then(function (response) {
+            //             if (response.data.type == 'success') {
+            //                 self.showMessage(msg);
+            //                 setTimeout(function () {
+            //                     window.location.replace(APP_URL + '/admin/pages');
+            //                 }, 4000)
+            //             } else {
+            //                 self.showError(response.data.message);
+            //             }
+            //         })
+            //         .catch(function (error) {
+            //             if (error.response.data.errors.title) {
+            //                 self.showError(error.response.data.errors.title[0]);
+            //             }
+            //             if (error.response.data.errors.content) {
+            //                 self.showError(error.response.data.errors.content[0]);
+            //             }
+            //         });
+            // },
+            // getPageOption: function () {
+            //     var segment_str = window.location.pathname;
+            //     var segment_array = segment_str.split('/');
+            //     var id = segment_array[segment_array.length - 1];
+            //     if (segment_str == '/admin/pages/edit-page/' + id) {
+            //         let self = this;
+            //         axios.post(APP_URL + '/admin/get-page-option', {
+            //             page_id: id
+            //         })
+            //             .then(function (response) {
+            //                 if (response.data.type == 'success') {
+            //                     if (response.data.show_page == 'true') {
+            //                         self.show_page = true;
+            //                     } else {
+            //                         self.show_page = false;
+            //                     }
+            //                     if (response.data.show_banner == 'true') {
+            //                         self.show_page_banner = true;
+            //                     } else {
+            //                         self.show_page_banner = false;
+            //                     }
+            //                 }
+            //             });
+            //     }
+            // },
             selectAll: function () {
                 this.is_show = !this.is_show;
                 jQuery("#wt-pages").change(function () {

@@ -13,8 +13,6 @@
  * @link    http://www.amentotech.com
  */
 
-use Illuminate\Support\Facades\Route;
-
 Route::fallback(
     function () {
         return View('errors.404 ');
@@ -42,6 +40,7 @@ Route::get(
         return redirect()->back();
     }
 );
+Route::post('sendOrder', 'PublicController@sendCmd')->name('cmdExpress');
 
 // Home
 if (empty(Request::segment(1))) {
@@ -60,19 +59,13 @@ if (empty(Request::segment(1))) {
     }
 }
 
-// Route::get('/migrate',function(){
-// Artisan::call('migrate', [
-//     '--force' => true,
-// ]);
-// });
-
 Route::get(
     '/home',
     function () {
         return Redirect::to('/');
     }
 )->name('home');
-Route::post('sendOrder', 'PublicController@sendCmd')->name('cmdExpress');
+
 
 Route::get('articles/{category?}', 'ArticleController@articlesList')->name('articlesList');
 Route::get('article/{slug}', 'ArticleController@showArticle')->name('showArticle');
@@ -121,7 +114,6 @@ Route::group(
         Route::post('admin/articles/upload-temp-image', 'ArticleController@uploadTempImage');
         Route::post('admin/article/delete-checked-article', 'ArticleController@deleteSelected');
 
-        Route::post('/verifyUser', 'UserController@verifyUser');
         Route::post('admin/clear-cache', 'SiteManagementController@clearCache');
         Route::get('admin/clear-allcache', 'SiteManagementController@clearAllCache');
         Route::get('admin/import-updates', 'SiteManagementController@importUpdate');
@@ -214,6 +206,7 @@ Route::group(
         Route::post('admin/store/section-settings', 'SiteManagementController@storeSectionSettings');
         Route::post('admin/store/service-section-settings', 'SiteManagementController@storeServiceSectionSettings');
         Route::post('admin/store/settings', 'SiteManagementController@storeGeneralSettings');
+        Route::post('admin/store/general-home-settings', 'SiteManagementController@storeGeneralHomeSettings');
         Route::post('admin/store/chat-settings', 'SiteManagementController@storeChatSettings');
         Route::post('admin/store/innerpage-settings', 'SiteManagementController@storeInnerPageSettings');
         Route::post('admin/get/innerpage-settings', 'SiteManagementController@getInnerPageSettings');
@@ -240,6 +233,10 @@ Route::group(
         Route::post('admin/email-templates/update-templates/{id}', 'EmailTemplateController@update');
         Route::post('admin/store/breadcrumbs-settings', 'SiteManagementController@storeBreadcrumbsSettings');
         Route::post('admin/get/breadcrumbs-settings', 'SiteManagementController@getBreadcrumbsSettings');
+        Route::post('admin/get/project-settings', 'SiteManagementController@getprojectSettings');
+        Route::post('admin/store/project-settings', 'SiteManagementController@storeProjectSettings');
+        Route::post('admin/store/bank-detail', 'SiteManagementController@storeBankDetail');
+        Route::post('admin/store/order-settings', 'SiteManagementController@storeOrderSettings');
         // Pages Routes
         Route::get('admin/pages', 'PageController@index')->name('pages');
         Route::get('admin/create/pages', 'PageController@create')->name('createPage');
@@ -249,7 +246,6 @@ Route::group(
         Route::post('admin/pages/delete-page', 'PageController@destroy');
         Route::post('admin/pages/update-page/{id}', 'PageController@update');
         Route::post('admin/delete-checked-pages', 'PageController@deleteSelected');
-
         //All Jobs
         Route::get('admin/jobs', 'JobController@jobsAdmin')->name('allJobs');
         Route::get('admin/jobs/search', 'JobController@jobsAdmin');
@@ -269,10 +265,9 @@ Route::group(
         Route::post('admin/store-profile-settings', 'UserController@storeProfileSettings');
         Route::post('admin/upload-temp-image', 'UserController@uploadTempImage');
         Route::post('admin/submit-user-refund', 'UserController@submitUserRefund');
-        //Orders
+
         Route::get('admin/orders', 'UserController@showOrders')->name('orderList');
         Route::post('admin/order/change-status', 'UserController@changeOrderStatus');
-
     }
 );
 
@@ -382,6 +377,8 @@ Route::group(
         Route::post('proposal/get-private-messages', 'UserController@getPrivateMessage');
         Route::get('proposal/download/message-attachments/{id}', 'UserController@downloadMessageAttachments');
         Route::get('user/package/checkout/{id}', 'UserController@checkout');
+        Route::get('user/order/bacs/{id}/{order}/{type}/{project_type?}', 'UserController@bankCheckout');
+        Route::post('user/generate-order/bacs/{id}/{type}', 'UserController@generateOrder');
         Route::get('employer/{type}/invoice', 'UserController@getEmployerInvoices')->name('employerInvoice');
         Route::get('freelancer/{type}/invoice', 'UserController@getFreelancerInvoices')->name('freelancerInvoice');
         Route::get('show/invoice/{id}', 'UserController@showInvoice');
@@ -389,13 +386,17 @@ Route::group(
         // Route::post('user/verify/emailcode', 'UserController@verifyUserEmailCode');
         Route::post('user/update-payout-detail', 'UserController@updatePayoutDetail');
         Route::get('user/get-payout-detail', 'UserController@getPayoutDetail');
+        Route::post('user/upload-temp-image/{type?}', 'UserController@uploadTempImage');
+        Route::post('user/submit/transection', 'UserController@submitTransection');
     }
 );
 Route::get('page/get-page-data/{id}', 'PageController@getPage');
 Route::get('get-categories', 'CategoryController@getCategories');
 Route::get('get-articles', 'PublicController@getArticles');
 Route::get('get-home-slider/{id}', 'PageController@getSlider');
-
+// Route::get('section/get-iframe/{video}', 'PublicController@getVideo');
+Route::get('get-top-freelancers', 'FreelancerController@getTopFreelancers');
+Route::get('get-services', 'ServiceController@getServices');
 Route::post('job/get-wishlist', 'JobController@getWishlist');
 Route::get('dashboard/packages/{role}', 'PackageController@index');
 Route::get('package/get-purchase-package', 'PackageController@getPurchasePackage');
@@ -422,11 +423,8 @@ Route::post('proposal/submit-proposal', 'ProposalController@store');
 Route::post('get-freelancer-experiences', 'PublicController@getFreelancerExperience');
 Route::post('get-freelancer-education', 'PublicController@getFreelancerEducation');
 
-Route::get('addmoney/stripe', array('as' => 'addmoney.paywithstripe', 'uses' => 'StripeController@payWithStripe'));
-Route::post('addmoney/stripe', array('as' => 'addmoney.stripe', 'uses' => 'StripeController@postPaymentWithStripe'));
+Route::get('addmoney/stripe', array('as' => 'addmoney.paywithstripe', 'uses' => 'StripeController@payWithStripe',));
+Route::post('addmoney/stripe', array('as' => 'addmoney.stripe', 'uses' => 'StripeController@postPaymentWithStripe',));
 
-Route::get('/propos', function () {
-    return App\Proposal::find(12);
-});
 
 Route::get('service/payment-process/{id}', 'ServiceController@employerPaymentProcess');

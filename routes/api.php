@@ -33,3 +33,7 @@ Route::get('v1/profile/setting', 'RestAPIController@getUserInfo');
 Route::post('v1/password/reset', 'RestAPIController@sendResetLinkEmail');
 Route::get('v1/employer-jobs', 'RestAPIController@getEmployerJobs');
 Route::post('v1/listing/add-jobs', 'RestAPIController@postJob');
+Route::get('v1/listing/services', 'RestAPIController@getServices');
+Route::get('v1/service/detail', 'RestAPIController@getService');
+Route::post('v1/create-user', 'RestAPIController@createUser');
+Route::post('v1/listing/add-service', 'RestAPIController@postService');

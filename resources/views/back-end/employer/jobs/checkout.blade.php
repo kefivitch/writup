@@ -55,16 +55,8 @@
                                     <td>{{{ $freelancer_name }}}</td>
                                 </tr>
                                 <tr>
-                                    <td>Montant HT :</td>
-                                    <td>{{{ $proposal->amount }}} {{ !empty($symbol['symbol']) ? $symbol['symbol'] : '$' }}</td>
-                                </tr>
-                                <tr>
-                                    <td>TVA <small class="text-secondary">(19%)</small>: </td>
-                                    <td>{{{ $proposal->amount * 0.19}}} {{ !empty($symbol['symbol']) ? $symbol['symbol'] : '$' }}</td>
-                                </tr>
-                                <tr>
-                                    <td>TTC :</td>
-                                    <td>{{{ $proposal->amount + ($proposal->amount * 0.19)}}} {{ !empty($symbol['symbol']) ? $symbol['symbol'] : '$' }}</td>
+                                    <td>{{ trans('lang.total') }}</td>
+                                    <td>{{ !empty($symbol['symbol']) ? $symbol['symbol'] : '$' }}{{{$proposal->amount}}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -72,10 +64,9 @@
                     @if (!empty($payment_gateway))
                         <div class="sj-checkpaymentmethod">
                             <div class="sj-title">
-                                <!--<h3>{{ trans('lang.select_pay_method') }}</h3>-->
-                                <h3>Continuer le paiement</h3>
+                                <h3>{{ trans('lang.select_pay_method') }}</h3>
                             </div>
-                            <ul class="sj-paymentmethod"><!--
+                            <ul class="sj-paymentmethod">
                                 @foreach ($payment_gateway as $gatway)
                                     <li>
                                         @if ($gatway == "paypal")
@@ -90,52 +81,7 @@
                                             </a>
                                         @endif
                                     </li>
-                                @endforeach-->
-                                @php
-                                    $NumSite = 'MAR762';
-                                    $Password = 're#yjL10';
-                                    $Amount = $proposal->amount*1000+($proposal->amount*0.19)*1000;
-                                    $Devise = 'TND';
-                                    $orderId = date('ymdHis');
-                                    $signture = sha1($NumSite.$Password.$orderId.$Amount.$Devise);
-                                @endphp
-                                <FORM name="paiment" method="POST" action="https://preprod.gpgcheckout.com/Paiement_test/Validation_paiement.php" >
-                                    @csrf
-                                    @method('POST')
-                                    <input type="hidden" name="NumSite" value="<?php echo $NumSite;?>">
-                                    <input type="hidden" name="Password" value="<?php echo md5($Password);?>">
-                                    <input type="hidden" name="orderID" value="<?php echo $orderId ;?>">
-                                    <input type="hidden" name="Amount" value="<?php echo $Amount;?>">
-                                    <input type="hidden" name="Currency" value="<?php echo $Devise;?>">
-                                    <input type="hidden" name="signature" value="<?php echo $signture;?>">
-                                    <input type="hidden" name="Language" value="fr">
-                                    <input type="hidden" name="EMAIL" value="{{ Auth::user()->email }}">
-                                    <input type="hidden" name="CustLastName" value="{{ Auth::user()->first_name }}">
-                                    <input type="hidden" name="CustFirstName" value="{{ Auth::user()->last_name }}">
-                                    <input type="hidden" placeholder="Saisir votre ville" name="CustCity" value="">
-                                    <input type="hidden" name="CustCountry" value="tunisie">
-                                    <input type="hidden" name="CustTel" value="{{ Auth::user()->phone }}">
-                                    <input type="hidden" name="PayementType" value="1">
-                                    <input type="hidden" name="MerchandSession" value="{{ $proposal->id }}">
-                                    <input type="hidden" name="orderProducts" value="{{ $job->title }}">
-                                    <input type="hidden" name="vad" value="924200003">
-                                    <input type="hidden" name="Terminal" value="001">
-                                    <input type="hidden" name="TauxConversion" value=" ">
-                                    <input type="hidden" name="BatchNumber" value=" ">
-                                    <input type="hidden" name="MerchantReference" value="">
-                                    <input type="hidden" name="Reccu_Num" value="">
-                                    <input type="hidden" name="Reccu_ExpiryDate " value="">
-                                    <input type="hidden" name="Reccu_Frecuency " value=" ">
-                                    
-                                    
-                                    <div class="row mt-3">
-                                        <div class="col-sm-9"></div>
-                                        <div class="col-sm-3">
-                                            <input type="submit" name="Valider" value="Valider" class="wt-btn">
-                                        </div>
-                                    </div>
-                                    
-                                </FORM>
+                                @endforeach
                             </ul>
                         </div>
                     @endif

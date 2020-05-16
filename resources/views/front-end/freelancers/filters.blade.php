@@ -61,7 +61,7 @@
                 </fieldset>
             </div>
         </div>
-        <!-- <div class="wt-widget wt-effectiveholder">
+        <div class="wt-widget wt-effectiveholder">
             <div class="wt-widgettitle">
                 <h2>{{{ trans('lang.hourly_rate') }}}</h2>
             </div>
@@ -86,9 +86,9 @@
                     </fieldset>
                 </div>
             </div>
-        </div> -->
+        </div>
         
-        <!-- <div class="wt-widget wt-effectiveholder">
+        <div class="wt-widget wt-effectiveholder">
             <div class="wt-widgettitle">
                 <h2>{{ trans('lang.freelancer_type') }}</h2>
             </div>
@@ -105,8 +105,8 @@
                     </div>
                 </div>
             </div>
-        </div> -->
-        <!-- <div class="wt-widget wt-effectiveholder">
+        </div>
+        <div class="wt-widget wt-effectiveholder">
             <div class="wt-widgettitle">
                 <h2>{{ trans('lang.english_level') }}</h2>
             </div>
@@ -125,7 +125,7 @@
                     </fieldset>
                 </div>
             </div>
-        </div> -->
+        </div>
         <div class="wt-widget wt-effectiveholder">
             <div class="wt-widgettitle">
                 <h2>{{ trans('lang.langs') }}</h2>

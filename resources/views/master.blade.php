@@ -65,7 +65,7 @@
 		var APP_DIRECTION = {!! json_encode(Helper:: getTextDirection()) !!}
 	</script>
 	@if (Auth::user())
-	<script type="text/javascript">
+		<script type="text/javascript">
 		var USERID = {!! json_encode(Auth:: user() -> id) !!}
 		window.Laravel = {!! json_encode([
 			'csrfToken'=> csrf_token(),

@@ -1,8 +1,13 @@
 @extends(file_exists(resource_path('views/extend/front-end/master.blade.php')) ? 'extend.front-end.master' : 'front-end.master')
 @section('content')
     @php
-    $breadcrumbs_settings = \App\SiteManagement::getMetaValue('show_breadcrumb');
-    $show_breadcrumbs = !empty($breadcrumbs_settings) ? $breadcrumbs_settings : 'true';
+    if (Schema::hasTable('site_managements')) {
+        $breadcrumbs_settings = \App\SiteManagement::getMetaValue('show_breadcrumb');
+        $show_breadcrumbs = !empty($breadcrumbs_settings) ? $breadcrumbs_settings : 'true';
+    } else {
+        $show_breadcrumbs ='';
+    }
+    
     @endphp
     <div class="wt-haslayout wt-innerbannerholder">
         <div class="container">

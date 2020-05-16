@@ -176,11 +176,11 @@ class ProposalController extends Controller
                     $json['message'] = trans('lang.job_not_avail');
                     return $json;
                 }
-               /* if (intval($request['amount']) > 0) {
+                if (intval($request['amount']) > $job->price) {
                     $json['type'] = 'error';
                     $json['message'] = trans('lang.proposal_exceed');
                     return $json;
-                }*/
+                }
                 $package = DB::table('items')->where('subscriber', Auth::user()->id)->select('product_id')->first();
                 $proposals = $this->proposal::where('freelancer_id', Auth::user()->id)->count();
                 $settings = SiteManagement::getMetaValue('settings');
@@ -352,13 +352,16 @@ class ProposalController extends Controller
         if (!empty($slug)) {
             $accepted_proposal = array();
             $job = Job::where('slug', $slug)->first();
-            $proposals = Job::latest()->find($job->id)->proposals;
+            // $proposals = Job::latest()->find($job->id)->proposals;
+            $proposals = Job::find($job->id)->proposals;
+            $order = Job::getProjectOrder($job->id);
             $accepted_proposal = Job::find($job->id)->proposals()->where('hired', 1)->first();
             $duration = !empty($job->duration) ? Helper::getJobDurationList($job->duration) : '';
             $currency   = SiteManagement::getMetaValue('commision');
             $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
             $payment_settings = SiteManagement::getMetaValue('commision');
             $enable_package = !empty($payment_settings) && !empty($payment_settings[0]['enable_packages']) ? $payment_settings[0]['enable_packages'] : 'true';
+            $mode = !empty($payment_settings) && !empty($payment_settings[0]['payment_mode']) ? $payment_settings[0]['payment_mode'] : 'true';
             if (file_exists(resource_path('views/extend/back-end/employer/proposals/index.blade.php'))) {
                 return View(
                     'extend.back-end.employer.proposals.index',
@@ -368,7 +371,9 @@ class ProposalController extends Controller
                         'duration',
                         'accepted_proposal',
                         'symbol',
-                        'enable_package'
+                        'enable_package',
+                        'mode',
+                        'order'
                     )
                 );
             } else {
@@ -380,7 +385,9 @@ class ProposalController extends Controller
                         'duration',
                         'accepted_proposal',
                         'symbol',
-                        'enable_package'
+                        'enable_package',
+                        'mode',
+                        'order'
                     )
                 );
             }
@@ -444,10 +451,12 @@ class ProposalController extends Controller
         $duration = !empty($job->duration) ? Helper::getJobDurationList($job->duration) : '';
         $review_options = DB::table('review_options')->get()->all();
         $user_slug = User::find($accepted_proposal->freelancer_id)->slug;
-        $freelancer_rating  = !empty($profile->ratings) ? Helper::getUnserializeData($profile->ratings) : 0;
-        $rating = !empty($freelancer_rating) ? $freelancer_rating[0] : 0;
-        $stars  =  !empty($freelancer_rating) ? $freelancer_rating[0] / 5 * 100 : 0;
         $feedbacks = Review::select('feedback')->where('receiver_id', $accepted_proposal->freelancer_id)->count();
+        $avg_rating = Review::where('receiver_id', $accepted_proposal->freelancer_id)->sum('avg_rating');
+        $rating  = $avg_rating != 0 ? round($avg_rating/Review::count()) : 0;
+        $reviews = Review::where('receiver_id', $accepted_proposal->freelancer_id)->get();
+        $stars  = $reviews->sum('avg_rating') != 0 ? (($reviews->sum('avg_rating')/$feedbacks)/5)*100 : 0;
+        $average_rating_count = !empty($feedbacks) ? $reviews->sum('avg_rating')/$feedbacks : 0;
         $currency   = SiteManagement::getMetaValue('commision');
         $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
         $cancel_proposal_text = trans('lang.cancel_proposal_text');
@@ -458,6 +467,7 @@ class ProposalController extends Controller
             return view(
                 'extend.back-end.employer.proposals.show',
                 compact(
+                    'average_rating_count',
                     'job',
                     'duration',
                     'accepted_proposal',
@@ -483,6 +493,7 @@ class ProposalController extends Controller
             return view(
                 'back-end.employer.proposals.show',
                 compact(
+                    'average_rating_count',
                     'job',
                     'duration',
                     'accepted_proposal',

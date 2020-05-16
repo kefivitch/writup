@@ -2,6 +2,11 @@
 @section('content')
     <div class="wt-dbsectionspace wt-haslayout la-aw-freelancer">
         <div class="freelancer-profile" id="user_profile">
+            <div class="preloader-section" v-if="loading" v-cloak>
+                <div class="preloader-holder">
+                    <div class="loader"></div>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-9">
                     <div class="wt-dashboardbox wt-dashboardtabsholder">

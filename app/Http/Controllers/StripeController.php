@@ -25,7 +25,7 @@ use Cartalyst\Stripe\Laravel\Facades\Stripe;
 use Stripe\Error\Card;
 use App\Proposal;
 use App\Job;
-use Illuminate\Support\Facades\Auth;
+use Auth;
 use App\Invoice;
 use DB;
 use App\Package;
@@ -341,7 +341,7 @@ class StripeController extends Controller
                                         }
                                     }
                                 }
-                            }//
+                            }
                         }
                     }
                 } else {
@@ -392,89 +392,6 @@ class StripeController extends Controller
             $json['url'] = url('dashboard/packages/freelancer');
             session()->forget('type');
             return $json;
-        }
-    }
-    public function postPayment(Request $request)
-    {
-        $amount = $request->TotalAmount;
-        $email = $request->EMAIL;
-        $firstname = $request->CustFirstName;
-        $lastname = $request->CustLastName;
-        $phone = $request->CustTel;
-        $currency = $request->Currency ;
-        $description = $request->orderProducts;
-        $paymentType = $request->PayementType;
-        $session = $request->merchandSession;
-        $orderID = $request->PAYID;
-        $status = $request->TransStatus;
-        $hash = $request->Signature;
-
-        
-        $invoice = new Invoice();
-        $invoice->title = 'Invoice '.$orderID;
-        $invoice->price = $amount;
-        $invoice->payer_name = $firstname.' '.$lastname;
-        $invoice->payer_email = $email;
-        $invoice->seller_email = 'test@email.com';
-        $invoice->currency_code = $currency;
-        $invoice->payer_status = $status;
-        $invoice->transaction_id = $hash;
-        $invoice->invoice_id = $orderID;
-        $invoice->customer_id = $session;
-        $invoice->shipping_amount = 0;
-        $invoice->handling_amount = 0;
-        $invoice->insurance_amount = 0;
-        $invoice->sales_tax = 0;
-        $invoice->payment_mode = 'gpg';
-        $invoice->paypal_fee = 0;
-        $invoice->paid =$description;
-        $product_type = $paymentType;
-        $invoice->type = $product_type;
-        $invoice->save();
-
-
-        $id = $orderID;
-        $proposal = Proposal::find($session);
-        $proposal->hired = 1;
-        $proposal->status = 'hired';
-        $proposal->paid = 'pending';
-        $proposal->save();
-        $job = Job::find($proposal->job->id);
-        $job->status = 'hired';
-        $job->save(); 
-        // send message to freelancer
-        $message = new Message();
-        $user = User::find(Auth::id());
-        $message->user()->associate($user);
-        $message->receiver_id = intval($proposal->freelancer_id);
-        $message->body = trans('lang.hire_for') . ' ' . $job->title . ' ' . trans('lang.project');
-        $message->status = 0;
-        $message->save();
-        // send mail
-        if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
-            $freelancer = User::find($proposal->freelancer_id);
-            $employer = User::find($job->user_id);
-            if (!empty($freelancer->email)) {
-                $email_params = array();
-                $template = DB::table('email_types')->select('id')->where('email_type', 'freelancer_email_hire_freelancer')->get()->first();
-                if (!empty($template->id)) {
-                    $template_data = EmailTemplate::getEmailTemplateByID($template->id);
-                    $email_params['project_title'] = $job->title;
-                    $email_params['hired_project_link'] = url('job/' . $job->slug);
-                    $email_params['name'] = Helper::getUserName($freelancer->id);
-                    $email_params['link'] = url('profile/' . $freelancer->slug);
-                    $email_params['employer_profile'] = url('profile/' . $employer->slug);
-                    $email_params['emp_name'] = Helper::getUserName($employer->id);
-                    Mail::to($freelancer->email)
-                        ->send(
-                            new FreelancerEmailMailable(
-                                'freelancer_email_hire_freelancer',
-                                $template_data,
-                                $email_params
-                            )
-                        );
-                }
-            }
         }
     }
 }

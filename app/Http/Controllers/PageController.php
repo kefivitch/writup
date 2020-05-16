@@ -13,16 +13,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Helper;
 use App\Page;
-use App\SiteManagement;
-use Auth;
-use DB;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Schema;
-use Session;
 use View;
+use Illuminate\Support\Facades\Redirect;
+use Session;
+use DB;
+use Auth;
+use App\User;
+use App\Helper;
+use App\SiteManagement;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Class PageController
@@ -127,7 +128,6 @@ class PageController extends Controller
                 $request,
                 [
                     'title' => 'required|string',
-                    'title_balise' => 'required|string',
 
                 ]
             );
@@ -161,7 +161,6 @@ class PageController extends Controller
                 $page = array();
                 $page['id'] = $page_data['id'];
                 $page['title'] = $page_data['title'];
-                $page['title_balise'] = $page_data['title_balise'];
                 $page['slug'] = $page_data['slug'];
                 $page['section_list'] = !empty($page_data['sections']) ? Helper::getUnserializeData($page_data['sections']) : array();
                 $description = $page_data['body'];
@@ -176,7 +175,7 @@ class PageController extends Controller
                 } else {
                     $show_banner_image = true;
                 }
-                $banner = !empty($page_banner) ? Helper::getBannerImage('uploads/pages/' . $page['id'] . '/' . $page_banner) : 'images/bannerimg/img-02.jpg';
+                $banner = !empty($page_banner) ? Helper::getBannerImage('uploads/pages/'.$page['id'].'/'. $page_banner) : 'images/bannerimg/img-02.jpg';
                 $meta_desc = !empty($page_meta) ? $page_meta : '';
                 $type = Helper::getAccessType() == 'services' ? 'service' : Helper::getAccessType();
                 // $home_id = SiteManagement::getMetaValue('homepage');
@@ -281,7 +280,6 @@ class PageController extends Controller
                 $page_data = $selected_page->toArray();
                 $page['id'] = $page_data['id'];
                 $page['title'] = $page_data['title'];
-                $page['title_balise'] = $page_data['title_balise'];
                 $page['slug'] = $page_data['slug'];
                 $page['section_list'] = Helper::getUnserializeData($page_data['sections']);
                 $parent_selected_id = '';
@@ -406,7 +404,6 @@ class PageController extends Controller
                 $request,
                 [
                     'title' => 'required|string',
-                    'title_balise' => 'required|string',
                 ]
             );
             $parent_id = filter_var($request['parent_id'], FILTER_SANITIZE_NUMBER_INT);

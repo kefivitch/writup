@@ -15,7 +15,7 @@
                 </div>
             </div>
         </div>
-        <!-- <div class="wt-widget wt-effectiveholder">
+        <div class="wt-widget wt-effectiveholder">
             <div class="wt-widgettitle">
                 <h2>{{ trans('lang.cats') }}</h2>
             </div>
@@ -40,8 +40,8 @@
                     @endif
                 </fieldset>
             </div>
-        </div> -->
-        <!-- <div class="wt-widget wt-effectiveholder">
+        </div>
+        <div class="wt-widget wt-effectiveholder">
             <div class="wt-widgettitle">
                 <h2>{{ trans('lang.locations') }}</h2>
             </div>
@@ -66,7 +66,7 @@
                     @endif
                 </fieldset>
             </div>
-        </div>  -->
+        </div>
         <div class="wt-widget wt-effectiveholder">
             <div class="wt-widgettitle">
                 <h2>{{ trans('lang.skills') }}</h2>
@@ -87,7 +87,7 @@
                 </fieldset>
             </div>
         </div>
-        <!-- <div class="wt-widget wt-effectiveholder" >
+        <div class="wt-widget wt-effectiveholder">
             <div class="wt-widgettitle">
                 <h2>{{ trans('lang.project_length') }}</h2>
             </div>
@@ -106,7 +106,7 @@
                     @endif
                 </fieldset>
             </div>
-        </div>  -->
+        </div>
         <div class="wt-widget wt-effectiveholder">
             <div class="wt-widgettitle">
                 <h2>{{ trans('lang.langs') }}</h2>

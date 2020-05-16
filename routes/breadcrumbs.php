@@ -86,3 +86,5 @@ Breadcrumbs::for(
         $trail->push(trans('lang.profile'), route('showUserProfile', ['slug' => $slug]));
     }
 );
+
+

@@ -12,27 +12,33 @@
  */
 namespace App\Http\Controllers;
 
-use App\Category;
-use App\EmailTemplate;
-use App\Helper;
-use App\Item;
 use App\Job;
+use Illuminate\Http\Request;
+use Auth;
+use Session;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Input;
 use App\Language;
+use App\Category;
+use App\Skill;
 use App\Location;
+use App\Helper;
+use App\Proposal;
+use ValidateRequests;
+use App\User;
+use App\Profile;
+use App\Package;
+use DB;
+use Spatie\Permission\Models\Role;
+use App\SiteManagement;
 use App\Mail\AdminEmailMailable;
 use App\Mail\EmployerEmailMailable;
-use App\Package;
-use App\Profile;
-use App\SiteManagement;
-use App\Skill;
-use App\User;
-use Auth;
+use App\EmailTemplate;
+use App\Item;
 use Carbon\Carbon;
-use DB;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -84,7 +90,7 @@ class JobController extends Controller
         $freelancer_level = Helper::getFreelancerLevelList();
         $skills = Skill::pluck('title', 'id');
         $categories = Category::pluck('title', 'id');
-        $role_id = Helper::getRoleByUserID(Auth::user()->id);
+        $role_id =  Helper::getRoleByUserID(Auth::user()->id);
         $package_options = Package::select('options')->where('role_id', $role_id)->first();
         $options = !empty($package_options) ? unserialize($package_options['options']) : array();
         if (file_exists(resource_path('views/extend/back-end/employer/jobs/create.blade.php'))) {
@@ -128,7 +134,7 @@ class JobController extends Controller
     public function index()
     {
         $job_details = $this->job->latest()->where('user_id', Auth::user()->id)->paginate(5);
-        $currency = SiteManagement::getMetaValue('commision');
+        $currency   = SiteManagement::getMetaValue('commision');
         $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
         if (file_exists(resource_path('views/extend/back-end/employer/jobs/index.blade.php'))) {
             return view('extend.back-end.employer.jobs.index', compact('job_details', 'symbol'));
@@ -263,12 +269,12 @@ class JobController extends Controller
             $request,
             [
                 'title' => 'required',
-                // 'project_levels' => 'required',
-                // 'job_duration' => 'required',
-                // 'freelancer_type' => 'required',
-                // 'english_level' => 'required',
-                'project_cost' => 'required',
-                'description' => 'required',
+                'project_levels'    => 'required',
+                'job_duration'    => 'required',
+                'freelancer_type'    => 'required',
+                'english_level'    => 'required',
+                'project_cost'    => 'required',
+                'description'    => 'required',
             ]
         );
         if (Schema::hasColumn('jobs', 'expiry_date')) {
@@ -318,13 +324,13 @@ class JobController extends Controller
             if ($request['is_featured'] == 'true') {
                 if ($posted_featured_jobs >= intval($option['featured_jobs'])) {
                     $json['type'] = 'error';
-                    $json['message'] = trans('lang.sorry_can_only_feature') . ' ' . $option['featured_jobs'] . ' ' . trans('lang.jobs_acc_to_pkg');
+                    $json['message'] = trans('lang.sorry_can_only_feature')  .' '. $option['featured_jobs'] .' ' . trans('lang.jobs_acc_to_pkg');
                     return $json;
                 }
             }
             if ($posted_jobs >= intval($option['jobs'])) {
                 $json['type'] = 'error';
-                $json['message'] = trans('lang.sorry_cannot_submit') . ' ' . $option['jobs'] . ' ' . trans('lang.jobs_acc_to_pkg');
+                $json['message'] = trans('lang.sorry_cannot_submit') .' '. $option['jobs'] .' ' . trans('lang.jobs_acc_to_pkg');
                 return $json;
             } else {
                 $job_post = $this->job->storeJobs($request);
@@ -347,22 +353,22 @@ class JobController extends Controller
                             $email_params['name'] = Helper::getUserName(Auth::user()->id);
                             $email_params['link'] = url('profile/' . $user->slug);
                             Mail::to(config('mail.username'))
+                            ->send(
+                                new AdminEmailMailable(
+                                    'admin_email_new_job_posted',
+                                    $template_data,
+                                    $email_params
+                                )
+                            );
+                            if (!empty($user->email)) {
+                                Mail::to($user->email)
                                 ->send(
-                                    new AdminEmailMailable(
-                                        'admin_email_new_job_posted',
-                                        $template_data,
+                                    new EmployerEmailMailable(
+                                        'employer_email_new_job_posted',
+                                        $template_data_employer,
                                         $email_params
                                     )
                                 );
-                            if (!empty($user->email)) {
-                                Mail::to($user->email)
-                                    ->send(
-                                        new EmployerEmailMailable(
-                                            'employer_email_new_job_posted',
-                                            $template_data_employer,
-                                            $email_params
-                                        )
-                                    );
                             }
                         }
                     }
@@ -390,22 +396,22 @@ class JobController extends Controller
                         $email_params['name'] = Helper::getUserName(Auth::user()->id);
                         $email_params['link'] = url('profile/' . $user->slug);
                         Mail::to(config('mail.username'))
+                        ->send(
+                            new AdminEmailMailable(
+                                'admin_email_new_job_posted',
+                                $template_data,
+                                $email_params
+                            )
+                        );
+                        if (!empty($user->email)) {
+                            Mail::to($user->email)
                             ->send(
-                                new AdminEmailMailable(
-                                    'admin_email_new_job_posted',
-                                    $template_data,
+                                new EmployerEmailMailable(
+                                    'employer_email_new_job_posted',
+                                    $template_data_employer,
                                     $email_params
                                 )
                             );
-                        if (!empty($user->email)) {
-                            Mail::to($user->email)
-                                ->send(
-                                    new EmployerEmailMailable(
-                                        'employer_email_new_job_posted',
-                                        $template_data_employer,
-                                        $email_params
-                                    )
-                                );
                         }
                     }
                 }
@@ -434,9 +440,9 @@ class JobController extends Controller
             $request,
             [
                 'title' => 'required',
-                'project_levels' => 'required',
-                'english_level' => 'required',
-                'project_cost' => 'required',
+                'project_levels'    => 'required',
+                'english_level'    => 'required',
+                'project_cost'    => 'required',
             ]
         );
         if (Schema::hasColumn('jobs', 'expiry_date')) {
@@ -460,7 +466,7 @@ class JobController extends Controller
                     'latitude' => ['regex:/^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}$/'],
                     'longitude' => ['regex:/^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,6}$/'],
                 ]
-            );
+            ); 
         }
         $id = $request['id'];
         $job_update = $this->job->updateJobs($request, $id);
@@ -496,10 +502,10 @@ class JobController extends Controller
             $auth_profile = Auth::user() ? auth()->user()->profile : '';
             $save_jobs = !empty($auth_profile->saved_jobs) ? unserialize($auth_profile->saved_jobs) : array();
             $save_employers = !empty($auth_profile->saved_employers) ? unserialize($auth_profile->saved_employers) : array();
-            $attachments = unserialize($job->attachments);
-            $currency = SiteManagement::getMetaValue('commision');
+            $attachments  = unserialize($job->attachments);
+            $currency   = SiteManagement::getMetaValue('commision');
             $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
-            $project_type = Helper::getProjectTypeList($job->project_type);
+            $project_type  = Helper::getProjectTypeList($job->project_type);
             $breadcrumbs_settings = SiteManagement::getMetaValue('show_breadcrumb');
             $show_breadcrumbs = !empty($breadcrumbs_settings) ? $breadcrumbs_settings : 'true';
             if (file_exists(resource_path('views/extend/front-end/jobs/show.blade.php'))) {
@@ -582,13 +588,13 @@ class JobController extends Controller
             $jobs = $this->job::where('title', 'like', '%' . $keyword . '%')->paginate(6)->setPath('');
             $pagination = $jobs->appends(
                 array(
-                    'keyword' => Input::get('keyword'),
+                    'keyword' => Input::get('keyword')
                 )
             );
         } else {
             $jobs = $this->job->latest()->paginate(6);
         }
-        $payment = SiteManagement::getMetaValue('commision');
+        $payment   = SiteManagement::getMetaValue('commision');
         $symbol = !empty($payment) && !empty($payment[0]['currency']) ? Helper::currencyList($payment[0]['currency']) : array();
         $payment_methods = Arr::pluck(Helper::getPaymentMethodList(), 'title', 'value');
         if (file_exists(resource_path('views/extend/back-end/admin/jobs/index.blade.php'))) {
@@ -626,7 +632,7 @@ class JobController extends Controller
         $Jobs_total_records = '';
         $type = 'job';
         $currency = SiteManagement::getMetaValue('commision');
-        $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
+        $symbol   = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
         $job_list_meta_title = !empty($inner_page) && !empty($inner_page[0]['job_list_meta_title']) ? $inner_page[0]['job_list_meta_title'] : trans('lang.job_listing');
         $job_list_meta_desc = !empty($inner_page) && !empty($inner_page[0]['job_list_meta_desc']) ? $inner_page[0]['job_list_meta_desc'] : trans('lang.job_meta_desc');
         $show_job_banner = !empty($inner_page) && !empty($inner_page[0]['show_job_banner']) ? $inner_page[0]['show_job_banner'] : 'true';

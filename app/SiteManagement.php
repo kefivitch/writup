@@ -11,13 +11,16 @@
  */
 namespace App;
 
-use Carbon\Carbon;
-use DB;
-use File;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\App;
+use DB;
+use Illuminate\Support\Facades\Validator;
+use File;
 use Storage;
+use Illuminate\Support\Arr;
+use Carbon\Carbon;
+use Session;
+use Illuminate\Support\Facades\App;
+use Cookie;
 
 /**
  * Class SiteManagement
@@ -48,9 +51,9 @@ class SiteManagement extends Model
         if (!empty($meta_key)) {
             $data = DB::table('site_managements')->select('meta_value')->where('meta_key', $meta_key)->get()->first();
             if (!empty($data)) {
-                $fixed_data = preg_replace_callback('!s:(\d+):"(.*?)";!', function ($match) {
+                $fixed_data = preg_replace_callback ( '!s:(\d+):"(.*?)";!', function($match) {
                     return ($match[1] == strlen($match[2])) ? $match[0] : 's:' . strlen($match[2]) . ':"' . $match[2] . '";';
-                }, $data->meta_value);
+                }, $data->meta_value );
                 return unserialize($fixed_data);
             }
         }
@@ -139,7 +142,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'email_data', 'meta_value' => serialize($email_data_array),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             return 'success';
@@ -246,7 +249,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'inner_page_data', 'meta_value' => serialize($inner_page_data_array),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             return 'success';
@@ -300,15 +303,15 @@ class SiteManagement extends Model
                         $settings_array[$key]['favicon'] = $setting['favicon'];
                     }
                 }
-                if (!empty($setting['language']) && File::exists(resource_path('lang/' . $setting['language']))) {
-                    if (File::exists(resource_path('lang/' . $setting['language'] . '/lang.php'))
-                        && File::exists(resource_path('lang/' . $setting['language'] . '/auth.php'))
-                        && File::exists(resource_path('lang/' . $setting['language'] . '/pagination.php'))
-                        && File::exists(resource_path('lang/' . $setting['language'] . '/passwords.php'))
-                        && File::exists(resource_path('lang/' . $setting['language'] . '/validation.php'))
+                if (!empty($setting['language']) && File::exists(resource_path('lang/'.$setting['language']))) {
+                    if (File::exists(resource_path('lang/'.$setting['language'].'/lang.php'))
+                        && File::exists(resource_path('lang/'.$setting['language'].'/auth.php'))
+                        && File::exists(resource_path('lang/'.$setting['language'].'/pagination.php'))
+                        && File::exists(resource_path('lang/'.$setting['language'].'/passwords.php'))
+                        && File::exists(resource_path('lang/'.$setting['language'].'/validation.php'))
                     ) {
                         $settings_array[$key]['language'] = $setting['language'];
-                        $settings_array[$key]['body-lang-class'] = 'lang-' . $setting['language'];
+                        $settings_array[$key]['body-lang-class'] = 'lang-'.$setting['language'];
                         Helper::changeEnv(
                             [
                                 'APP_LANG' => $setting['language'],
@@ -328,7 +331,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'settings', 'meta_value' => serialize($settings_array),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             \Artisan::call('config:cache');
@@ -360,8 +363,8 @@ class SiteManagement extends Model
                             File::makeDirectory($new_path, 0755, true, true);
                         }
                         $filename = $icon[$key];
-                        rename($old_path . '/' . $icon[$key], $new_path . '/' . time() . '-' . $filename);
-                        $icon_array[$key] = time() . '-' . $filename;
+                        rename($old_path . '/' . $icon[$key], $new_path . '/' .time().'-'.$filename);
+                        $icon_array[$key] = time().'-'.$filename;
                     } else {
                         $icon_array[$key] = $icon[$key];
                     }
@@ -374,7 +377,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'icons', 'meta_value' => serialize($icon_array),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             return 'success';
@@ -404,7 +407,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'styling', 'meta_value' => serialize($style_settings),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             \Artisan::call('cache:clear');
@@ -443,7 +446,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'footer_settings', 'meta_value' => serialize($footer_settings),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             return 'success';
@@ -473,7 +476,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'socials', 'meta_value' => serialize($socials),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             return 'success';
@@ -506,7 +509,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'search_menu', 'meta_value' => serialize($menu),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             $existing_menu_title = DB::table('site_managements')->where('meta_key', 'menu_title')->first();
@@ -516,7 +519,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'menu_title', 'meta_value' => $menu_title,
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             $json['type'] = 'success';
@@ -542,7 +545,7 @@ class SiteManagement extends Model
             foreach ($commision_settings as $key => $setting) {
                 $commision_settings_array[$key]['commision'] = $setting['commision'];
                 $commision_settings_array[$key]['min_payout'] = $setting['min_payout'];
-                if (!empty($setting['payment_method'])) {
+                if(!empty($setting['payment_method'])){
                     $commision_settings_array[$key]['payment_method'] = $setting['payment_method'];
                 }
                 $commision_settings_array[$key]['currency'] = $setting['currency'];
@@ -562,7 +565,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'commision', 'meta_value' => serialize($commision_settings_array),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             Helper::changeEnv(
@@ -598,12 +601,12 @@ class SiteManagement extends Model
                 DB::table('site_managements')->where('meta_key', '=', 'payment_settings')->delete();
                 Helper::changeEnv(
                     [
-                        'PAYPAL_LIVE_API_USERNAME' => "",
-                        'PAYPAL_LIVE_API_PASSWORD' => "",
-                        'PAYPAL_LIVE_API_SECRET' => "",
-                        'PAYPAL_SANDBOX_API_USERNAME' => "",
-                        'PAYPAL_SANDBOX_API_PASSWORD' => "",
-                        'PAYPAL_SANDBOX_API_SECRET' => "",
+                        'PAYPAL_LIVE_API_USERNAME' =>"",
+                        'PAYPAL_LIVE_API_PASSWORD' =>"",
+                        'PAYPAL_LIVE_API_SECRET' =>"",
+                        'PAYPAL_SANDBOX_API_USERNAME'=>"",
+                        'PAYPAL_SANDBOX_API_PASSWORD'=>"",
+                        'PAYPAL_SANDBOX_API_SECRET'=>"",
                         'PAYPAL_MODE' => '',
                     ]
                 );
@@ -611,19 +614,19 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'payment_settings', 'meta_value' => serialize($payment_settings),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             $new_payment_settings = SiteManagement::getMetaValue('payment_settings');
             if ($new_payment_settings[0]['enable_sandbox'] === 'true') {
                 Helper::changeEnv(
                     [
-                        'PAYPAL_LIVE_API_USERNAME' => "",
-                        'PAYPAL_LIVE_API_PASSWORD' => "",
-                        'PAYPAL_LIVE_API_SECRET' => "",
-                        'PAYPAL_SANDBOX_API_USERNAME' => $client_id,
-                        'PAYPAL_SANDBOX_API_PASSWORD' => $paypal_password,
-                        'PAYPAL_SANDBOX_API_SECRET' => $paypal_secret,
+                        'PAYPAL_LIVE_API_USERNAME' =>"",
+                        'PAYPAL_LIVE_API_PASSWORD' =>"",
+                        'PAYPAL_LIVE_API_SECRET' =>"",
+                        'PAYPAL_SANDBOX_API_USERNAME'=> $client_id,
+                        'PAYPAL_SANDBOX_API_PASSWORD'=> $paypal_password,
+                        'PAYPAL_SANDBOX_API_SECRET'=> $paypal_secret,
                         'PAYPAL_MODE' => 'sandbox',
                     ]
                 );
@@ -633,9 +636,9 @@ class SiteManagement extends Model
                         'PAYPAL_LIVE_API_USERNAME' => $client_id,
                         'PAYPAL_LIVE_API_PASSWORD' => $paypal_password,
                         'PAYPAL_LIVE_API_SECRET' => $paypal_secret,
-                        'PAYPAL_SANDBOX_API_USERNAME' => "",
-                        'PAYPAL_SANDBOX_API_PASSWORD' => "",
-                        'PAYPAL_SANDBOX_API_SECRET' => "",
+                        'PAYPAL_SANDBOX_API_USERNAME'=>"",
+                        'PAYPAL_SANDBOX_API_PASSWORD'=>"",
+                        'PAYPAL_SANDBOX_API_SECRET'=>"",
                         'PAYPAL_MODE' => 'live',
                     ]
                 );
@@ -676,7 +679,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'stripe_settings', 'meta_value' => serialize($payment_settings),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             Helper::changeEnv(
@@ -737,7 +740,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'home_settings', 'meta_value' => serialize($home_settings),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             return 'success';
@@ -801,7 +804,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'section_settings', 'meta_value' => serialize($section_settings),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             if (!empty($request['app_desc'])) {
@@ -809,7 +812,7 @@ class SiteManagement extends Model
                 DB::table('site_managements')->insert(
                     [
                         'meta_key' => 'app_desc', 'meta_value' => $request['app_desc'],
-                        "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                        "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                     ]
                 );
             } elseif (empty($request['app_desc'])) {
@@ -820,7 +823,7 @@ class SiteManagement extends Model
                 DB::table('site_managements')->insert(
                     [
                         'meta_key' => 'app_android_link', 'meta_value' => $request['app_android_link'],
-                        "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                        "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                     ]
                 );
             } elseif (empty($request['app_android_link'])) {
@@ -831,7 +834,7 @@ class SiteManagement extends Model
                 DB::table('site_managements')->insert(
                     [
                         'meta_key' => 'app_ios_link', 'meta_value' => $request['app_ios_link'],
-                        "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                        "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                     ]
                 );
             } elseif (empty($request['app_ios_link'])) {
@@ -842,6 +845,7 @@ class SiteManagement extends Model
             return 'error';
         }
     }
+
 
     /**
      * Store registration settings
@@ -900,7 +904,7 @@ class SiteManagement extends Model
                 DB::table('site_managements')->insert(
                     [
                         'meta_key' => 'reg_form_settings', 'meta_value' => serialize($register_setting),
-                        "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                        "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                     ]
                 );
                 return 'success';
@@ -929,7 +933,7 @@ class SiteManagement extends Model
         DB::table('site_managements')->insert(
             [
                 'meta_key' => 'access_type', 'meta_value' => $request['access_type'],
-                "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                "created_at" => Carbon::now(), "updated_at" => Carbon::now()
             ]
         );
         return 'success';
@@ -952,7 +956,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'service_section_setting', 'meta_value' => serialize($request->all()),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             return 'success';
@@ -977,7 +981,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'show_breadcrumb', 'meta_value' => serialize($breadcrumb),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             return 'success';
@@ -1001,7 +1005,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'project_settings', 'meta_value' => serialize($request->except('_token')),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             return 'success';
@@ -1025,7 +1029,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'order_settings', 'meta_value' => serialize($request->except('_token')),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             return 'success';
@@ -1049,7 +1053,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'chat_settings', 'meta_value' => serialize($request->all()),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             return 'success';
@@ -1073,7 +1077,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'bank_detail', 'meta_value' => serialize($request->except('_token')),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             return 'success';
@@ -1097,7 +1101,7 @@ class SiteManagement extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'homepage', 'meta_value' => serialize($request->except('_token')),
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             return 'success';

@@ -152,17 +152,40 @@ class SiteManagementController extends Controller
         $service_inner_banner = !empty($inner_page) && !empty($inner_page[0]['service_inner_banner']) ? $inner_page[0]['service_inner_banner'] : null;
         $service_meta_title = !empty($inner_page) && !empty($inner_page[0]['service_list_meta_title']) ? $inner_page[0]['service_list_meta_title'] : '';
         $service_meta_desc = !empty($inner_page) && !empty($inner_page[0]['service_list_meta_desc']) ? $inner_page[0]['service_list_meta_desc'] : '';
+        $article_meta_title = !empty($inner_page) && !empty($inner_page[0]['article_list_meta_title']) ? $inner_page[0]['article_list_meta_title'] : '';
+        $article_meta_desc = !empty($inner_page) && !empty($inner_page[0]['article_list_meta_desc']) ? $inner_page[0]['article_list_meta_desc'] : '';
+        $show_article_banner = !empty($inner_page) && !empty($inner_page[0]['show_article_banner']) ? $inner_page[0]['show_article_banner'] : '';
+        $article_inner_banner = !empty($inner_page) && !empty($inner_page[0]['article_inner_banner']) ? $inner_page[0]['article_inner_banner'] : null;
         $app_access_type = DB::table('site_managements')->select('meta_value')->where('meta_key', 'access_type')->get()->first();
         $access_type = !empty($app_access_type) ? $app_access_type->meta_value : '';
         $reg_form_banner = !empty($register_form) && !empty($register_form[0]['reg_form_banner']) ? $register_form[0]['reg_form_banner'] : null;
         $chat_setting = SiteManagement::getMetaValue('chat_settings');
         $port =!empty($chat_setting) && !empty($chat_setting['port']) ? $chat_setting['port'] : 3001;
         $host = !empty($chat_setting) && !empty($chat_setting['host']) ? $chat_setting['host'] : 'http://localhost';
-
+        $bank_detail = SiteManagement::getMetaValue('bank_detail');
+        $account_name =!empty($bank_detail) && !empty($bank_detail['account_name']) ? $bank_detail['account_name'] : '';
+        $account_number =!empty($bank_detail) && !empty($bank_detail['account_number']) ? $bank_detail['account_number'] : '';
+        $bank_name =!empty($bank_detail) && !empty($bank_detail['bank_name']) ? $bank_detail['bank_name'] : '';
+        $bank_routing_number =!empty($bank_detail) && !empty($bank_detail['bank_routing_number']) ? $bank_detail['bank_routing_number'] : '';
+        $bank_bic_swift =!empty($bank_detail) && !empty($bank_detail['bank_bic_swift']) ? $bank_detail['bank_bic_swift'] : '';
+        $bank_iban =!empty($bank_detail) && !empty($bank_detail['bank_iban']) ? $bank_detail['bank_iban'] : '';
+        $bank_description =!empty($bank_detail) && !empty($bank_detail['description']) ? $bank_detail['description'] : '';
+        $bank_instruction =!empty($bank_detail) && !empty($bank_detail['instruction']) ? $bank_detail['instruction'] : '';
+        $order_settings = SiteManagement::getMetaValue('order_settings');
+        $new_order_subject =!empty($order_settings) && !empty($order_settings['admin_order']['subject']) ? $order_settings['admin_order']['subject'] : '';
+        $new_order_content =!empty($order_settings) && !empty($order_settings['admin_order']['email_content']) ? $order_settings['admin_order']['email_content'] : '';
+        $employer_hiring_subject =!empty($order_settings) && !empty($order_settings['employer_hire']['subject']) ? $order_settings['employer_hire']['subject'] : '';
+        $employer_hiring_content =!empty($order_settings) && !empty($order_settings['employer_hire']['email_content']) ? $order_settings['employer_hire']['email_content'] : '';
+        $homepage_list = DB::table('pages')->select('id', 'title')->get()->toArray();
+        $homepage = SiteManagement::getMetaValue('homepage');
+        $selected_homepage =!empty($homepage) && !empty($homepage['home']) ? $homepage['home'] : 'v1';
         if (file_exists(resource_path('views/extend/back-end/admin/settings/index.blade.php'))) {
             return view(
                 'extend.back-end.admin.settings.index',
                 compact(
+                    'new_order_subject', 'new_order_content', 'employer_hiring_subject', 'employer_hiring_content',
+                    'bank_bic_swift', 'bank_iban', 'bank_description', 'bank_instruction',
+                    'account_name', 'account_number', 'bank_name', 'bank_routing_number',
                     'from_email', 'from_email_id', 'sender_name',
                     'sender_tagline', 'sender_url', 'email_logo', 'email_banner',
                     'sender_avatar', 'title', 'email', 'logo', 'commision',
@@ -181,13 +204,17 @@ class SiteManagementController extends Controller
                     'show_emp_banner', 'job_list_meta_title', 'job_list_meta_desc',
                     'show_job_banner', 'f_inner_banner', 'e_inner_banner', 'job_inner_banner',
                     'favicon', 'show_service_banner', 'service_inner_banner', 'service_meta_title',
-                    'service_meta_desc', 'access_type', 'reg_form_banner', 'port', 'host'
+                    'service_meta_desc', 'access_type', 'reg_form_banner', 'port', 'host', 'homepage_list',
+                    'selected_homepage', 'article_meta_title','article_meta_desc','show_article_banner','article_inner_banner'
                 )
             );
         } else {
             return view(
                 'back-end.admin.settings.index',
                 compact(
+                    'new_order_subject', 'new_order_content', 'employer_hiring_subject', 'employer_hiring_content',
+                    'bank_bic_swift', 'bank_iban', 'bank_description', 'bank_instruction',
+                    'account_name', 'account_number', 'bank_name', 'bank_routing_number',
                     'from_email', 'from_email_id', 'sender_name',
                     'sender_tagline', 'sender_url', 'email_logo', 'email_banner',
                     'sender_avatar', 'title', 'email', 'logo', 'commision',
@@ -207,7 +234,8 @@ class SiteManagementController extends Controller
                     'show_emp_banner', 'job_list_meta_title', 'job_list_meta_desc',
                     'show_job_banner', 'f_inner_banner', 'e_inner_banner', 'job_inner_banner',
                     'favicon', 'show_service_banner', 'service_inner_banner', 'service_meta_title',
-                    'service_meta_desc', 'access_type', 'reg_form_banner', 'port', 'host'
+                    'service_meta_desc', 'access_type', 'reg_form_banner', 'port', 'host', 'homepage_list',
+                    'selected_homepage', 'article_meta_title','article_meta_desc','show_article_banner','article_inner_banner'
                 )
             );
         }
@@ -382,6 +410,11 @@ class SiteManagementController extends Controller
                 $json['show_service_banner'] = 'true';
             }
         }
+        if (!empty($inner_page_settings[0]['show_article_banner'])) {
+            if ($inner_page_settings[0]['show_article_banner'] == 'true') {
+                $json['show_article_banner'] = 'true';
+            }
+        }
         return $json;
     }
 
@@ -533,6 +566,44 @@ class SiteManagementController extends Controller
                 $json['message'] = trans('lang.settings_saved');
                 return $json;
             } elseif ($store_email_settings == "lang_not_found") {
+                $json['type'] = 'error';
+                $json['message'] = trans('lang.lang_not_found');
+                return $json;
+            } else {
+                $json['type'] = 'error';
+                $json['message'] = trans('lang.something_wrong');
+                return $json;
+            }
+        }
+    }
+
+    /**
+     * Store general home settings
+     *
+     * @param mixed $request get req attributes
+     *
+     * @access public
+     *
+     * @return View
+     */
+    public function storeGeneralHomeSettings(Request $request)
+    {
+        $server = Helper::worketicIsDemoSiteAjax();
+        if (!empty($server)) {
+            $response['type'] = 'error';
+            $response['message'] = $server->getData()->message;
+            return $response;
+        }
+        $json = array();
+        if (!empty($request)) {
+            $store_general_home_settings
+                = $this->settings->saveGeneralHomeSettings($request);
+            if ($store_general_home_settings == "success") {
+                $json['type'] = 'success';
+                $json['progressing'] = trans('lang.saving');
+                $json['message'] = trans('lang.settings_saved');
+                return $json;
+            } elseif ($store_general_home_settings == "lang_not_found") {
                 $json['type'] = 'error';
                 $json['message'] = trans('lang.lang_not_found');
                 return $json;
@@ -1197,6 +1268,11 @@ class SiteManagementController extends Controller
         } else {
             $json['employer_package'] = 'true';
         }
+        if (!empty($commision_settings[0]['payment_mode'])) {
+            $json['payment_mode'] = $commision_settings[0]['payment_mode'];
+        } else {
+            $json['payment_mode'] = 'true';
+        }
         if (!empty($payment_settings[0]['enable_sandbox'])) {
             $json['enable_sandbox'] = $payment_settings[0]['enable_sandbox'];
         } else {
@@ -1238,6 +1314,41 @@ class SiteManagementController extends Controller
             }
         }
     }
+
+    /**
+     * Store Breadcrumbs Settings
+     *
+     * @param mixed $request get req attributes
+     *
+     * @access public
+     *
+     * @return View
+     */
+    public function storeBankDetail(Request $request)
+    {
+        $server = Helper::worketicIsDemoSiteAjax();
+        if (!empty($server)) {
+            $response['type'] = 'error';
+            $response['message'] = $server->getData()->message;
+            return $response;
+        }
+        $json = array();
+        if (!empty($request)) {
+            $bank_detail
+                = $this->settings->saveBankDetail($request);
+            if ($bank_detail == "success") {
+                $json['type'] = 'success';
+                $json['progressing'] = trans('lang.saving');
+                $json['message'] = trans('lang.settings_saved');
+                return $json;
+            } else {
+                $json['type'] = 'error';
+                $json['message'] = trans('lang.something_wrong');
+                return $json;
+            }
+        }
+    }
+
     /**
      * Get Breadcrumbs settings.
      *
@@ -1255,5 +1366,92 @@ class SiteManagementController extends Controller
             $json['breadcrumbs_settings'] = 'true';
         }
         return $json;
+    }
+
+    /**
+     * Get Breadcrumbs settings.
+     *
+     * @param integer $request $request->attributes
+     *
+     * @return Response
+     */
+    public function getprojectSettings(Request $request)
+    {
+        $json = array();
+        $project_settings = !empty(SiteManagement::getMetaValue('project_settings')) ? SiteManagement::getMetaValue('project_settings') : array();
+        if (!empty($project_settings)) {
+            $json['project_settings'] = $project_settings['enable_completed_projects'];
+        } else {
+            $json['project_settings'] = 'true';
+        }
+        return $json;
+    }
+
+    /**
+     * Store Breadcrumbs Settings
+     *
+     * @param mixed $request get req attributes
+     *
+     * @access public
+     *
+     * @return View
+     */
+    public function storeProjectSettings(Request $request)
+    {
+        $server = Helper::worketicIsDemoSiteAjax();
+        if (!empty($server)) {
+            $response['type'] = 'error';
+            $response['message'] = $server->getData()->message;
+            return $response;
+        }
+        $json = array();
+        if (!empty($request)) {
+            $store_project_settings
+                = $this->settings->saveProjectSettings($request);
+            if ($store_project_settings == "success") {
+                $json['type'] = 'success';
+                $json['progressing'] = trans('lang.saving');
+                $json['message'] = trans('lang.settings_saved');
+                return $json;
+            } else {
+                $json['type'] = 'error';
+                $json['message'] = trans('lang.something_wrong');
+                return $json;
+            }
+        }
+    }
+
+    /**
+     * Store order Settings
+     *
+     * @param mixed $request get req attributes
+     *
+     * @access public
+     *
+     * @return View
+     */
+    public function storeOrderSettings(Request $request)
+    {
+        $server = Helper::worketicIsDemoSiteAjax();
+        if (!empty($server)) {
+            $response['type'] = 'error';
+            $response['message'] = $server->getData()->message;
+            return $response;
+        }
+        $json = array();
+        if (!empty($request)) {
+            $order_settings
+                = $this->settings->saveOrderSettings($request);
+            if ($order_settings == "success") {
+                $json['type'] = 'success';
+                $json['progressing'] = trans('lang.saving');
+                $json['message'] = trans('lang.settings_saved');
+                return $json;
+            } else {
+                $json['type'] = 'error';
+                $json['message'] = trans('lang.something_wrong');
+                return $json;
+            }
+        }
     }
 }

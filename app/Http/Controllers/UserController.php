@@ -16,43 +16,45 @@ namespace App\Http\Controllers;
 
 use App\EmailTemplate;
 use App\Helper;
-use App\Http\Controllers\Exception;
 use App\Invoice;
-use App\Item;
 use App\Job;
 use App\Language;
 use App\Mail\AdminEmailMailable;
 use App\Mail\FreelancerEmailMailable;
 use App\Mail\GeneralEmailMailable;
-use App\Message;
-use App\Offer;
 use App\Package;
-use App\Payout;
 use App\Profile;
 use App\Proposal;
 use App\Report;
 use App\Review;
-use App\Service;
 use App\SiteManagement;
 use App\User;
 use Auth;
 use Carbon\Carbon;
 use DB;
-use File;
 use Hash;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
-use PDF;
 use Session;
-use App\Order;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
-use Storage;
+use Illuminate\Support\Facades\Input;
 use View;
+use App\Offer;
+use App\Message;
+use Illuminate\Support\Arr;
+use App\Payout;
+use File;
+use Storage;
+use PDF;
+use App\Item;
+use App\Http\Controllers\Exception;
+use App\Service;
+use App\Order;
+use App\Mail\EmployerEmailMailable;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Class UserController
@@ -169,7 +171,7 @@ class UserController extends Controller
      *
      * @return View
      */
-   public function requestPassword(Request $request)
+    public function requestPassword(Request $request)
     {
         $server_verification = Helper::worketicIsDemoSite();
         if (!empty($server_verification)) {
@@ -315,7 +317,7 @@ class UserController extends Controller
             $request,
             [
                 'old_password' => 'required',
-                'retype_password' => 'required',
+                'retype_password'    => 'required',
             ]
         );
         $json = array();
@@ -527,11 +529,11 @@ class UserController extends Controller
         if (Auth::user()) {
             $user = $this->user::find(Auth::user()->id);
             $profile = $user->profile;
-            $saved_jobs = !empty($profile->saved_jobs) ? unserialize($profile->saved_jobs) : array();
+            $saved_jobs        = !empty($profile->saved_jobs) ? unserialize($profile->saved_jobs) : array();
             $saved_freelancers = !empty($profile->saved_freelancer) ? unserialize($profile->saved_freelancer) : array();
-            $saved_employers = !empty($profile->saved_employers) ? unserialize($profile->saved_employers) : array();
-            $currency = SiteManagement::getMetaValue('commision');
-            $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
+            $saved_employers   = !empty($profile->saved_employers) ? unserialize($profile->saved_employers) : array();
+            $currency          = SiteManagement::getMetaValue('commision');
+            $symbol            = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
             if ($request->path() === 'employer/saved-items') {
                 if (file_exists(resource_path('views/extend/back-end/employer/saved-items.blade.php'))) {
                     return view(
@@ -833,7 +835,7 @@ class UserController extends Controller
                     'reason' => 'required',
                 ]
             );
-            if ($request['model'] == "App\Job" && $request['report_type'] != 'proposal_cancel') {
+            if ($request['model'] == "App\Job" && $request['report_type'] <> 'proposal_cancel') {
                 $job = Job::find($request['id']);
                 if ($job->employer->id == Auth::user()->id) {
                     $json['type'] = 'error';
@@ -841,7 +843,7 @@ class UserController extends Controller
                     return $json;
                 }
             }
-            if ($request['model'] == "App\Service" && $request['report_type'] != 'service_cancel') {
+            if ($request['model'] == "App\Service" && $request['report_type'] <> 'service_cancel') {
                 $service = Service::find($request['id']);
                 $freelancer = $service->seller->first();
                 if ($freelancer->id == Auth::user()->id) {
@@ -887,7 +889,7 @@ class UserController extends Controller
                                 $template_data = EmailTemplate::getEmailTemplateByID($report_employer_template->id);
                                 $employer = User::find($request['id']);
                                 $email_params['reported_employer'] = Helper::getUserName($request['id']);
-                                $email_params['link'] = url('profile/' . $employer->slug);
+                                $email_params['link'] = url('profile/' . $employer->slug);;
                                 $email_params['report_by_link'] = url('profile/' . $user->slug);
                                 $email_params['reported_by'] = Helper::getUserName(Auth::user()->id);
                                 $email_params['message'] = $request['description'];
@@ -1121,8 +1123,8 @@ class UserController extends Controller
                         $excerpt = str_limit($content, 100);
                         $default_avatar = url('images/user-login.png');
                         $profile_image = !empty($data->avater)
-                        ? '/uploads/users/' . $data->author_id . '/' . $data->avater
-                        : $default_avatar;
+                            ? '/uploads/users/' . $data->author_id . '/' . $data->avater
+                            : $default_avatar;
                         $messages[$key]['id'] = $data->id;
                         $messages[$key]['author_id'] = $data->author_id;
                         $messages[$key]['proposal_id'] = $data->proposal_id;
@@ -1203,13 +1205,207 @@ class UserController extends Controller
             $payout_settings = SiteManagement::getMetaValue('commision');
             $payment_gateway = !empty($payout_settings) && !empty($payout_settings[0]['payment_method']) ? $payout_settings[0]['payment_method'] : array();
             $symbol = !empty($payout_settings) && !empty($payout_settings[0]['currency']) ? Helper::currencyList($payout_settings[0]['currency']) : array();
+            $mode = !empty($payout_settings) && !empty($payout_settings[0]['payment_mode']) ? $payout_settings[0]['payment_mode'] : 'true';
             if (file_exists(resource_path('views/extend/back-end/package/checkout.blade.php'))) {
-                return view::make('extend.back-end.package.checkout', compact('package', 'package_options', 'payment_gateway', 'symbol'));
+                return view::make('extend.back-end.package.checkout', compact('package', 'package_options', 'payment_gateway', 'symbol', 'mode'));
             } else {
-                return view::make('back-end.package.checkout', compact('package', 'package_options', 'payment_gateway', 'symbol'));
+                return view::make('back-end.package.checkout', compact('package', 'package_options', 'payment_gateway', 'symbol', 'mode'));
             }
         }
     }
+
+    /**
+     * Store profile settings.
+     *
+     * @param \Illuminate\Http\Request $request request attributes
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function generateOrder($id, $type)
+    {
+        $server = Helper::worketicIsDemoSiteAjax();
+        if (!empty($server)) {
+            $response['type'] = 'error';
+            $response['message'] = $server->getData()->message;
+            return $response;
+        }
+        $json = array();
+        if (!empty($id)) {
+            $order = new Order();
+            $new_order = $order->saveOrder(Auth::user()->id, $id, $type);
+            if ($type == 'service') {
+                $json['service_order'] = $new_order['service_order'];
+            }
+            $json['type'] = 'success';
+            $json['order_id'] = $new_order['id'];
+            $json['process'] = trans('lang.saving_profile');
+            return $json;
+        } else {
+            $json['type'] = 'error';
+            $json['process'] = trans('lang.something_wrong');
+            return $json;
+        }
+    }
+
+    /**
+     * Checkout Page.
+     *
+     * @param \Illuminate\Http\Request $id ID
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function bankCheckout($id, $order, $type, $project_type = '')
+    {
+        if (!empty($id) && Auth::user()) {
+            $subtitle = '';
+            $options = '';
+            $seller = '';
+            if ($type == 'project') {
+                if ($project_type == 'service') {
+                    $service_order = DB::table('service_user')->select('service_id')->where('id', $id)->first();
+                    $service = Service::find($service_order->service_id);
+                    $title = $service->title;
+                    $cost = $service->price;
+                    $product_id = $id;
+                } else {
+                    $proposal = Proposal::where('id', $id)->get()->first();
+                    if (!empty($proposal)) {
+                        $job = $proposal->job;
+                        $product_id = $proposal->id;
+                        $title = $job->title;
+                        $cost = $proposal->amount;
+                    } else {
+                        abort(404);
+                    }
+                }
+            } else {
+                $package = Package::find($id);
+                if (!empty($package)) {
+                    $options = unserialize($package->options);
+                    $product_id = $package->id;
+                    $title = $package->title;
+                    $cost = $package->cost;
+                    $subtitle = $package->subtitle;
+                } else {
+                    abort(404);
+                }
+            }
+            $payout_settings = SiteManagement::getMetaValue('commision');
+            $symbol = !empty($payout_settings) && !empty($payout_settings[0]['currency']) ? Helper::currencyList($payout_settings[0]['currency']) : array();
+            $mode = !empty($payout_settings) && !empty($payout_settings[0]['payment_mode']) ? $payout_settings[0]['payment_mode'] : 'true';
+            $bank_detail = SiteManagement::getMetaValue('bank_detail');
+            if (file_exists(resource_path('views/extend/back-end/package/bank-checkout.blade.php'))) {
+                return view::make(
+                    'extend.back-end.package.bank-checkout',
+                    compact('product_id', 'title', 'symbol', 'mode', 'bank_detail', 'order', 'cost', 'subtitle', 'options', 'type')
+                );
+            } else {
+                return view::make(
+                    'back-end.package.bank-checkout',
+                    compact('product_id', 'title', 'symbol', 'mode', 'bank_detail', 'order', 'cost', 'subtitle', 'options', 'type')
+                );
+            }
+        } else {
+            abort(404);
+        }
+    }
+
+    /**
+     * Store profile settings.
+     *
+     * @param \Illuminate\Http\Request $request request attributes
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function submitTransection(Request $request)
+    {
+        $server = Helper::worketicIsDemoSiteAjax();
+        if (!empty($server)) {
+            $response['type'] = 'error';
+            $response['message'] = $server->getData()->message;
+            return $response;
+        }
+        $json = array();
+        if (!empty($request)) {
+            $type = !empty(session()->get('type')) ? session()->get('type') : '';
+            $product_id = !empty(session()->get('product_id')) ? session()->get('product_id') : '';
+            $product_title = !empty(session()->get('product_title')) ? session()->get('product_title') : '';
+            $product_price = !empty(session()->get('product_price')) ? session()->get('product_price') : '';
+            $order = !empty(session()->get('order')) ? session()->get('order') : '';
+            if (!empty($type) && !empty($product_id)) {
+                $invoice = new Invoice();
+                $invoice->title = trans('lang.bank_transfer');
+                $invoice->price = $product_price;
+                $invoice->payer_name = Helper::getUserName(Auth::user()->id);
+                $invoice->payer_email = Auth::user()->email;
+                $invoice->shipping_amount = 0;
+                $invoice->handling_amount = 0;
+                $invoice->insurance_amount = 0;
+                $invoice->sales_tax = 0;
+                $invoice->payment_mode = 'bacs';
+                $invoice->paid = 0;
+                $invoice->type = $type;
+                $invoice->detail = !empty($request['trans_detail']) ? $request['trans_detail'] : '';
+                $old_path = 'uploads\users\temp';
+                $trans_attachments = array();
+                if (!empty($request['attachments'])) {
+                    $attachments = $request['attachments'];
+                    foreach ($attachments as $key => $attachment) {
+                        if (Storage::disk('local')->exists($old_path . '/' . $attachment)) {
+                            $new_path = 'uploads/users/' . Auth::user()->id;
+                            if (!file_exists($new_path)) {
+                                File::makeDirectory($new_path, 0755, true, true);
+                            }
+                            $filename = time() . '-' . $attachment;
+                            Storage::move($old_path . '/' . $attachment, $new_path . '/' . $filename);
+                            $trans_attachments[] = $filename;
+                        }
+                    }
+                    $invoice->transection_doc = serialize($trans_attachments);
+                }
+                $invoice->save();
+                $invoice_id = DB::getPdo()->lastInsertId();
+                DB::table('orders')
+                    ->where('id', $order)
+                    ->update(['invoice_id' => $invoice_id]);
+                if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
+                    $order = DB::table('orders')->where('id', $order)->first();
+                    $email_params = array();
+                    $template_data = array();
+                    $order_settings = SiteManagement::getMetaValue('order_settings');
+                    $template_data['subject'] = !empty($order_settings) && !empty($order_settings['admin_order']['subject']) ? $order_settings['admin_order']['subject'] : '';
+                    $template_data['content'] = !empty($order_settings) && !empty($order_settings['admin_order']['email_content']) ? $order_settings['admin_order']['email_content'] : '';
+                    $email_params['name'] = Helper::getUserName(Auth::user()->id);
+                    $email_params['order_id'] = $order->id;
+                    Mail::to(Auth::user()->email)
+                        ->send(
+                            new AdminEmailMailable(
+                                'admin_new_order_received',
+                                $template_data,
+                                $email_params
+                            )
+                        );
+                }
+                session()->forget('product_id');
+                session()->forget('product_title');
+                session()->forget('product_price');
+                session()->forget('order');
+                session()->put(['message' => trans('lang.transection_uploaded')]);
+                $json['type'] = 'success';
+                $json['return_url'] = url(Auth::user()->getRoleNames()[0] . '/dashboard');
+                return $json;
+            } else {
+                $json['type'] = 'error';
+                $json['process'] = trans('lang.something_wrong');
+                return $json;
+            }
+        } else {
+            $json['type'] = 'error';
+            $json['process'] = trans('lang.something_wrong');
+            return $json;
+        }
+    }
+
     /**
      * Store profile settings.
      *
@@ -1333,7 +1529,7 @@ class UserController extends Controller
                     if (Schema::hasColumn('items', 'type')) {
                         $item = DB::table('items')->select('id')->where('type', 'package')->where('subscriber', $order->user_id)->first();
                         if (empty($item)) {
-                            $item = DB::table('items')->select('id')->where('subscriber', $order->user_id)->first();
+                            $item = DB::table('items')->select('id')->where('subscriber', $order->user_id)->first();    
                         }
                     } else {
                         $item = DB::table('items')->select('id')->where('subscriber', $order->user_id)->first();
@@ -1468,7 +1664,7 @@ class UserController extends Controller
     public function getEmployerInvoices($type = '')
     {
         if (Auth::user()->getRoleNames()[0] != 'admin' && Auth::user()->getRoleNames()[0] === 'employer') {
-            $currency = SiteManagement::getMetaValue('commision');
+            $currency   = SiteManagement::getMetaValue('commision');
             $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
             $invoices = array();
             $expiry_date = '';
@@ -1520,7 +1716,7 @@ class UserController extends Controller
                 ->where('invoices.type', $type)
                 ->get();
             $expiry_date = '';
-            $currency = SiteManagement::getMetaValue('commision');
+            $currency   = SiteManagement::getMetaValue('commision');
             $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
             if ($type === 'project') {
                 if (file_exists(resource_path('views/extend/back-end/freelancer/invoices/project.blade.php'))) {
@@ -1584,7 +1780,7 @@ class UserController extends Controller
     public function showOrders()
     {
         $orders = Order::all();
-        $currency = SiteManagement::getMetaValue('commision');
+        $currency   = SiteManagement::getMetaValue('commision');
         $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
         $status_list = Helper::getOrderStatus();
         if (file_exists(resource_path('views/extend/back-end/admin/orders/index.blade.php'))) {
@@ -1593,6 +1789,7 @@ class UserController extends Controller
             return view::make('back-end.admin.orders.index', compact('orders', 'symbol', 'status_list'));
         }
     }
+
     /**
      * Display a listing of the resource.
      *
@@ -1647,10 +1844,9 @@ class UserController extends Controller
         $this->validate(
             $request,
             [
-                'first_name' => 'required',
-                'last_name' => 'required',
+                'first_name'    => 'required',
+                'last_name'    => 'required',
                 'email' => 'required|email',
-                'phone' => 'required|digits:8',
             ]
         );
         $json = array();
@@ -1670,7 +1866,7 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function uploadTempImage(Request $request)
+    public function uploadTempImage(Request $request, $type = '')
     {
         $path = Helper::PublicPath() . '/uploads/users/temp/';
         if (!empty($request['hidden_avater_image'])) {
@@ -1694,6 +1890,11 @@ class UserController extends Controller
         } elseif (!empty($request['hidden_banner_image'])) {
             $profile_image = $request['hidden_banner_image'];
             return Helper::uploadTempImage($path, $profile_image);
+        } elseif (!empty($type) && $type == 'file') {
+            $path = 'uploads/users/temp/';
+            return Helper::uploadTempattachments($path, $request->file);
+        } else {
+            return Helper::uploadTempImage($path, $request->file);
         }
     }
 
@@ -1712,7 +1913,7 @@ class UserController extends Controller
             $request,
             [
                 'projects' => 'required',
-                'desc' => 'required',
+                'desc'    => 'required',
             ]
         );
 
@@ -1893,7 +2094,7 @@ class UserController extends Controller
                 $users = $this->user::where('first_name', 'like', '%' . $keyword . '%')->orWhere('last_name', 'like', '%' . $keyword . '%')->paginate(7)->setPath('');
                 $pagination = $users->appends(
                     array(
-                        'keyword' => Input::get('keyword'),
+                        'keyword' => Input::get('keyword')
                     )
                 );
             } else {
@@ -1919,7 +2120,7 @@ class UserController extends Controller
         if (!empty($_GET['year']) && !empty($_GET['month'])) {
             $year = $_GET['year'];
             $month = $_GET['month'];
-            $payouts = DB::table('payouts')
+            $payouts =  DB::table('payouts')
                 ->select('*')
                 ->whereYear('created_at', '=', $year)
                 ->whereMonth('created_at', '=', $month)
@@ -1927,11 +2128,11 @@ class UserController extends Controller
             $pagination = $payouts->appends(
                 array(
                     'year' => Input::get('year'),
-                    'month' => Input::get('month'),
+                    'month' => Input::get('month')
                 )
             );
         } else {
-            $payouts = Payout::paginate(7);
+            $payouts =  Payout::paginate(7);
         }
         $selected_year = !empty($_GET['year']) ? $_GET['year'] : '';
         $selected_month = !empty($_GET['month']) ? $_GET['month'] : '';
@@ -1961,7 +2162,7 @@ class UserController extends Controller
         if (!empty($id)) {
             $slected_ids = explode(',', $id);
         }
-        $payouts = DB::table('payouts')
+        $payouts =  DB::table('payouts')
             ->select('*')
             ->whereYear('created_at', '=', $year)
             ->whereMonth('created_at', '=', $month)
@@ -2008,6 +2209,20 @@ class UserController extends Controller
             $payout = Payout::find($request['id']);
             $payout->status = $request['status'];
             $payout->save();
+            if (!empty($request['projects_ids'])) {
+                $projects_ids = Unserialize($request['projects_ids']);
+                foreach ($projects_ids as $key => $id) {
+                    if ($payout->type == 'job') {
+                        $proposal = Proposal::find($id);
+                        $proposal->paid_progress = 'completed';
+                        $proposal->save();
+                    } elseif ($payout->type == 'service') {
+                        DB::table('service_user')
+                            ->where('id', $id)
+                            ->update(['paid_progress' => 'completed']);
+                    }
+                }
+            }
             $json['type'] = 'success';
             $json['message'] = trans('lang.status_updated');
             return $json;
@@ -2117,12 +2332,5 @@ class UserController extends Controller
             $json['message'] = trans('lang.verify_code');
             return $json;
         }
-    }
-
-    public function verifyUser(Request $request)
-    {
-        $user = User::find($request->user_id);
-        $user->user_verified = 1;
-        $user->save();
     }
 }

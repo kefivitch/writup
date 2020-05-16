@@ -33,7 +33,7 @@
                                                         &nbsp;{{{ Helper::getUserName($job->employer->id) }}}
                                                     </a>
                                                     @if (!empty($job->title))
-                                                        <h2>{!! $job->title !!}</h2>
+                                                        <h2>{{{ $job->title }}}</h2>
                                                     @endif
                                                 </div>
                                                 <ul class="wt-saveitem-breadcrumb wt-userlisting-breadcrumb">

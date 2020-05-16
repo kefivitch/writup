@@ -9,7 +9,7 @@
 @section('content')
     @if ($show_f_banner == 'true')
         @php $breadcrumbs = Breadcrumbs::generate('searchResults'); @endphp
-        <div class="wt-haslayout wt-innerbannerholder" style="background-image:url({{{ asset(Helper::getBannerImage('uploads/settings/general/'.$f_inner_banner)) }}})">
+        <div class="wt-haslayout wt-innerbannerholder" style="background-image:url({{{ asset(Helper::getBannerImage($f_inner_banner, 'uploads/settings/general')) }}})">
             <div class="container">
                 <div class="row justify-content-md-center">
                     <div class="col-xs-12 col-sm-12 col-md-8 push-md-2 col-lg-6 push-lg-3">
@@ -92,11 +92,12 @@
                                                             'images/user.jpg';
                                             $flag = !empty($freelancer->location->flag) ? Helper::getLocationFlag($freelancer->location->flag) :
                                                     '/images/img-01.png';
-                                            $avg_rating = \App\Review::where('receiver_id', $freelancer->id)->sum('avg_rating');
+                                            $feedbacks = \App\Review::select('feedback')->where('receiver_id', $freelancer->id)->count();
+                                            $avg_rating = App\Review::where('receiver_id', $freelancer->id)->sum('avg_rating');
                                             $rating  = $avg_rating != 0 ? round($avg_rating/\App\Review::count()) : 0;
                                             $reviews = \App\Review::where('receiver_id', $freelancer->id)->get();
-                                            $stars  = $reviews->sum('avg_rating') != 0 ? $reviews->sum('avg_rating')/20*100 : 0;
-                                            $feedbacks = \App\Review::select('feedback')->where('receiver_id', $freelancer->id)->count();
+                                            $stars  = $reviews->sum('avg_rating') != 0 ? (($reviews->sum('avg_rating')/$feedbacks)/5)*100 : 0;
+                                            $average_rating_count = !empty($feedbacks) ? $reviews->sum('avg_rating')/$feedbacks : 0;
                                             $verified_user = \App\User::select('user_verified')->where('id', $freelancer->id)->pluck('user_verified')->first();
                                             $save_freelancer = !empty(auth()->user()->profile->saved_freelancer) ? unserialize(auth()->user()->profile->saved_freelancer) : array();
                                             $badge = Helper::getUserBadge($freelancer->id);
@@ -123,7 +124,7 @@
                                                 @endif
                                             @endif
                                             <figure class="wt-userlistingimg">
-                                                <img src="{{{ asset($user_image) }}}" alt="{{ trans('lang.img') }}">
+                                                <img src="{{{ asset(Helper::getImageWithSize('uploads/users/'.$freelancer->id, $freelancer->profile->avater, 'listing')) }}}" alt="{{ trans('lang.img') }}">
                                             </figure>
                                             <div class="wt-userlistingcontent">
                                                 <div class="wt-contenthead">
@@ -166,7 +167,9 @@
                                                 </div>
                                                 <div class="wt-rightarea">
                                                     <span class="wt-stars"><span style="width: {{ $stars }}%;"></span></span>
-                                                    <span class="wt-starcontent">{{{ $rating }}}<sub>{{ trans('lang.5') }}</sub> <em>({{{ $feedbacks }}} {{ trans('lang.feedbacks') }})</em></span>
+                                                    <span class="wt-starcontent">
+                                                        {{{ round($average_rating_count) }}}<sub>{{ trans('lang.5') }}</sub> <em>({{{ $feedbacks }}} {{ trans('lang.feedbacks') }})</em>
+                                                    </span>
                                                 </div>
                                             </div>
                                             @if (!empty($freelancer->profile->description))

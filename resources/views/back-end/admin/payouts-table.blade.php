@@ -32,7 +32,7 @@
                                                 <option value="completed" {{$payout->status == 'completed' ? 'selected' : ''}}>{{ trans('lang.completed') }}</option>
                                             </select>
                                         </span>
-                                        <a href="javascrip:void(0);" class="wt-searchgbtn" @click.prevent='changePayoutStatus({{$payout->id}})'><i class="fa fa-check"></i></a>
+                                        <a href="javascrip:void(0);" class="wt-searchgbtn" @click.prevent='changePayoutStatus({{$payout->id}}, {{json_encode($payout->projects_ids)}})'><i class="fa fa-check"></i></a>
                                     </div>
                                 </fieldset>
                             </form>

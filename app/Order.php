@@ -2,9 +2,9 @@
 
 namespace App;
 
-use Auth;
-use DB;
 use Illuminate\Database\Eloquent\Model;
+use DB;
+use Auth;
 
 class Order extends Model
 {
@@ -15,7 +15,7 @@ class Order extends Model
      * @var    array $fillable
      */
     protected $fillable = array(
-        'user_id', 'product_id', 'invoice_id', 'status',
+        'user_id', 'product_id', 'invoice_id', 'status'
     );
 
     /**

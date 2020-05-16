@@ -11,10 +11,12 @@
  */
 namespace App\Mail;
 
-use App\EmailHelper;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use App\EmailHelper;
+use App\SiteManagement;
 
 /**
  * Class GeneralEmailMailable
@@ -102,7 +104,7 @@ class GeneralEmailMailable extends Mailable
         $site_title = EmailHelper::getSiteTitle();
         $signature = EmailHelper::getSignature();
         $app_content = $this->template->content;
-        $email_content_default = " Hi %name%!
+        $email_content_default =    " Hi %name%!
                                     Thanks for registering at " . $site_title . ". Here is your verification code to complete your registration process.:
                                     Name : %name%
                                     Email : %email%
@@ -142,9 +144,9 @@ class GeneralEmailMailable extends Mailable
         $site_title = EmailHelper::getSiteTitle();
         $signature = EmailHelper::getSignature();
         $app_content = $this->template->content;
-        $email_content_default = " Hi %name%!
+        $email_content_default =    " Hi %name%!
 
-                                      Thanks for registering at " . $site_title . ". You can now login to manage your account using the following credentials:
+                                      Thanks for registering at ".$site_title.". You can now login to manage your account using the following credentials:
 
                                       Username: %name%
                                       Password: %password%
@@ -184,7 +186,7 @@ class GeneralEmailMailable extends Mailable
         $reset_link = $link;
         $signature = EmailHelper::getSignature();
         $app_content = $this->template->content;
-        $email_content_default = "Hi %name%!
+        $email_content_default =    "Hi %name%!
 
                                     <strong>Lost Password reset</strong>
 
@@ -233,9 +235,9 @@ class GeneralEmailMailable extends Mailable
         $invite_message = $message;
         $signature = EmailHelper::getSignature();
         $app_content = $this->template->content;
-        $email_content_default = "Hi,
+        $email_content_default =    "Hi,
 
-                                    %username% has invited you to signup at <a href=" % link % "> " . $site_title . " </a> You have invitation message given below
+                                    %username% has invited you to signup at <a href="%link%"> ".$site_title." </a> You have invitation message given below
 
                                     %message%
 
@@ -275,7 +277,7 @@ class GeneralEmailMailable extends Mailable
         $contact_message = $message;
         $signature = EmailHelper::getSignature();
         $app_content = $this->template->content;
-        $email_content_default = "Hi,
+        $email_content_default =    "Hi,
                                      A person has contacted you, description of message is given below.
 
                                      Subject : %subject%
@@ -319,7 +321,7 @@ class GeneralEmailMailable extends Mailable
         $pass = $password;
         $signature = EmailHelper::getSignature();
         $app_content = $this->template->content;
-        $email_content_default = "Hi %name%!
+        $email_content_default =    "Hi %name%!
 
                                     <strong>Password Reset</strong>
 

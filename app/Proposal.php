@@ -201,7 +201,7 @@ class Proposal extends Model
             })
             ->orderBy('private_messages.created_at')->get()->toArray();
     }
-
+    
     /**
      * Get message
      *
@@ -212,7 +212,7 @@ class Proposal extends Model
      * @return response
      */
     public static function getProjectHistory($user_id, $freelancer_id, $proposal_id, $project_type)
-    {   
+    {
         return DB::table('private_messages')
             ->join('private_messages_to', 'private_messages.id', '=', 'private_messages_to.private_message_id')
             ->join('profiles', 'profiles.user_id', '=', 'private_messages.author_id')
@@ -226,17 +226,22 @@ class Proposal extends Model
     /**
      * Get proposals by status.
      *
-     * @param mixed $user_id User ID
-     * @param int   $status  Status
-     * @param int   $limit   limit
+     * @param mixed  $user_id     User ID
+     * @param int    $status      Status
+     * @param string $paid_status paid_status
+     * @param int    $limit       limit
      *
      * @return \Illuminate\Http\Response
      */
-    public static function getProposalsByStatus($user_id, $status, $limit = 3)
+    public static function getProposalsByStatus($user_id, $status, $paid_status = '', $limit = 3)
     {
-        return Proposal::select('id', 'amount', 'updated_at')->latest()
+        $projects = Proposal::select('id', 'amount', 'updated_at')->latest()
             ->where('freelancer_id', $user_id)
-            ->where('status', $status)->take($limit)->get();
+            ->where('status', $status);
+        if (!empty($paid_status)) {
+            $projects->where('paid', $paid_status);
+        }
+        return $projects->take($limit)->get();
     }
 
     /**

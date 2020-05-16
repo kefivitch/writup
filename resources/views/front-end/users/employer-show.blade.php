@@ -32,6 +32,11 @@
         </div>
     </div>
     <div class="wt-main-section wt-haslayout la-profile-holder" id="user_profile">
+        <div class="preloader-section" v-if="loading" v-cloak>
+            <div class="preloader-holder">
+                <div class="loader"></div>
+            </div>
+        </div>
         <div class="container">
             <div class="row">
                 <div id="wt-twocolumns" class="wt-twocolumns wt-haslayout">
@@ -133,7 +138,8 @@
                                             <i class="fa fab fa-pinterest-p"></i>{{ trans('lang.share_pinterest') }}</a>
                                         </li>
                                         <li class="wt-googleplus">
-                                            <a href="https://plus.google.com/share?url={{ urlencode(Request::fullUrl()) }}" class="social-share"><i class="fa fab fa-google-plus-g"></i>{{ trans('lang.share_google') }}</a>
+                                            <a href="https://plus.google.com/share?url={{ urlencode(Request::fullUrl()) }}" class="social-share">
+                                            <i class="fa fab fa-google-plus-g"></i>{{ trans('lang.share_google') }}</a>
                                         </li>
                                     </ul>
                            
@@ -144,7 +150,7 @@
                                     <h2>{{ trans('lang.report_employer') }}</h2>
                                 </div>
                                 <div class="wt-widgetcontent">
-                                    {!! Form::open(['url' => '', 'class' =>'wt-formtheme wt-formreport', 'id' => 'submit-report',  '@submit.prevent'=>'submitReport("'.$profile->user_id.'","employer-report")']) !!}
+                                    {!! Form::open(['url' => '', 'class' =>'wt-formtheme wt-formreport', 'id' => 'submit-report',  '@submit.prevent'=>'submitReport("'.$user->id.'","employer-report")']) !!}
                                         <fieldset>
                                             <div class="form-group">
                                                 <span class="wt-select">
@@ -170,7 +176,7 @@
                                     <h3>{{ trans('lang.about') }} “{{{ $user_name }}}”</h3>
                                 </div>
                                 <div class="wt-description">
-                                    @php echo htmlspecialchars_decode(stripslashes($profile->description)); @endphp
+                                    @php echo htmlspecialchars_decode(stripslashes($user->profile->description)); @endphp
                                 </div>
                             </div>
                             @if (!empty($jobs) && $jobs->count() > 0)
@@ -197,7 +203,7 @@
                                                     <h2>{{{$job->title}}}</h2>
                                                 </div>
                                                 <div class="wt-description">
-                                                    <p>@php echo htmlspecialchars_decode(stripslashes(str_limit($description, 200))); @endphp </p>
+                                                    <p>@php echo htmlspecialchars_decode(stripslashes(str_limit($description, 200))); @endphp</p>
                                                 </div>
                                                 <div class="wt-tag wt-widgettag">
                                                     @foreach ($job->skills as $skill )
@@ -207,18 +213,12 @@
                                             </div>
                                             <div class="wt-viewjobholder">
                                                 <ul>
-                                                    <li><span><i class="wt-viewjobdollar">
-                                                        @if(!empty($symbol)) 
-                                                        {{$symbol['symbol']}} 
-                                                        @else   {{'$'}}
-                                                        @endif
-                                                       
-                                                    </i>{{{$job->price}}}</span></li>
+                                                    <li><span><i class="wt-viewjobdollar">{{ !empty($symbol) ? $symbol['symbol'] : '$' }}</i>{{{$job->price}}}</span></li>
                                                     @if (!empty($job->location->title))
                                                         <li><span><img src="{{{asset(App\Helper::getLocationFlag($job->location->flag))}}}" alt="{{{ trans('lang.location') }}}"> {{{ $job->location->title }}}</span></li>
                                                     @endif
                                                     <li><span><i class="far fa-folder wt-viewjobfolder"></i>{{{ trans('lang.type') }}} {{{$project_type}}}</span></li>
-                                                    <li><span><i class="far fa-clock wt-viewjobclock"></i>{{ $job->deadline }}</span></li>
+                                                    <li><span><i class="far fa-clock wt-viewjobclock"></i>{{{ Helper::getJobDurationList($job->duration) }}}</span></li>
                                                     <li><span><i class="fa fa-tag wt-viewjobtag"></i>{{{ trans('lang.job_id') }}} {{{$job->code}}}</span></li>
 
                                                     @if (!empty($save_jobs) && in_array($job->id, $save_jobs))

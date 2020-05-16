@@ -13,10 +13,10 @@
 
 namespace App;
 
-use Carbon\Carbon;
-use DB;
-use File;
 use Illuminate\Database\Eloquent\Model;
+use DB;
+use Carbon\Carbon;
+use File;
 
 /**
  * Class Page
@@ -51,7 +51,7 @@ class Page extends Model
      *
      * @var array $fillable
      */
-    protected $fillable = array('title', 'slug', 'body','title_balise');
+    protected $fillable = array('title', 'slug', 'body');
 
     /**
      * Set slug attribute
@@ -82,7 +82,7 @@ class Page extends Model
      */
     public static function getPages()
     {
-        $pages = DB::table('pages')->paginate(5);
+        $pages = DB::table('pages')->paginate(10);
         return $pages;
     }
 
@@ -100,7 +100,6 @@ class Page extends Model
             $count = 0;
             $old_path = Helper::PublicPath() . '/uploads/pages/temp';
             $this->title = filter_var($request->title, FILTER_SANITIZE_STRING);
-            $this->title_balise = filter_var($request->title_balise, FILTER_SANITIZE_STRING);
             $this->slug = filter_var($request->title, FILTER_SANITIZE_STRING);
             $this->body = !empty($request->body) ? $request->body : 'null';
             if ($request->parent_id) {
@@ -109,7 +108,7 @@ class Page extends Model
                 $this->relation_type = 0;
             }
             $this->save();
-            $page_id = $this->id;
+            $page_id =  $this->id;
             $new_path = Helper::PublicPath() . '/uploads/pages/' . $page_id;
             $page = self::findOrFail($this->id);
             $page_banner = '';
@@ -297,13 +296,13 @@ class Page extends Model
                     $filename = time() . '-' . $request['page_banner_value'];
                     rename($old_path . '/' . $request['page_banner_value'], $new_path . '/' . $filename);
                     $page_banner = $filename;
-                }
+                } 
             }
             if (!empty($request['seo_desc'])) {
                 DB::table('site_managements')->insert(
                     [
                         'meta_key' => 'seo-desc-' . $page_id, 'meta_value' => $request['seo_desc'],
-                        "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                        "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                     ]
                 );
             }
@@ -316,7 +315,7 @@ class Page extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'show-page-' . $page_id, 'meta_value' => $show_page,
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             if ($request['show_page_banner'] == true) {
@@ -328,14 +327,14 @@ class Page extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'show-banner-' . $page_id, 'meta_value' => $show_banner,
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             if (!empty($page_banner)) {
                 DB::table('site_managements')->insert(
                     [
                         'meta_key' => 'page-banner-' . $page_id, 'meta_value' => $page_banner,
-                        "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                        "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                     ]
                 );
             }
@@ -360,7 +359,6 @@ class Page extends Model
                 $pages->slug = filter_var($request->title, FILTER_SANITIZE_STRING);
             }
             $pages->title = filter_var($request->title, FILTER_SANITIZE_STRING);
-            $pages->title_balise = filter_var($request->title_balise, FILTER_SANITIZE_STRING);
             $pages->body = !empty($request->body) ? $request->body : 'null';
             if ($request->parent_id == null) {
                 $pages->relation_type = 0;
@@ -538,7 +536,7 @@ class Page extends Model
                                             }
                                             $filename = time() . '-' . $work_tab;
                                             rename($old_path . '/' . $work_tab, $new_path . '/' . $filename);
-                                        }
+                                        } 
                                         $work_tab_section[$work_tab_key] = $filename;
                                     } elseif ($work_tab_key == 'description') {
                                         $work_tab_section[$work_tab_key] = str_replace('"', "'", $work_tab);
@@ -583,7 +581,7 @@ class Page extends Model
                 DB::table('site_managements')->insert(
                     [
                         'meta_key' => 'seo-desc-' . $id, 'meta_value' => $request['seo_desc'],
-                        "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                        "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                     ]
                 );
             }
@@ -596,7 +594,7 @@ class Page extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'show-page-' . $id, 'meta_value' => $show_page,
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
             if ($request['show_page_banner'] == true) {
@@ -608,16 +606,16 @@ class Page extends Model
             DB::table('site_managements')->insert(
                 [
                     'meta_key' => 'show-banner-' . $id, 'meta_value' => $show_banner,
-                    "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                    "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                 ]
             );
-
+            
             if (!empty($page_banner)) {
                 DB::table('site_managements')->where('meta_key', '=', 'page-banner-' . $id)->delete();
                 DB::table('site_managements')->insert(
                     [
                         'meta_key' => 'page-banner-' . $id, 'meta_value' => $page_banner,
-                        "created_at" => Carbon::now(), "updated_at" => Carbon::now(),
+                        "created_at" => Carbon::now(), "updated_at" => Carbon::now()
                     ]
                 );
             }
@@ -651,6 +649,7 @@ class Page extends Model
             return DB::table('pages')->select('slug')->where('id', $id)->get()->first();
         }
     }
+
 
     /**
      * Get Parent Pages
@@ -719,8 +718,8 @@ class Page extends Model
     {
         if ($meta['style'] == 'style1') {
             ob_start();
-            ?>
-            <div class="wt-haslayout wt-bannerholder" style="background-image:url(<?php url('/');?>)">
+?>
+            <div class="wt-haslayout wt-bannerholder" style="background-image:url(<?php url('/'); ?>)">
                 <div class="container">
                     <div class="row">
                         <div class="col-12 col-sm-12 col-md-12 col-lg-5">
@@ -759,7 +758,7 @@ class Page extends Model
                 </div>
             </div>
 <?php
-return ob_get_clean();
+            return ob_get_clean();
         }
     }
 }

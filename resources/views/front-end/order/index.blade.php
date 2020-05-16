@@ -33,26 +33,7 @@
               
                 <div class="col-xs-12 col-sm-12 col-md-5 col-lg-5 col-xl-4 float-left">
                     <aside id="wt-sidebar" class="wt-sidebar">
-                        @if (!empty($cats) && count($cats) !== 0)
-                        <div class="wt-widget wt-categoriesholder">
-                            <div class="wt-widgettitle">
-                                <h2>{{ trans('lang.cats') }}</h2>
-                            </div>
-                            <div class="wt-widgetcontent">
-                                <ul class="wt-categoriescontent">
-                                    @foreach ($cats as $key => $cat)
-                                    @php
-                                    $selected_category = \App\ArticleCategory::where('id', $cat['id'])->first();
-                                    $article_count = $selected_category->articles->count();
-                                    @endphp
-                                    <li><a
-                                            href="{{{ url('articles/'.$cat['slug']) }}}">{{$cat['title']}}<em>{{$article_count}}</em></a>
-                                    </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </div>
-                        @endif
+                       
                         @if (!empty($latest_article) && count($latest_article) !== 0)
                         <div class="wt-widget wt-widgetarticlesholder">
                             <div class="wt-widgettitle">

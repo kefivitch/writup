@@ -43,7 +43,7 @@
                                                         <a href="{{{ url('profile/'.$job->employer->slug) }}}">@if ($verified_user === 1)<i class="fa fa-check-circle"></i>@endif&nbsp;{{{ $employer_name }}}</a>
                                                     @endif
                                                     @if (!empty($job->title))
-                                                        <h2>{!! $job->title !!}</h2>
+                                                        <h2>{{{ $job->title }}}</h2>
                                                     @endif
                                                 </div>
                                             @endif
@@ -116,7 +116,7 @@
                                             @endif
                                             <div class="wt-proposalfeedback">
                                                 <span class="wt-stars"><span style="width: {{ $stars }}%;"></span></span>
-                                                <span class="wt-starcontent">{{{ $rating }}}<sub>{{ trans('lang.5') }}</sub> <em>({{{ $feedbacks }}} {{ trans('lang.feedbacks') }})</em></span>
+                                                <span class="wt-starcontent">{{{ round($average_rating_count) }}}<sub>{{ trans('lang.5') }}</sub> <em>({{{ $feedbacks }}} {{ trans('lang.feedbacks') }})</em></span>
                                             </div>
                                         </div>
                                         <div class="wt-rightarea wt-titlewithsearch">

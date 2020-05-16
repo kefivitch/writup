@@ -35,7 +35,7 @@
                                                     <a href="{{{ url('profile/'.$job->employer->slug) }}}">@if($verified_user === 1)<i class="fa fa-check-circle"></i>@endif&nbsp;{{{ $user_name }}}</a>
                                                 @endif
                                                 @if (!empty($job->title))
-                                                    <h2>{!! $job->title !!}</h2>
+                                                    <h2>{{{ $job->title }}}</h2>
                                                 @endif
                                             </div>
                                         @endif
@@ -91,14 +91,14 @@
                                         $user_image = !empty($profile) ? $profile->avater : '';
                                         $profile_image = !empty($user_image) ? '/uploads/users/'.$accepted_proposal->freelancer_id.'/'.$user_image : 'images/user-login.png';
                                         $user_name = Helper::getUserName($user->id);
-                                        $avg_rating = \App\Review::where('receiver_id', $proposal->freelancer_id)->sum('avg_rating');
+                                        $feedbacks = \App\Review::select('feedback')->where('receiver_id', $user->id)->count();
+                                        $avg_rating = App\Review::where('receiver_id', $user->id)->sum('avg_rating');
                                         $rating  = $avg_rating != 0 ? round($avg_rating/\App\Review::count()) : 0;
-                                        $reviews = \App\Review::where('receiver_id', $proposal->freelancer_id)->get();
-                                        $stars  = $reviews->sum('avg_rating') != 0 ? $reviews->sum('avg_rating')/20*100 : 0;
-                                        $feedbacks = \App\Review::select('feedback')->where('receiver_id', $proposal->freelancer_id)->count();
+                                        $reviews = \App\Review::where('receiver_id', $user->id)->get();
+                                        $stars  = $reviews->sum('avg_rating') != 0 ? (($reviews->sum('avg_rating')/$feedbacks)/5)*100 : 0;
+                                        $average_rating_count = !empty($feedbacks) ? $reviews->sum('avg_rating')/$feedbacks : 0;
                                         $completion_time = !empty($accepted_proposal->completion_time) ? \App\Helper::getJobDurationList($accepted_proposal->completion_time) : '';
                                         $p_attachments = !empty($accepted_proposal->attachments) ? unserialize($accepted_proposal->attachments) : '';
-                                        $feedbacks = \App\Review::select('feedback')->where('receiver_id', $user->id)->count();
                                         $badge = Helper::getUserBadge($user->id);
                                         if (!empty($enable_package) && $enable_package === 'true') {
                                             $feature_class = !empty($badge) ? 'wt-featured' : '';
@@ -131,7 +131,7 @@
                                                 @endif
                                                 <div class="wt-proposalfeedback">
                                                     <span class="wt-stars"><span style="width: {{ $stars }}%;"></span></span>
-                                                    <span class="wt-starcontent">{{{ $rating }}}<sub>{{ trans('lang.5') }}</sub> <em>({{{ $feedbacks }}} {{ trans('lang.feedbacks') }})</em></span>
+                                                    <span class="wt-starcontent">{{{ round($average_rating_count) }}}<sub>{{ trans('lang.5') }}</sub> <em>({{{ $feedbacks }}} {{ trans('lang.feedbacks') }})</em></span>
                                                 </div>
                                             </div>
                                             <div class="wt-rightarea">
@@ -188,12 +188,13 @@
                                                     $profile = \App\User::find($proposal->freelancer_id)->profile;
                                                     $user_image = !empty($profile) ? $profile->avater : '';
                                                     $profile_image = !empty($user_image) ? '/uploads/users/'.$proposal->freelancer_id.'/'.$user_image : 'images/user-login.png';
-                                                    $user_name = $user->first_name.'.'.substr($user->last_name,0,1);
-                                                    $avg_rating = \App\Review::where('receiver_id', $proposal->freelancer_id)->sum('avg_rating');
+                                                    $user_name = $user->first_name.' '.$user->last_name;
+                                                    $feedbacks = \App\Review::select('feedback')->where('receiver_id', $proposal->freelancer_id)->count();
+                                                    $avg_rating = App\Review::where('receiver_id', $proposal->freelancer_id)->sum('avg_rating');
                                                     $rating  = $avg_rating != 0 ? round($avg_rating/\App\Review::count()) : 0;
                                                     $reviews = \App\Review::where('receiver_id', $proposal->freelancer_id)->get();
-                                                    $stars  = $reviews->sum('avg_rating') != 0 ? $reviews->sum('avg_rating')/20*100 : 0;
-                                                    $feedbacks = \App\Review::select('feedback')->where('receiver_id', $proposal->freelancer_id)->count();
+                                                    $stars  = $reviews->sum('avg_rating') != 0 ? (($reviews->sum('avg_rating')/$feedbacks)/5)*100 : 0;
+                                                    $average_rating_count = !empty($feedbacks) ? $reviews->sum('avg_rating')/$feedbacks : 0;
                                                     $completion_time = !empty($proposal->completion_time) ? \App\Helper::getJobDurationList($proposal->completion_time) : '';
                                                     $attachments = !empty($proposal->attachments) ? unserialize($proposal->attachments) : '';
                                                     $attachments_count = 0;
@@ -233,13 +234,19 @@
                                                         @endif
                                                         <div class="wt-proposalfeedback">
                                                             <span class="wt-stars"><span style="width: {{ $stars }}%;"></span></span>
-                                                            <span class="wt-starcontent">{{{ $rating }}}<sub>{{ trans('lang.5') }}</sub> <em>({{{ $feedbacks }}} {{ trans('lang.feedbacks') }})</em></span>
+                                                            <span class="wt-starcontent">{{{ round($average_rating_count) }}}<sub>{{ trans('lang.5') }}</sub> <em>({{{ $feedbacks }}} {{ trans('lang.feedbacks') }})</em></span>
                                                         </div>
                                                     </div>
                                                     <div class="wt-rightarea">
                                                         <div class="wt-btnarea">
                                                             @if (empty($accepted_proposal))
-                                                                <a href="javascript:void(0);"  v-on:click.prevent="hireFreelancer('{{{$proposal->id}}}')" class="wt-btn">{{ trans('lang.hire_now') }}</a>
+                                                                @if (!empty($order))
+                                                                   @if ($order->product_id == $proposal->id)     
+                                                                        <h5>{{trans('lang.pending_hiring')}}</h5>
+                                                                   @endif
+                                                                @else
+                                                                    <a href="javascript:void(0);"  v-on:click.prevent="hireFreelancer('{{{$proposal->id}}}', '{{$mode}}')" class="wt-btn">{{ trans('lang.hire_now') }}</a>
+                                                                @endif
                                                             @endif
                                                         </div>
                                                         <div class="wt-hireduserstatus">
@@ -271,7 +278,7 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                        @endforeach
+                                            @endforeach
                                         </div>
                                     @else
                                         @if (file_exists(resource_path('views/extend/errors/no-record.blade.php'))) 

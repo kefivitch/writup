@@ -53,7 +53,7 @@
                                                     <h2>{!! $job->title !!}</h2>
                                                 </div>
                                                 <div class="wt-description">
-                                                    <p>{!!str_limit($description, 300)!!}</p>
+                                                    <p>{{str_limit($description, 300)}}</p>
                                                 </div>
                                                 <div class="wt-tag wt-widgettag">
                                                     @foreach ($job->skills as $skill )

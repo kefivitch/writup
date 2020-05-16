@@ -90,10 +90,12 @@ class FreelancerController extends Controller
         $packages = DB::table('items')->where('subscriber', Auth::user()->id)->count();
         $package_options = Package::select('options')->where('role_id', $role_id)->first();
         $options = !empty($package_options) ? unserialize($package_options['options']) : array();
+        $videos = !empty($profile->videos) ? Helper::getUnserializeData($profile->videos) : '';
         if (file_exists(resource_path('views/extend/back-end/freelancer/profile-settings/personal-detail/index.blade.php'))) {
             return view(
                 'extend.back-end.freelancer.profile-settings.personal-detail.index',
                 compact(
+                    'videos',
                     'locations',
                     'skills',
                     'profile',
@@ -113,6 +115,7 @@ class FreelancerController extends Controller
             return view(
                 'back-end.freelancer.profile-settings.personal-detail.index',
                 compact(
+                    'videos',
                     'locations',
                     'skills',
                     'profile',
@@ -156,6 +159,10 @@ class FreelancerController extends Controller
                     'width' => 100,
                     'height' => 100,
                 ),
+                'listing' => array(
+                    'width' => 255,
+                    'height' => 255,
+                ),
             );
             // return Helper::uploadTempImage($path, $profile_image);
             return Helper::uploadTempImageWithSize($path, $profile_image, '', $image_size);
@@ -193,9 +200,17 @@ class FreelancerController extends Controller
                 'first_name'    => 'required',
                 'last_name'    => 'required',
                 'gender'    => 'required',
-                'phone' => 'digits:8'
             ]
         );
+        if (!empty($request['latitude']) || !empty($request['longitude'])) {
+            $this->validate(
+                $request,
+                [
+                    'latitude' => ['regex:/^[-]?(([0-8]?[0-9])\.(\d+))|(90(\.0+)?)$/'],
+                    'longitude' => ['regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/'],
+                ]
+            ); 
+        }
         if (Auth::user()) {
             $role_id = Helper::getRoleByUserID(Auth::user()->id);
             $packages = DB::table('items')->where('subscriber', Auth::user()->id)->count();
@@ -264,6 +279,45 @@ class FreelancerController extends Controller
                 $json['type'] = 'error';
                 return $json;
             }
+        } else {
+            $json['type'] = 'error';
+            return $json;
+        }
+    }
+
+    /**
+     * Get top freelancer
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getTopFreelancers()
+    {
+        $json = array();
+        $freelancers = User::getTopFreelancers();
+        $top_freelancers = array();
+        if (!empty($freelancers)) {
+            foreach ($freelancers as $key => $freelancer) {
+                $user = User::find($freelancer->id);
+                $top_freelancers[$key]['id'] = $freelancer->id;
+                $top_freelancers[$key]['name'] = Helper::getUserName($freelancer->id);
+                $top_freelancers[$key]['slug'] = $user->slug;
+                $top_freelancers[$key]['image'] = asset(Helper::getProfileImage($freelancer->id));
+                $top_freelancers[$key]['flag'] = !empty($user->location->flag) ? Helper::getLocationFlag($user->location->flag) :'';
+                $top_freelancers[$key]['location'] = !empty($user->location->title) ? $user->location->title :'';
+                $top_freelancers[$key]['tagline'] = !empty($user->profile->tagline) ? $user->profile->tagline :'';
+                $top_freelancers[$key]['hourly_rate'] = !empty($user->profile->hourly_rate) ? $user->profile->hourly_rate :'';
+                $currency   = SiteManagement::getMetaValue('commision');
+                $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
+                $top_freelancers[$key]['symbol'] = !empty($symbol['symbol']) ? $symbol['symbol'] : '$';
+                $top_freelancers[$key]['average_rating_count'] = !empty($freelancer->total_reviews) ? $freelancer->rating/$freelancer->total_reviews : 0;
+                $top_freelancers[$key]['total_reviews'] = !empty($freelancer->total_reviews) ? $freelancer->total_reviews : 0;
+                $top_freelancers[$key]['save_freelancers'] = !empty(auth()->user()->profile->saved_freelancer) ? unserialize(auth()->user()->profile->saved_freelancer) : array();
+            }
+        }
+        if (!empty($top_freelancers)) {
+            $json['type'] = 'success';
+            $json['freelancers'] = $top_freelancers;
+            return $json;
         } else {
             $json['type'] = 'error';
             return $json;
@@ -683,7 +737,7 @@ class FreelancerController extends Controller
         if (Auth::user()) {
             $ongoing_jobs = array();
             $freelancer_id = Auth::user()->id;
-            $ongoing_projects = Proposal::getProposalsByStatus($freelancer_id, 'hired', 3);
+            $ongoing_projects = Proposal::getProposalsByStatus($freelancer_id, 'hired');
             $cancelled_projects = Proposal::getProposalsByStatus($freelancer_id, 'cancelled');
             $package_item = Item::where('subscriber', $freelancer_id)->first();
             $package = !empty($package_item) ? Package::find($package_item->product_id) : array();
@@ -693,6 +747,7 @@ class FreelancerController extends Controller
             $message_status = Message::where('status', 0)->where('receiver_id', $freelancer_id)->count();
             $notify_class = $message_status > 0 ? 'wt-insightnoticon' : '';
             $completed_projects = Proposal::getProposalsByStatus($freelancer_id, 'completed');
+            $completed_projects_history = Proposal::getProposalsByStatus($freelancer_id, 'completed', 'completed');
             $currency   = SiteManagement::getMetaValue('commision');
             $symbol     = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
             $trail      = !empty($package) && $package['trial'] == 1 ? 'true' : 'false';
@@ -715,6 +770,8 @@ class FreelancerController extends Controller
                 return view(
                     'extend.back-end.freelancer.dashboard',
                     compact(
+                        'freelancer_id',
+                        'completed_projects_history',
                         'access_type',
                         'ongoing_projects',
                         'cancelled_projects',
@@ -743,6 +800,8 @@ class FreelancerController extends Controller
                 return view(
                     'back-end.freelancer.dashboard',
                     compact(
+                        'freelancer_id',
+                        'completed_projects_history',
                         'access_type',
                         'ongoing_projects',
                         'cancelled_projects',
@@ -920,7 +979,6 @@ class FreelancerController extends Controller
                         'cancel_popup_title',
                         'pivot_id',
                         'purchaser',
-                        'employer',
                         'symbol'
                     )
                 );
@@ -944,7 +1002,6 @@ class FreelancerController extends Controller
                         'cancel_popup_title',
                         'pivot_id',
                         'purchaser',
-                        'employer',
                         'symbol'
                     )
                 );

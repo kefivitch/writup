@@ -16,7 +16,6 @@
               <div class="form-group la-section-title">
                 <input type="text" placeholder="Title" v-model="form.title" name="title" class="form-control" />
               </div>
-             
               <div class="form-group la-section-title" v-if="form.body && form.body !='null'">
                 <tinymce-editor 
                     v-model="form.body" 
@@ -25,9 +24,6 @@
                 <!-- <textarea class="form-control wt-tinymceeditor" id="wt-tinymceeditor" :placeholder="trans('lang.ph_desc')" name="content">{{pageData.body}}</textarea> -->
               </div>
             </fieldset>
-              <div class="form-group la-section-title">
-                <input type="text" placeholder="Title Balise" v-model="form.title_balise" name="title_balise" class="form-control" />
-              </div>
             <draggable
               class="list-group dragArea"
               :list="sections"
@@ -324,7 +320,6 @@ export default {
       form: {
         sections: [],
         title: "",
-        title_balise:"",
         body:'',
         meta: {
           freelancers: [],
@@ -338,9 +333,6 @@ export default {
           app_section: [],
           articles:[],
           title: {
-            show: true
-          },
-           title_balise: {
             show: true
           }
         },
@@ -396,7 +388,6 @@ export default {
     this.getPageData();
     this.getPageOption();
     this.form.title = this.pageData.title;
-    this.form.title_balise = this.pageData.title_balise;
     this.form.seo_desc = this.seo_desc
     if (this.selected_parent) {
       this.form.parent_id = this.selected_parent

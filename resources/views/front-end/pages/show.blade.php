@@ -9,7 +9,7 @@
 @endpush
 @section('title')
         @if ($home == false)
-            {{ $page['title_balise'] }}
+            {{ $page['title'] }}
         @else 
             {{ config('app.name') }} 
         @endif
@@ -63,6 +63,12 @@
         </div>
     @endif
     <div id="pages-list">
+        @if (Session::has('error'))
+            <div class="flash_msg">
+                <flash_messages :message_class="'danger'" :time ='5' :message="'{{{ Session::get('error') }}}'" v-cloak></flash_messages>
+            </div>
+            @php session()->forget('error'); @endphp
+        @endif
         @if ($home == false)
             @if ($show_banner_image == false && !empty($page['title']) && $show_title == true)
                 <div class="wt-innerbannercontent wt-without-banner-title">

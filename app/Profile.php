@@ -138,6 +138,9 @@ class Profile extends Model
                 rename($old_path . '/small-' . $request['hidden_avater_image'], $new_path . '/small-' . $filename);
                 rename($old_path . '/medium-small-' . $request['hidden_avater_image'], $new_path . '/medium-small-' . $filename);
                 rename($old_path . '/medium-' . $request['hidden_avater_image'], $new_path . '/medium-' . $filename);
+                if (file_exists($old_path . '/listing-' . $request['hidden_avater_image'])) {
+                    rename($old_path . '/listing-' . $request['hidden_avater_image'], $new_path . '/listing-' . $filename);
+                }
             }
             $profile->avater = filter_var($filename, FILTER_SANITIZE_STRING);
         } else {
@@ -158,6 +161,15 @@ class Profile extends Model
             $profile->banner = filter_var($filename, FILTER_SANITIZE_STRING);
         } else {
             $profile->banner = null;
+        }
+        $videos = !empty($request['video']) ? $request['video'] : array();
+        if (!empty($videos)) {
+            foreach ($videos as $key => $video) {
+                $videos[$key]['url'] = $video['url'];
+            }
+            $profile->videos = serialize($videos);
+        } else {
+            $profile->videos = null;
         }
         return $profile->save();
     }

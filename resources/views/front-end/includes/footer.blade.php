@@ -67,7 +67,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                        <p class="wt-copyrights"><span>Copyright © {{ date('Y') }} Writup, Powered By <a href="https://mc-zen.com">McZEN</a></span></p>
+                        <p class="wt-copyrights"><span>{{{ !empty($footer['copyright']) ? $footer['copyright'] : 'Worketic. All Rights Reserved. Amentotech.'  }}}</p>
                         @if(!empty($footer['pages']))
                             <nav class="wt-addnav">
                                 <ul>

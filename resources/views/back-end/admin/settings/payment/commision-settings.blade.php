@@ -4,6 +4,11 @@
     @else
         @include('back-end.admin.settings.payment.site-payment-options')
     @endif
+    @if (file_exists(resource_path('views/extend/back-end/admin/settings/payment/payment-mode.blade.php')))
+        @include('extend.back-end.admin.settings.payment.payment-mode')
+    @else
+        @include('back-end.admin.settings.payment.payment-mode')
+    @endif
     <div class="wt-location wt-tabsinfo">
         <div class="wt-tabscontenttitle">
             <h2>{{{ trans('lang.ph_currency_setting') }}}</h2>

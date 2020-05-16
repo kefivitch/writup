@@ -1,24 +1,15 @@
 @extends(file_exists(resource_path('views/extend/back-end/master.blade.php')) ? 'extend.back-end.master' : 'back-end.master')
 @section('content')
     <section class="wt-haslayout wt-dbsectionspace wt-insightuser" id="dashboard">
+        @if (Session::has('message'))
+            <div class="flash_msg">
+                <flash_messages :message_class="'success'" :time ='5' :message="'{{{ Session::get('message') }}}'" v-cloak></flash_messages>
+            </div>
+            @php session()->forget('message');  @endphp
+        @endif
         <div class="row">
             <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
                 <div class="wt-insightsitemholder">
-                    @if (session('success'))
-                    <div class="row">
-                        <div class="alert alert-success" style="width:100%">
-                            {{ session('success') }}
-                        </div>
-                    </div>
-                    @endif
-
-                    @if (session('error'))
-                    <div class="row">
-                        <div class="alert alert-error" style="width:100%">
-                            {{ session('error') }}
-                        </div>
-                    </div>
-                    @endif
                     <div class="row">
                         <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
                             <div class="wt-insightsitem wt-dashboardbox {{$notify_class}}">
@@ -35,11 +26,11 @@
                         </div>
                         @if ($access_type == 'jobs' || $access_type== 'both')
                             <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
-                                <div class="wt-insightsitem wt-dashboardbox wt-insightnoticon">
+                                <div class="wt-insightsitem wt-dashboardbox">
                                     <figure class="wt-userlistingimg">
                                         {{ Helper::getImages('uploads/settings/icon',$latest_proposals_icon, 'layers') }}
                                     </figure>
-                                    <div class="wt-insightdetails ">
+                                    <div class="wt-insightdetails">
                                         <div class="wt-title">
                                             <h3>{{ trans('lang.latest_proposals') }}</h3>
                                             <a href="{{{ url('employer/dashboard/manage-jobs') }}}">{{ trans('lang.click_view') }}</a>

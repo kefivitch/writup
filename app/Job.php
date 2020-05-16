@@ -21,6 +21,8 @@ use Auth;
 use App\Proposal;
 use App\Location;
 use App\Language;
+use Illuminate\Support\Facades\Schema;
+use Carbon\Carbon;
 
 /**
  * Class Job
@@ -163,8 +165,6 @@ class Job extends Model
             $this->location()->associate($location);
             $this->employer()->associate($user_id);
             $this->title = filter_var($request['title'], FILTER_SANITIZE_STRING);
-            $this->deadline = filter_var($request['deadline'], FILTER_SANITIZE_STRING);
-            $this->mots = filter_var($request['mots'], FILTER_SANITIZE_STRING);
             $this->slug = filter_var($request['title'], FILTER_SANITIZE_STRING);
             $this->price = filter_var($request['project_cost'], FILTER_SANITIZE_STRING);
             $this->project_level = filter_var($request['project_levels'], FILTER_SANITIZE_STRING);
@@ -177,6 +177,9 @@ class Job extends Model
             $this->address = filter_var($request['address'], FILTER_SANITIZE_STRING);
             $this->longitude = filter_var($request['longitude'], FILTER_SANITIZE_STRING);
             $this->latitude = filter_var($request['latitude'], FILTER_SANITIZE_STRING);
+            if (Schema::hasColumn('jobs', 'expiry_date')) {
+                $this->expiry_date = $request['expiry_date'];
+            }
             $old_path = 'uploads\jobs\temp';
             $job_attachments = array();
             if (!empty($request['attachments'])) {
@@ -239,19 +242,20 @@ class Job extends Model
                 $job->slug = filter_var($request['title'], FILTER_SANITIZE_STRING);
             }
             $job->title = filter_var($request['title'], FILTER_SANITIZE_STRING);
-            $job->deadline = filter_var($request['deadline'], FILTER_SANITIZE_STRING);
             $job->price = filter_var($request['project_cost'], FILTER_SANITIZE_STRING);
             $job->project_level = filter_var($request['project_levels'], FILTER_SANITIZE_STRING);
             $job->description = $request['description'];
             $job->english_level = filter_var($request['english_level'], FILTER_SANITIZE_STRING);
             $job->duration = filter_var($request['job_duration'], FILTER_SANITIZE_STRING);
-            $job->mots = filter_var($request['mots'], FILTER_SANITIZE_STRING);
             $job->freelancer_type = filter_var($request['freelancer_type'], FILTER_SANITIZE_STRING);
             $job->is_featured = filter_var($request['is_featured'], FILTER_SANITIZE_STRING);
             $job->show_attachments = filter_var($request['show_attachments'], FILTER_SANITIZE_STRING);
             $job->address = filter_var($request['address'], FILTER_SANITIZE_STRING);
             $job->longitude = filter_var($request['longitude'], FILTER_SANITIZE_STRING);
             $job->latitude = filter_var($request['latitude'], FILTER_SANITIZE_STRING);
+            if (Schema::hasColumn('jobs', 'expiry_date')) {
+                $job->expiry_date = $request['expiry_date'];
+            }
             $old_path = 'uploads\jobs\temp';
             $job_attachments = array();
             if (!empty($request['attachments'])) {
@@ -311,9 +315,13 @@ class Job extends Model
      * @return relation
      */
     public static function getSearchResult(
-        $keyword, $search_categories, $search_locations,
-        $search_skills, $search_project_lengths,
-        $search_languages
+        $keyword,
+        $search_categories,
+        $search_locations,
+        $search_skills,
+        $search_project_lengths,
+        $search_languages,
+        $display_completed_projects
     ) {
         $json = array();
         $jobs = Job::select('*');
@@ -371,8 +379,11 @@ class Job extends Model
             }
             $jobs->whereIn('id', $job_id);
         }
+        if ($display_completed_projects == 'false') {
+            $jobs = $jobs->where('status', '!=', 'completed');
+        }
         $jobs = $jobs->orderByRaw("is_featured DESC, updated_at DESC")->paginate(7)->setPath('');
-        foreach ($filters as $key => $filter ) {
+        foreach ($filters as $key => $filter) {
             $pagination = $jobs->appends(
                 array(
                     $key => $filter
@@ -405,4 +416,19 @@ class Job extends Model
         return $job->delete();
     }
 
+    /**
+     * Get order
+     *
+     * @param int   $project_id project_id
+     *
+     * @return response
+     */
+    public static function getProjectOrder($project_id)
+    {
+        return DB::table('orders')
+            ->join('proposals', 'orders.product_id', '=', 'proposals.id')
+            ->join('jobs', 'proposals.job_id', '=', 'jobs.id')
+            ->select('orders.product_id')
+            ->where('jobs.id', $project_id)->first();
+    }
 }

@@ -49,23 +49,25 @@
 													</div>
 												</span>
 											</td>
-											<td>
-												<span class="bt-content">
-													<div class="wt-service-tabel">
-														@if (!empty($attachment))
-															<figure class="service-feature-image"><img src="{{{asset(Helper::getProfileImage($employer->id))}}}" alt="{{{trans('lang.image')}}}"></figure>
-														@endif
-														<div class="wt-freelancers-content">
-															<div class="dc-title">
-																@if ($employer->user_verified == 1)
-																	<span class="wt-featuredtagvtwo">{{ trans('lang.featured') }}</span>
-																@endif
-																<a href="{{{url('profile/'.$employer->slug)}}}"><h3>{{{Helper::getUserName($employer->id)}}}</h3></a>
+											@if (!empty($employer))
+												<td>
+													<span class="bt-content">
+														<div class="wt-service-tabel">
+															@if (!empty($attachment))
+																<figure class="service-feature-image"><img src="{{{asset(Helper::getProfileImage($employer->id))}}}" alt="{{{trans('lang.image')}}}"></figure>
+															@endif
+															<div class="wt-freelancers-content">
+																<div class="dc-title">
+																	@if ($employer->user_verified == 1)
+																		<span class="wt-featuredtagvtwo">{{ trans('lang.featured') }}</span>
+																	@endif
+																	<a href="{{{url('profile/'.$employer->slug)}}}"><h3>{{{Helper::getUserName($employer->id)}}}</h3></a>
+																</div>
 															</div>
 														</div>
-													</div>
-												</span>
-											</td>
+													</span>
+												</td>
+											@endif
 											<td>
 												<span class="la-order-status {{$order->status == 'cancelled' ? 'la-order-cancelled' : ''}}">
 													<h4>{{{$order->status}}}</h4>

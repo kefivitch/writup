@@ -45,14 +45,15 @@
                             <div class="row">
                                 <div class="wt-userprofile">
                                     @if (!empty($avatar))
-                                        <figure><img src="{{{ asset($avatar) }}}" alt="{{{ trans('lang.user_avatar') }}}"></figure>
+                                        {{-- <figure><img src="{{{ asset($avatar) }}}" alt="{{{ trans('lang.user_avatar') }}}"></figure> --}}
+                                        <figure><img src="{{{ asset(Helper::getImage('uploads/users/' . $profile->user_id,$profile->avater, '' , 'user.jpg')) }}}" alt="{{{ trans('lang.user_avatar') }}}"></figure>
                                     @endif
                                     <div class="wt-title">
                                         @if (!empty($user_name))
                                             <h3>@if ($user->user_verified === 1)<i class="fa fa-check-circle"></i> @endif {{{ $user_name }}}</h3>
                                         @endif
                                         <span>
-                                            <div class="wt-proposalfeedback"><span class="wt-starcontent"> {{{ $rating }}}/<i>5</i>&nbsp;<em>({{{ $reviews->count() }}} {{ trans('lang.feedbacks') }})</em></span></div>
+                                            <div class="wt-proposalfeedback"><span class="wt-starcontent"> {{{ round($average_rating_count) }}}/<i>5</i>&nbsp;<em>({{{ $reviews->count() }}} {{ trans('lang.feedbacks') }})</em></span></div>
                                             @if (!empty($joining_date))
                                                 {{{ trans('lang.member_since') }}}&nbsp;{{{ $joining_date }}}
                                             @endif
@@ -131,16 +132,50 @@
             </div>
         </div>
         @if (Helper::getAccessType() == 'both' || Helper::getAccessType() == 'services')
-            <div class="container">
+            @if (!empty($services) && $services->count() > 0)
+                <div class="container">
+                    <div class="row">	
                 <div class="row">	
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
-                        <div class="wt-services-holder">
-                            <div class="wt-title">
-                                <h2>{{ trans('lang.services') }}</h2>
-                            </div>
-                            <div class="wt-services-content">
-                                <div class="row">
-                                    @if (!empty($services))
+                    <div class="row">	
+                <div class="row">	
+                    <div class="row">	
+                <div class="row">	
+                    <div class="row">	
+                <div class="row">	
+                    <div class="row">	
+                <div class="row">	
+                    <div class="row">	
+                <div class="row">	
+                    <div class="row">	
+                <div class="row">	
+                    <div class="row">	
+                <div class="row">	
+                    <div class="row">	
+                <div class="row">	
+                    <div class="row">	
+                <div class="row">	
+                    <div class="row">	
+                <div class="row">	
+                    <div class="row">	
+                <div class="row">	
+                    <div class="row">	
+                <div class="row">	
+                    <div class="row">	
+                <div class="row">	
+                    <div class="row">	
+                <div class="row">	
+                    <div class="row">	
+                <div class="row">	
+                    <div class="row">	
+                <div class="row">	
+                    <div class="row">	
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 float-left">
+                            <div class="wt-services-holder">
+                                <div class="wt-title">
+                                    <h2>{{ trans('lang.services') }}</h2>
+                                </div>
+                                <div class="wt-services-content">
+                                    <div class="row">
                                         @foreach ($services as $service)
                                             @php 
                                                 $service_reviews = Helper::getServiceReviews($user->id, $service->id); 
@@ -190,13 +225,13 @@
                                                 </div>
                                             </div>
                                         @endforeach
-                                    @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endif
         @endif
         <div class="container">
             <div class="row">
@@ -224,30 +259,20 @@
                                                         <div class="wt-contenthead">
                                                             <div class="wt-title">
                                                                 <a href="{{{ url('profile/'.$job->employer->slug) }}}">@if ($user->user_verified === 1)<i class="fa fa-check-circle"></i>@endif {{{ Helper::getUserName($review->user_id) }}}</a>
-                                                                <h3>{!! $job->title !!}</h3>
+                                                                <h3>{{{ $job->title }}}</h3>
                                                             </div>
                                                             <ul class="wt-userlisting-breadcrumb">
                                                                 <li><span><i class="fa fa-dollar-sign"></i><i class="fa fa-dollar-sign"></i> {{{ \App\Helper::getProjectLevel($job->project_level) }}}</span></li>
-                                                                <li>
-                                                                    <span>
-                                                                        <img src="{{{asset(App\Helper::getLocationFlag($job->location->flag))}}}" alt="{{{ trans('lang.flag_img') }}}"> {{{ $job->location->title }}}
-                                                                    </span>
-                                                                </li>
+                                                                @if (!empty($job->location) && $job->location->count() > 0)
+                                                                    <li>
+                                                                        <span>
+                                                                            <img src="{{{asset(App\Helper::getLocationFlag($job->location->flag))}}}" alt="{{{ trans('lang.flag_img') }}}"> {{{ $job->location->title }}}
+                                                                        </span>
+                                                                    </li>
+                                                                @endif
                                                                 <li><span><i class="far fa-calendar"></i> {{ Carbon\Carbon::parse($job->created_at)->format('M Y') }} - {{ Carbon\Carbon::parse($job->updated_at)->format('M Y') }}</span></li>
                                                                 <li>
                                                                     <span class="wt-stars"><span style="width: {{ $stars }}%;"></span></span>
-                                                                    {{-- <vue-stars
-                                                                    :name="'rating[{{$key}}][rate]'"
-                                                                    :active-color="'#fecb02'"
-                                                                    :inactive-color="'#999999'"
-                                                                    :shadow-color="'#ffff00'"
-                                                                    :hover-color="'#fecb02'"
-                                                                    :max="5"
-                                                                    :value="{{$review->avg_rating}}"
-                                                                    :readonly="true"
-                                                                    :char="'★'"
-                                                                    id="rating-{{$key}}"
-                                                                    /> --}}
                                                                 </li>
                                                             </ul>
                                                         </div>
@@ -324,6 +349,42 @@
                                     </div>
                                 @endif
                             </div>
+                            @if (!empty($videos))
+                                <div class="wt-videos">
+                                    <div class="wt-usertitle">
+                                        <h2>{{{ trans('lang.videos') }}}</h2>
+                                    </div>
+                                    <div class="wt-user-videos">
+                                        @foreach ($videos as $video)
+                                            @php 
+                                                $width 	= 367;
+                                                $height = 206;
+                                                $url = parse_url($video['url']);
+                                            @endphp
+                                            @if (!empty($url) && !empty($url['query']))
+                                                <figure>
+                                                    @php
+                                                        if ( isset( $url['host'] ) && ( $url['host'] == 'vimeo.com' || $url['host'] == 'player.vimeo.com' ) ) {
+                                                            $content_exp = explode("/", $media);
+                                                            $content_vimo = array_pop($content_exp);
+                                                            echo '<iframe width="' . intval($width) . '" height="' . intval($height) . '" src="https://player.vimeo.com/video/' . $content_vimo . '" 
+                                                    ></iframe>';
+                                                        } elseif ( isset( $url['host'] ) && $url['host'] == 'soundcloud.com') {
+                                                            $video = wp_oembed_get($media, array('height' => intval($height)));
+                                                            $search = array('webkitallowfullscreen', 'mozallowfullscreen', 'frameborder="no"', 'scrolling="no"');
+                                                            $video = str_replace($search, '', $video);
+                                                            echo str_replace('&', '&amp;', $video);
+                                                        } else {
+                                                            echo '<iframe width="'.$width.'" height="'.$height.'" src="https://www.youtube.com/embed/'.str_replace("v=", '', $url['query']).'" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                                                        }
+                                                    @endphp
+                                                
+                                                </figure>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
                             <div class="wt-experience">
                                 <div class="wt-usertitle">
                                     <h2>{{{ trans('lang.experience') }}}</h2>

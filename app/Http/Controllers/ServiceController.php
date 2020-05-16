@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Redirect;
 use App\Mail\AdminEmailMailable;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Schema;
 
 class ServiceController extends Controller
 {
@@ -57,6 +58,7 @@ class ServiceController extends Controller
         $categories = Category::all();
         $locations  = Location::all();
         $languages  = Language::all();
+        $inner_page  = SiteManagement::getMetaValue('inner_page_data');
         $service_list_meta_title = !empty($inner_page) && !empty($inner_page[0]['service_list_meta_title']) ? $inner_page[0]['service_list_meta_title'] : trans('lang.service_listing');
         $service_list_meta_desc = !empty($inner_page) && !empty($inner_page[0]['service_list_meta_desc']) ? $inner_page[0]['service_list_meta_desc'] : trans('lang.service_meta_desc');
         $show_service_banner = !empty($inner_page) && !empty($inner_page[0]['show_service_banner']) ? $inner_page[0]['show_service_banner'] : 'true';
@@ -180,6 +182,15 @@ class ServiceController extends Controller
                 'description'    => 'required',
             ]
         );
+        if (!empty($request['latitude']) || !empty($request['longitude'])) {
+            $this->validate(
+                $request,
+                [
+                    'latitude' => ['regex:/^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}$/'],
+                    'longitude' => ['regex:/^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,6}$/'],
+                ]
+            );
+        }
         $user = User::find(Auth::user()->id);
         $package_item = Item::where('subscriber', Auth::user()->id)->first();
         $package = !empty($package_item) ? Package::find($package_item->product_id) : '';
@@ -194,7 +205,7 @@ class ServiceController extends Controller
         if (empty($payment_settings)) {
             $package_status = 'true';
         } else {
-            $package_status =!empty($payment_settings[0]['enable_packages']) ? $payment_settings[0]['enable_packages'] : 'true';
+            $package_status = !empty($payment_settings[0]['enable_packages']) ? $payment_settings[0]['enable_packages'] : 'true';
         }
         if ($package_status === 'true') {
             if (!empty($package->count()) && $current_date > $expiry_date) {
@@ -277,13 +288,13 @@ class ServiceController extends Controller
                     $email_params['link'] = url('profile/' . $user->slug);
                     $template_data = Helper::getAdminServicePostedEmailContent();
                     Mail::to(config('mail.username'))
-                    ->send(
-                        new AdminEmailMailable(
-                            'admin_email_new_service_posted',
-                            $template_data,
-                            $email_params
-                        )
-                    );
+                        ->send(
+                            new AdminEmailMailable(
+                                'admin_email_new_service_posted',
+                                $template_data,
+                                $email_params
+                            )
+                        );
                 }
                 return $json;
             } elseif ($service_post['type'] == 'error') {
@@ -308,77 +319,84 @@ class ServiceController extends Controller
     public function show($slug)
     {
         $selected_service = $this->service::select('id')->where('slug', $slug)->first();
-        $service = $this->service::find($selected_service->id);
-        $currency   = SiteManagement::getMetaValue('commision');
-        $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
-        $delivery_time = DeliveryTime::where('id', $service->delivery_time_id)->first();
-        $response_time = ResponseTime::where('id', $service->response_time_id)->first();
-        $reasons = Helper::getReportReasons();
-        $seller = $service->seller->first();
-        $reviews = !empty($seller) ? Helper::getServiceReviews($seller->id, $service->id) : '';
-        $auth_profile = Auth::user() ? auth()->user()->profile : '';
-        if (!empty($reviews)) {
-            $rating  = $reviews->sum('avg_rating') != 0 ? round($reviews->sum('avg_rating') / $reviews->count()) : 0;
-        } else {
-            $rating = 0;
-        }
-
-        $total_orders = Helper::getServiceCount($service->id, 'hired');
-        $attachments = !empty($seller) ? Helper::getUnserializeData($service->attachments) : '';
-        // $service_reviews = DB::table('reviews')->where('job_id', $service->id)->get();
-        $save_services = !empty(auth()->user()->profile->saved_services) ? unserialize(auth()->user()->profile->saved_services) : array();
-        $key='set_service_view';
-        $breadcrumbs_settings = SiteManagement::getMetaValue('show_breadcrumb');
-        $show_breadcrumbs = !empty($breadcrumbs_settings) ? $breadcrumbs_settings : 'true';
-        if (!isset($_COOKIE[$key . $selected_service->id])) {
-            setcookie($key . $selected_service->id, $key, time() + 3600);
-            $view_key = $key;
-            $count = $service->views;
-            if ($count == '') {
-                $count = 1;
+        if (!empty($selected_service)) {
+            $service = $this->service::find($selected_service->id);
+            $currency   = SiteManagement::getMetaValue('commision');
+            $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
+            $mode = !empty($currency) && !empty($currency[0]['payment_mode']) ? $currency[0]['payment_mode'] : 'true';
+            $delivery_time = DeliveryTime::where('id', $service->delivery_time_id)->first();
+            $response_time = ResponseTime::where('id', $service->response_time_id)->first();
+            $reasons = Helper::getReportReasons();
+            $seller = $service->seller->first();
+            $reviews = !empty($seller) ? Helper::getServiceReviews($seller->id, $service->id) : '';
+            $auth_profile = Auth::user() ? auth()->user()->profile : '';
+            if (!empty($reviews)) {
+                $rating  = $reviews->sum('avg_rating') != 0 ? round($reviews->sum('avg_rating') / $reviews->count()) : 0;
             } else {
-                $count++;
+                $rating = 0;
             }
-            $service->views = $count;
-            $service->save();
-        }
-        if (!empty($service)) {
-            if (file_exists(resource_path('views/extend/front-end/services/show.blade.php'))) {
-                return view(
-                    'extend.front-end.services.show',
-                    compact(
-                        'service',
-                        'symbol',
-                        'delivery_time',
-                        'response_time',
-                        'reasons',
-                        'reviews',
-                        'rating',
-                        'seller',
-                        'total_orders',
-                        'attachments',
-                        'save_services',
-                        'show_breadcrumbs'
-                    )
-                );
+
+            $total_orders = Helper::getServiceCount($service->id, 'hired');
+            $attachments = !empty($seller) ? Helper::getUnserializeData($service->attachments) : '';
+            // $service_reviews = DB::table('reviews')->where('job_id', $service->id)->get();
+            $save_services = !empty(auth()->user()->profile->saved_services) ? unserialize(auth()->user()->profile->saved_services) : array();
+            $key = 'set_service_view';
+            $breadcrumbs_settings = SiteManagement::getMetaValue('show_breadcrumb');
+            $show_breadcrumbs = !empty($breadcrumbs_settings) ? $breadcrumbs_settings : 'true';
+            if (!isset($_COOKIE[$key . $selected_service->id])) {
+                setcookie($key . $selected_service->id, $key, time() + 3600);
+                $view_key = $key;
+                $count = $service->views;
+                if ($count == '') {
+                    $count = 1;
+                } else {
+                    $count++;
+                }
+                $service->views = $count;
+                $service->save();
+            }
+            if (!empty($service)) {
+                if (file_exists(resource_path('views/extend/front-end/services/show.blade.php'))) {
+                    return view(
+                        'extend.front-end.services.show',
+                        compact(
+                            'service',
+                            'symbol',
+                            'delivery_time',
+                            'response_time',
+                            'reasons',
+                            'reviews',
+                            'rating',
+                            'seller',
+                            'total_orders',
+                            'attachments',
+                            'save_services',
+                            'show_breadcrumbs',
+                            'mode'
+                        )
+                    );
+                } else {
+                    return view(
+                        'front-end.services.show',
+                        compact(
+                            'service',
+                            'symbol',
+                            'delivery_time',
+                            'response_time',
+                            'reasons',
+                            'reviews',
+                            'rating',
+                            'seller',
+                            'total_orders',
+                            'attachments',
+                            'save_services',
+                            'show_breadcrumbs',
+                            'mode'
+                        )
+                    );
+                }
             } else {
-                return view(
-                    'front-end.services.show',
-                    compact(
-                        'service',
-                        'symbol',
-                        'delivery_time',
-                        'response_time',
-                        'reasons',
-                        'reviews',
-                        'rating',
-                        'seller',
-                        'total_orders',
-                        'attachments',
-                        'save_services',
-                        'show_breadcrumbs'
-                    )
-                );
+                abort(404);
             }
         } else {
             abort(404);
@@ -459,6 +477,15 @@ class ServiceController extends Controller
             return $response;
         }
         $json = array();
+        if (!empty($request['latitude']) || !empty($request['longitude'])) {
+            $this->validate(
+                $request,
+                [
+                    'latitude' => ['regex:/^-?([1-8]?[1-9]|[1-9]0)\.{1}\d{1,6}$/'],
+                    'longitude' => ['regex:/^-?([1]?[1-7][1-9]|[1]?[1-8][0]|[1-9]?[0-9])\.{1}\d{1,6}$/'],
+                ]
+            );
+        }
         $this->validate(
             $request,
             [
@@ -611,52 +638,50 @@ class ServiceController extends Controller
     public function employerPaymentProcess($id)
     {
         if (Auth::user() && !empty($id)) {
-            if (Auth::user()) {
-                if (Auth::user()->getRoleNames()->first() === 'employer') {
-                    $user_id = Auth::user()->id;
-                    $employer = User::find($user_id);
-                    $service = Service::find($id);
-                    $seller = Helper::getServiceSeller($service->id);
-                    $freelancer = User::find($seller->user_id);
-                    $freelancer_name = Helper::getUserName($freelancer->id);
-                    $profile = User::find($freelancer->id)->profile;
-                    $user_image = !empty($profile) ? $profile->avater : '';
-                    $profile_image = !empty($user_image) ? '/uploads/users/' . $freelancer->id . '/' . $user_image : 'images/user-login.png';
-                    $payout_settings = SiteManagement::getMetaValue('commision');
-                    $payment_gateway = !empty($payout_settings) && !empty($payout_settings[0]['payment_method']) ? $payout_settings[0]['payment_method'] : null;
-                    $currency   = SiteManagement::getMetaValue('commision');
-                    $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
-                    if (file_exists(resource_path('views/extend/back-end/employer/services/checkout.blade.php'))) {
-                        return view(
-                            'extend.back-end.employer.services.checkout',
-                            compact(
-                                'service',
-                                'freelancer_name',
-                                'profile_image',
-                                'payment_gateway',
-                                'symbol',
-                                'user_id',
-                                'freelancer'
-                            )
-                        );
-                    } else {
-                        return view(
-                            'back-end.employer.services.checkout',
-                            compact(
-                                'service',
-                                'freelancer_name',
-                                'profile_image',
-                                'payment_gateway',
-                                'symbol',
-                                'user_id',
-                                'freelancer'
-                            )
-                        );
-                    }
+            if (Auth::user()->getRoleNames()->first() === 'employer') {
+                $user_id = Auth::user()->id;
+                $employer = User::find($user_id);
+                $service = Service::find($id);
+                $seller = Helper::getServiceSeller($service->id);
+                $freelancer = User::find($seller->user_id);
+                $freelancer_name = Helper::getUserName($freelancer->id);
+                $profile = User::find($freelancer->id)->profile;
+                $user_image = !empty($profile) ? $profile->avater : '';
+                $profile_image = !empty($user_image) ? '/uploads/users/' . $freelancer->id . '/' . $user_image : 'images/user-login.png';
+                $payout_settings = SiteManagement::getMetaValue('commision');
+                $payment_gateway = !empty($payout_settings) && !empty($payout_settings[0]['payment_method']) ? $payout_settings[0]['payment_method'] : null;
+                $currency   = SiteManagement::getMetaValue('commision');
+                $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
+                if (file_exists(resource_path('views/extend/back-end/employer/services/checkout.blade.php'))) {
+                    return view(
+                        'extend.back-end.employer.services.checkout',
+                        compact(
+                            'service',
+                            'freelancer_name',
+                            'profile_image',
+                            'payment_gateway',
+                            'symbol',
+                            'user_id',
+                            'freelancer'
+                        )
+                    );
                 } else {
-                    Session::flash('error', trans('lang.buy_service_warning'));
-                    return Redirect::back();
+                    return view(
+                        'back-end.employer.services.checkout',
+                        compact(
+                            'service',
+                            'freelancer_name',
+                            'profile_image',
+                            'payment_gateway',
+                            'symbol',
+                            'user_id',
+                            'freelancer'
+                        )
+                    );
                 }
+            } else {
+                Session::flash('error', trans('lang.buy_service_warning'));
+                return Redirect::back();
             }
         } else {
             Session::flash('error', trans('lang.buy_service_warning'));
@@ -745,6 +770,56 @@ class ServiceController extends Controller
                 'back-end.admin.services.order',
                 compact('orders', 'symbol', 'payment_methods')
             );
+        }
+    }
+    /**
+     * Get services
+     *
+     * @param mixed $request request attributes
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getServices()
+    {
+        $json = array();
+        $service_list = array();
+        if (Schema::hasTable('services') && Schema::hasTable('service_user')) {
+            $services = $this->service::latest()->paginate(6);
+            foreach ($services as $key => $service) {
+                $service_list[$key]['title'] = $service->title;
+                $service_list[$key]['is_featured'] = $service->is_featured;
+                $service_list[$key]['slug'] = $service->slug;
+                $service_list[$key]['price'] = $service->price;
+                $service_list[$key]['seller'] = $service->seller->toArray();
+                $service_list[$key]['seller_count'] = $service->seller->count();
+                $service_reviews = $service->seller->count() > 0 ? Helper::getServiceReviews($service->seller[0]->id, $service->id) : ''; 
+                $service_list[$key]['service_reviews'] = !empty($service_reviews) ? $service_reviews->count() : '';
+                $service_list[$key]['service_rating']  = !empty($service_reviews) && $service_reviews->sum('avg_rating') != 0 ? round($service_reviews->sum('avg_rating') / $service_reviews->count()) : 0;
+                $service_list[$key]['attachments'] = Helper::getUnserializeData($service->attachments);
+                $attachments = Helper::getUnserializeData($service->attachments);
+                // $service_list[$key]['enable_slider'] = !empty($attachments) ? 'wt-servicesslider' : '';
+                $service_list[$key]['enable_slider'] = count($attachments) > 1 ? 'wt-freelancerslider owl-carousel' : '';
+                $service_list[$key]['no_attachments'] = empty($attachments) ? 'la-service-info' : '';
+                $service_list[$key]['total_orders'] = Helper::getServiceCount($service->id, 'hired');
+                $service_list[$key]['seller_name'] = !empty($service->seller[0]) ? Helper::getUserName($service->seller[0]->id) : '';
+                $service_list[$key]['seller_image'] = !empty($service->seller[0]) ? asset(Helper::getProfileImage($service->seller[0]->id)): '';
+                if (!empty($attachments)) {
+                    foreach ($attachments as $attachment_key => $attachment) {
+                        $service_list[$key]['attachments'][$attachment_key] =  !empty($service->seller[0]) ? asset(Helper::getImageWithSize('uploads/services/'.$service->seller[0]->id, $attachment, 'medium')) : '';
+                    }
+                }
+                $currency   = SiteManagement::getMetaValue('commision');
+                $symbol = !empty($currency) && !empty($currency[0]['currency']) ? Helper::currencyList($currency[0]['currency']) : array();
+                $service_list[$key]['symbol'] = !empty($symbol['symbol']) ? $symbol['symbol'] : '$';
+            }
+        }
+        if (!empty($service_list)) {
+            $json['type'] = 'success';
+            $json['services'] = $service_list;
+            return $json;
+        } else {
+            $json['type'] = 'error';
+            return $json;
         }
     }
 }

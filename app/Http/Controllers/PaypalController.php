@@ -184,6 +184,10 @@ class PaypalController extends Controller
                 } else {
                     // Perform transaction on PayPal
                     $payment_status = $this->provider->doExpressCheckoutPayment($cart, $token, $PayerID);
+                    if ($payment_status['ACK'] == 'Failure') {
+                        Session::flash('error', $response['L_LONGMESSAGE0']);
+                        return Redirect::back();
+                    }
                     $status = !empty($payment_status['PAYMENTINFO_0_PAYMENTSTATUS']) ? $payment_status['PAYMENTINFO_0_PAYMENTSTATUS'] : 'Processed';
                 }
                 $payment_detail = array();
@@ -231,6 +235,8 @@ class PaypalController extends Controller
                 $title = session()->get('product_title');
                 $price = session()->get('product_price');
                 $user_id = Auth::user()->id;
+                $settings = SiteManagement::getMetaValue('commision');
+                $currency = !empty($settings[0]['currency']) ? $settings[0]['currency'] : 'USD';
                 if ($success == true) {
                     DB::table('orders')->insert(
                         ['user_id' => $user_id, 'product_id' => $id, 'invoice_id' => null, 'status' => 'pending', 'created_at' => \Carbon\Carbon::now(), 'updated_at' => \Carbon\Carbon::now()]
@@ -259,6 +265,7 @@ class PaypalController extends Controller
                             'name' => $title,
                             'price' => $price,
                             'qty' => 1,
+                            'currency_code' => $currency,
                         ],
 
                     ];
@@ -353,13 +360,13 @@ class PaypalController extends Controller
         if (Auth::user()) {
             if ($product_type == 'package') {
                 if (session()->has('product_id')) {
-                    $package_item = \App\Item::where('subscriber', Auth::user()->id)->first();
+                    $package_item = Item::where('subscriber', Auth::user()->id)->first();
                     $id = session()->get('product_id');
-                    $package = \App\Package::find($id);
+                    $package = Package::find($id);
                     $option = !empty($package->options) ? unserialize($package->options) : '';
                     $expiry = !empty($option) ? $package_item->created_at->addDays($option['duration']) : '';
                     $expiry_date = !empty($expiry) ? Carbon::parse($expiry)->toDateTimeString() : '';
-                    $user = \App\User::find(Auth::user()->id);
+                    $user = User::find(Auth::user()->id);
                     if (!empty($package->badge_id) && $package->badge_id != 0) {
                         $user->badge_id = $package->badge_id;
                     }
@@ -367,9 +374,6 @@ class PaypalController extends Controller
                     $user->save();
                     // send mail
                     if (!empty(config('mail.username')) && !empty(config('mail.password'))) {
-                        $item = DB::table('items')->where('product_id', $id)->get()->toArray();
-                        $package =  Package::where('id', $item[0]->product_id)->first();
-                        $user = User::find($item[0]->subscriber);
                         $role = $user->getRoleNames()->first();
                         $package_options = unserialize($package->options);
                         if (!empty($invoice)) {

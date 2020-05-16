@@ -24,27 +24,27 @@
                                     <div class="wt-tabscontenttitle">
                                         <h2>{{ trans('lang.job_desc') }}</h2>
                                     </div>
-                                    <div class="wt-formtheme wt-userform wt-userformvtwo">
+                                    <div class="wt-formtheme wt-userform wt-userformvtwo la-job-details-form">
                                         <fieldset>
                                             <div class="form-group">
                                                 {!! Form::text('title', $job->title, array('class' => 'form-control', 'placeholder' => trans('lang.job_title'))) !!}
                                             </div>
-                                            <div class="form-group form-group-half wt-formwithlabel" style="display: none;"> 
+                                            <div class="form-group form-group-half wt-formwithlabel">
                                                 <span class="wt-select">
                                                         {!! Form::select('project_levels', $project_levels , e($job->project_level)) !!}
                                                     </span>
                                             </div>
-                                            <div class="form-group form-group-half wt-formwithlabel" style="display: none;">
+                                            <div class="form-group form-group-half wt-formwithlabel">
                                                 <span class="wt-select">
                                                     {!! Form::select('job_duration', $job_duration , e($job->duration)) !!}
                                                 </span>
                                             </div>
-                                            <div class="form-group form-group-half wt-formwithlabel" style="display: none;">
+                                            <div class="form-group form-group-half wt-formwithlabel">
                                                 <span class="wt-select">
                                                     {!! Form::select('freelancer_type', $freelancer_level_list, e($job->freelancer_type)) !!}
                                                 </span>
                                             </div>
-                                            <div class="form-group form-group-half wt-formwithlabel" style="display: none;">
+                                            <div class="form-group form-group-half wt-formwithlabel">
                                                 <span class="wt-select">
                                                     {!! Form::select('english_level', $english_levels, e($job->english_level)) !!}
                                                 </span>
@@ -52,42 +52,8 @@
                                             <div class="form-group form-group-half wt-formwithlabel job-cost-input">
                                                 {!! Form::text('project_cost', $job->price, array('class' => 'form-control', 'placeholder' => trans('lang.project_cost'))) !!}
                                             </div>
-                                            <div class="form-group form-group-half wt-formwithlabel job-cost-input">
-                                                {!! Form::text('mots', $job->mots, array('class' => 'form-control', 'placeholder' => trans('lang.mots'))) !!}
-                                            </div>
+                                            <job-expiry :db_expiry_date="'{{$job->expiry_date}}'" :ph_expiry_date="'{{trans('lang.project_expiry')}}'"></job-expiry>
                                         </fieldset>
-                                    </div>
-                                </div>
-                                  <div class="wt-jobskills wt-tabsinfo la-location-edit" >
-                                    <div class="wt-tabscontenttitle">
-                                        <h2>{{ trans('lang.your_loc') }}</h2>
-                                    </div>
-                                    <div class="wt-formtheme wt-userform">
-                                        <fieldset>
-                                            <div class="form-group form-group-half">
-                                                <span class="wt-select">
-                                                        {!! Form::select('locations', $locations, $job->location_id, array('class' => 'skill-dynamic-field', 'placeholder' => trans('lang.select_locations'))) !!}
-                                                    </span>
-                                            </div>
-                                           
-                                        </fieldset>
-                                    </div>
-                                </div>
-                                <div class="wt-jobcategories wt-tabsinfo">
-                                <div class="wt-tabscontenttitle">
-                                    <h2>{{ trans('lang.deadline') }} : {!!$job->deadline!!}</h2>
-                                </div>
-                                <div class="form-group">
-                                    
-                                    <input type="datetime-local" name="deadline" class="form-control" value="{!!$job->deadline!!}" >
-                                </div>
-                                </div>
-                                 <div class="wt-jobskills wt-tabsinfo la-jobedit">
-                                    <div class="wt-tabscontenttitle">
-                                        <h2>{{ trans('lang.skills_req') }}</h2>
-                                    </div>
-                                    <div class="la-jobedit-content">
-                                        <job_skills :placeholder="'select skills'"></job_skills>
                                     </div>
                                 </div>
                                 <div class="wt-jobskills wt-tabsinfo">
@@ -97,7 +63,7 @@
                                     <div class="wt-divtheme wt-userform wt-userformvtwo">
                                         <div class="form-group">
                                             <span class="wt-select">
-                                                {!! Form::select('categories[]', $categories, $job->categories, array('class' => '', 'data-placeholder' => trans('lang.select_job_cats'))) !!}
+                                                {!! Form::select('categories[]', $categories, $job->categories, array('class' => 'chosen-select', 'multiple', 'data-placeholder' => trans('lang.select_job_cats'))) !!}
                                             </span>
                                         </div>
                                     </div>
@@ -109,7 +75,7 @@
                                     <div class="wt-divtheme wt-userform wt-userformvtwo">
                                         <div class="form-group">
                                             <span class="wt-select">
-                                                {!! Form::select('languages[]', $languages, $job->languages, array('class' => '', 'data-placeholder' => trans('lang.select_lang'))) !!}
+                                                {!! Form::select('languages[]', $languages, $job->languages, array('class' => 'chosen-select', 'multiple', 'data-placeholder' => trans('lang.select_lang'))) !!}
                                             </span>
                                         </div>
                                     </div>
@@ -123,9 +89,46 @@
                                         => trans('lang.job_dtl_note')]) !!}
                                     </div>
                                 </div>
-                               
-                              
-                                <div class="wt-featuredholder wt-tabsinfo" style="display: none;">
+                                <div class="wt-jobskills wt-tabsinfo la-jobedit">
+                                    <div class="wt-tabscontenttitle">
+                                        <h2>{{ trans('lang.skills_req') }}</h2>
+                                    </div>
+                                    <div class="la-jobedit-content">
+                                        <job_skills :placeholder="'select skills'"></job_skills>
+                                    </div>
+                                </div>
+                                <div class="wt-jobskills wt-tabsinfo la-location-edit">
+                                    <div class="wt-tabscontenttitle">
+                                        <h2>{{ trans('lang.your_loc') }}</h2>
+                                    </div>
+                                    <div class="wt-formtheme wt-userform">
+                                        <fieldset>
+                                            <div class="form-group form-group-half">
+                                                <span class="wt-select">
+                                                        {!! Form::select('locations', $locations, $job->location_id, array('class' => 'skill-dynamic-field', 'placeholder' => trans('lang.select_locations'))) !!}
+                                                    </span>
+                                            </div>
+                                            <div class="form-group form-group-half">
+                                                {!! Form::text( 'address', $job->address, ['class' =>'form-control', 'placeholder' => trans('lang.your_address')] ) !!}
+                                            </div>
+                                            @if (!empty($job->latitude) && !empty($job->longitude))
+                                                <div class="form-group wt-formmap">
+                                                    <div class="wt-locationmap">
+                                                        <custom-map :latitude="{{ $job->latitude }}" :longitude="{{ $job->longitude }}"></custom-map>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                            <div class="form-group form-group-half">
+                                                {!! Form::text( 'longitude', $job->longitude, ['class' =>'form-control', 'placeholder' => trans('lang.enter_logitude')])
+                                                !!}
+                                            </div>
+                                            <div class="form-group form-group-half">
+                                                {!! Form::text( 'latitude', $job->latitude, ['class' =>'form-control', 'placeholder' => trans('lang.enter_latitude')]) !!}
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                                <div class="wt-featuredholder wt-tabsinfo">
                                     <div class="wt-tabscontenttitle">
                                         <h2>{{ trans('lang.is_featured') }}</h2>
                                         <div class="wt-rightarea">
