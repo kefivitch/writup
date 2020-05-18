@@ -723,6 +723,7 @@ return [
     '5' => '/5',
     'scan_with_smartphone' => 'Scan with your',
     'smartphone' => 'Smart Phone',
+    'phone'=>'Phone',
     'get_handy' => 'To Get It Handy.',
     'report_job' => 'Report This Job',
     'report_service' => 'Report This Service',

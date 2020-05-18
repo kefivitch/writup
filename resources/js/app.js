@@ -374,6 +374,7 @@ if (document.getElementById("registration")) {
             user_email: '',
             first_name: '',
             last_name: '',
+             phone:'',
             form_step1: {
                 email_error: '',
                 is_email_error: false,
@@ -381,10 +382,12 @@ if (document.getElementById("registration")) {
                 is_first_name_error: false,
                 last_name_error: '',
                 is_last_name_error: false,
+                 phone_error: '',
+                is_phone_error: false,
             },
             form_step2: {
-                locations_error: '',
-                is_locations_error: false,
+                // locations_error: '',
+                // is_locations_error: false,
                 password_error: '',
                 is_password_error: false,
                 password_confirm_error: '',
@@ -421,7 +424,8 @@ if (document.getElementById("registration")) {
                 this.form_step1.last_name_error = '';
                 this.form_step1.is_last_name_error = false;
                 this.form_step1.email_error = '';
-                this.form_step1.is_email_error = false;
+                 this.form_step1.phone_error = '';
+                this.form_step1.is_phone_error = false;
                 var self = this;
                 let register_Form = document.getElementById('register_form');
                 let form_data = new FormData(register_Form);
@@ -437,6 +441,10 @@ if (document.getElementById("registration")) {
                         if (error.response.data.errors.last_name) {
                             self.form_step1.last_name_error = error.response.data.errors.last_name[0];
                             self.form_step1.is_last_name_error = true;
+                        }
+                        if (error.response.data.errors.phone) {
+                            self.form_step1.phone_error = error.response.data.errors.phone[0];
+                            self.form_step1.is_phone_error = true;
                         }
                         if (error.response.data.errors.email) {
                             self.form_step1.email_error = error.response.data.errors.email[0];
@@ -481,6 +489,7 @@ if (document.getElementById("registration")) {
                 form_data.append('email', this.user_email);
                 form_data.append('first_name', this.first_name);
                 form_data.append('last_name', this.last_name);
+                form_data.append('phone', this.phone);
                 var self = this;
                 axios.post(APP_URL + '/register', form_data)
                     .then(function (response) {

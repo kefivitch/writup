@@ -28,6 +28,8 @@
                                     <tr>
                                         <th>{{{ trans('lang.user_name') }}}</th>
                                         <th>{{{ trans('lang.ph_email') }}}</th>
+                                        <th>{{{ trans('Vérifié') }}}</th>
+                                        <th>{{{ trans('lang.phone') }}}</th>
                                         <th>{{{ trans('lang.role') }}}</th>
                                         <th>{{{ trans('lang.action') }}}</th>
                                     </tr>
@@ -39,6 +41,12 @@
                                             <tr class="del-user-{{ $user->id }}">
                                                 <td>{{{ ucwords(\App\Helper::getUserName($user->id)) }}}</td>
                                                 <td>{{{ $user->email }}}</td>
+                                                <td>@if ($user->user_verified)
+                                                    OUI
+                                                    @else
+                                                    NON
+                                                    @endif</td>
+                                                <td>{{{ $user->phone }}}</td>
                                                 <td>{{ $user->getRoleNames()->first() }}</td>
                                                 <td>
                                                     <div class="wt-actionbtn">

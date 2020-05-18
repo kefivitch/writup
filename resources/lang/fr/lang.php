@@ -17,7 +17,7 @@ return [
     'port_note_5' => 'if you will change this port then you have to change it in index.js located in your-project > js > index.js at line no 3',
     'port_note_6' => 'Your node server should run index.js located in theme for real-time chat. Please ask your hosting provider, how you can run this file.',
     'chat_settings' => 'Chat Settings',
-    
+    'employer' => 'Employeur',
     'admin' => 'Admin',
     'paid_both' => 'Paid for both',
     'paid_employers' => 'Paid for employer',
@@ -620,6 +620,9 @@ return [
     'project_inv' => 'Factures de projet',
     'saved_items' => 'Mes articles sauvegardés',
     'articles' => 'Articles',
+    'manage_articles' => 'Gérer Articles',
+    'categories' => 'Catégories',
+    'phone'=>'Téléphone',
     'verified_company' => 'Société vérifiée',
     'company_followers' => 'Abonnés de l\'entreprise',
     'no_followers' => 'Aucun abonné',

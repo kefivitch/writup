@@ -215,6 +215,7 @@ class EmployerController extends Controller
             [
                 'first_name'    => 'required',
                 'last_name'    => 'required',
+                'phone' => 'digits:8'
             ]
         );
         if (!empty($request['latitude']) || !empty($request['longitude'])) {

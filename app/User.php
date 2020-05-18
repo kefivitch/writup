@@ -52,7 +52,7 @@ class User extends Authenticatable
         'first_name', 'last_name', 'slug', 'email', 'password',
         'avatar', 'banner', 'tagline', 'description',
         'location_id', 'verification_code', 'address',
-        'longitude', 'latitude'
+        'longitude', 'latitude','phone'
     ];
 
     /**
@@ -300,6 +300,7 @@ class User extends Authenticatable
         if (!empty($request)) {
             $this->first_name = filter_var($request['first_name'], FILTER_SANITIZE_STRING);
             $this->last_name = filter_var($request['last_name'], FILTER_SANITIZE_STRING);
+            $this->phone = filter_var($request['phone'], FILTER_SANITIZE_STRING);
             $this->slug = filter_var($request['first_name'], FILTER_SANITIZE_STRING) . '-' .
                 filter_var($request['last_name'], FILTER_SANITIZE_STRING);
             $this->email = filter_var($request['email'], FILTER_VALIDATE_EMAIL);

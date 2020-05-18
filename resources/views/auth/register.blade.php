@@ -86,10 +86,17 @@
                                                 <strong v-cloak>@{{form_step1.last_name_error}}</strong>
                                             </span>
                                         </div>
-                                        <div class="form-group">
+                                        <div class="form-group form-group-half">
                                             <input id="user_email" type="email" class="form-control" name="email" placeholder="{{{ trans('lang.ph_email') }}}" value="{{ old('email') }}" v-bind:class="{ 'is-invalid': form_step1.is_email_error }" v-model="user_email">
                                             <span class="help-block" v-if="form_step1.email_error">
                                                 <strong v-cloak>@{{form_step1.email_error}}</strong>
+                                            </span>
+                                        </div>
+                                        <div class="form-group form-group-half">
+                                            <input type="text" name="phone" id="phone" class="form-control" placeholder="Téléphone"
+                                                v-bind:class="{ 'is-invalid': form_step1.is_phone_error }" v-model="phone">
+                                            <span class="help-block" v-if="form_step1.phone_error">
+                                                <strong v-cloak>@{{form_step1.phone_error}}</strong>
                                             </span>
                                         </div>
                                         <div class="form-group">
@@ -115,7 +122,7 @@
                                             <li><a href="javascrip:void(0);">{{{ trans('lang.03') }}}</a></li>
                                             <li><a href="javascrip:void(0);">{{{ trans('lang.04') }}}</a></li>
                                         </ul>
-                                        @if (!empty($locations))
+                                        <!-- @if (!empty($locations))
                                             <div class="form-group">
                                                 <span class="wt-select">
                                                     {!! Form::select('locations', $locations, null, array('placeholder' => trans('lang.select_locations'), 'v-bind:class' => '{ "is-invalid": form_step2.is_locations_error }')) !!}
@@ -124,7 +131,7 @@
                                                     </span>
                                                 </span>
                                             </div>
-                                        @endif
+                                        @endif -->
                                         <div class="form-group form-group-half">
                                             <input id="password" type="password" class="form-control" name="password" placeholder="{{{ trans('lang.ph_pass') }}}" v-bind:class="{ 'is-invalid': form_step2.is_password_error }">
                                             <span class="help-block" v-if="form_step2.password_error">

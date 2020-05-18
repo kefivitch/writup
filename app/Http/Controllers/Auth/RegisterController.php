@@ -109,7 +109,7 @@ class RegisterController extends Controller
         return Validator::make(
             $data,
             [
-
+                'phone' => 'digits:8|required',
             ]
         );
     }
