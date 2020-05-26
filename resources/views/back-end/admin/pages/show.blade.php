@@ -15,7 +15,7 @@
                     <div class="wt-innerbannercontent">
                         @if (!empty($page))
                             <div class="wt-title">
-                                <h1>{{{ $page->title }}}</h1>
+                                <h1 style="color: #fff;">{{{ $page->title }}}</h1>
                             </div>
                         @endif
                         @if (count($breadcrumbs))

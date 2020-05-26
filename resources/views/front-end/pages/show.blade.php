@@ -40,7 +40,7 @@
                         <div class="wt-innerbannercontent">
                             @if (!empty($page) && $show_title == true)
                                 <div class="wt-title">
-                                    <h1>{{{ $page['title'] }}}</h1>
+                                    <h1 style="color: #fff;">{{{ $page['title'] }}}</h1>
                                 </div>
                             @endif
                             @if (!empty($show_breadcrumbs) && $show_breadcrumbs === 'true')

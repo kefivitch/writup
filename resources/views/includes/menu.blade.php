@@ -13,7 +13,7 @@
                     @endphp
                     @if ($page->relation_type == 0 && ($show_page == 'true' || $show_page == true))
                         <li class="{{!empty($page_has_child) ? 'menu-item-has-children page_item_has_children' : '' }} @if ($pageID == $page->slug ) current-menu-item @endif">
-                            <a href="{{url('page/'.$page->slug)}}">{{{$page->title}}}</a>
+                            <a href="#">{{{$page->title}}}</a>
                             @if (!empty($page_has_child))
                                 <ul class="sub-menu">
                                     @foreach($page_has_child as $parent)
