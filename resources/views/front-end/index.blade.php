@@ -35,7 +35,7 @@
                         <div class="col-12 col-sm-12 col-md-12 col-lg-5">
                             <div class="wt-bannerimages">
                                 <figure class="wt-bannermanimg" data-tilt>
-                                    <img src="{{{ asset(Helper::getHomeBanner('inner_image')) }}}" alt="{{{ trans('lang.img') }}}">
+                                    <img src="{{{ asset(Helper::getHomeBanner('inner_image')) }}}" alt="plateforme de redaction web freelance">
                                 </figure>
                             </div>
                         </div>
@@ -231,7 +231,7 @@
                         <div class="row">
                             <div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
                                 <figure class="wt-mobileimg">
-                                    <img src="{{{ asset(Helper::getAppSection('image')) }}}" alt="{{{ trans('lang.img') }}}">
+                                    <img src="{{{ asset(Helper::getAppSection('image')) }}}" alt="freelance en redaction web">
                                 </figure>
                             </div>
                             <div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">

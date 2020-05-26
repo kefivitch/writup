@@ -5,9 +5,9 @@
             <div class="col-12 col-sm-12 col-md-12 col-lg-5">
                 <div class="wt-bannerimages">
                     <figure class="wt-bannermanimg">
-                        <img :src="imageUrl+slider.inner_banner_image" alt="img description">
-                        <img :src="imageUrl+slider.floating_image01" class="wt-bannermanimgone" alt="img description">
-                        <img :src="imageUrl+slider.floating_image02" class="wt-bannermanimgtwo" alt="img description">
+                        <img :src="imageUrl+slider.inner_banner_image" alt="plateforme de redaction web freelance">
+                        <img :src="imageUrl+slider.floating_image01" class="wt-bannermanimgone" alt="plateforme de redaction web freelance">
+                        <img :src="imageUrl+slider.floating_image02" class="wt-bannermanimgtwo" alt="plateforme de redaction web freelance">
                     </figure>
                 </div>
             </div>

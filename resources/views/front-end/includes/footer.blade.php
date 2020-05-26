@@ -12,7 +12,7 @@
                         <div class="col-12 col-sm-12 col-md-6 col-lg-6">
                             <div class="wt-footerlogohold">
                                 @if (!empty($footer['footer_logo']))
-                                    <strong class="wt-logo"><a href="{{{ url('/') }}}"><img src="{{{ asset(\App\Helper::getFooterLogo($footer['footer_logo'])) }}}" alt="company logo here"></a></strong>
+                                    <strong class="wt-logo"><a href="{{{ url('/') }}}"><img src="{{{ asset(\App\Helper::getFooterLogo($footer['footer_logo'])) }}}" alt="writup plateforme de redaction web freelance"></a></strong>
                                 @endif
                                 @if (!empty($footer['description']))
                                     <div class="wt-description">

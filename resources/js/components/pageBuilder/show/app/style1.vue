@@ -4,7 +4,7 @@
             <div class="row">
                 <div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
                     <figure class="wt-mobileimg">
-                        <img :src="imageUrl+app.app_image" alt="image">
+                        <img :src="imageUrl+app.app_image" alt="freelance en redaction web">
                     </figure>
                 </div>
                 <div class="col-12 col-sm-12 col-md-6 col-lg-6 float-left">
@@ -18,12 +18,12 @@
                             <ul class="wt-appicon">
                                 <li>
                                     <a :href="app.andriod_url">
-                                        <figure><img :src="baseUrl+'/images/android.png'" alt="image"></figure>
+                                        <figure><img :src="baseUrl+'/images/android.png'" alt="freelance en redaction web"></figure>
                                     </a>
                                 </li>
                                 <li>
                                     <a :href="app.ios_url">
-                                        <figure><img :src="baseUrl+'/images/ios.png'" alt="image"></figure>
+                                        <figure><img :src="baseUrl+'/images/ios.png'" alt="freelance en redaction web"></figure>
                                     </a>
                                 </li>
                             </ul>

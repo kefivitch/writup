@@ -31,7 +31,7 @@
                         <div class="row">
                             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                                 @if (!empty($logo) || Schema::hasTable('site_managements'))
-                                    <strong class="wt-logo"><a href="{{{ url('/') }}}"><img src="{{{ asset($logo) }}}" alt="{{{ trans('Logo') }}}"></a></strong>
+                                    <strong class="wt-logo"><a href="{{{ url('/') }}}"><img src="{{{ asset($logo) }}}" alt="writup"></a></strong>
                                 @endif
                                 <div class="wt-rightarea">
                                     @guest
@@ -133,7 +133,7 @@
                                     {{ Helper::displayEmailWarning() }}
                                 @endauth
                                 @if (!empty($logo) || Schema::hasTable('site_managements'))
-                                    <strong class="wt-logo"><a href="{{{ url('/') }}}"><img src="{{{ asset($logo) }}}" alt="{{{ trans('Logo') }}}"></a></strong>
+                                    <strong class="wt-logo"><a href="{{{ url('/') }}}"><img src="{{{ asset($logo) }}}" alt="writup"></a></strong>
                                 @endif
                                 @if (!empty(Route::getCurrentRoute()) && Route::getCurrentRoute()->uri() != '/' && Route::getCurrentRoute()->uri() != 'home')
                                     <search-form
@@ -216,7 +216,7 @@
                                         @endphp
                                             <div class="wt-userlogedin">
                                                 <figure class="wt-userimg">
-                                                    {{-- <img src="{{{ asset($profile_image) }}}" alt="{{{ trans('lang.user_avatar') }}}"> --}}
+                                                  
                                                     <img src="{{{ asset(Helper::getImage('uploads/users/' . Auth::user()->id, $profile->avater, '' , 'user.jpg')) }}}" alt="{{{ trans('lang.user_avatar') }}}">
                                                 </figure>
                                                 <div class="wt-username">
@@ -252,7 +252,7 @@
                                 {{ Helper::displayEmailWarning() }}
                             @endauth
                             @if (!empty($logo) || Schema::hasTable('site_managements'))
-                                <strong class="wt-logo"><a href="{{{ url('/') }}}"><img src="{{{ asset($logo) }}}" alt="{{{ trans('Logo') }}}"></a></strong>
+                                <strong class="wt-logo"><a href="{{{ url('/') }}}"><img src="{{{ asset($logo) }}}" alt="writup"></a></strong>
                             @endif
                             @if (!empty(Route::getCurrentRoute()) && Route::getCurrentRoute()->uri() != '/' && Route::getCurrentRoute()->uri() != 'home')
                                 <search-form
@@ -343,7 +343,7 @@
                                     @endphp
                                         <div class="wt-userlogedin">
                                             <figure class="wt-userimg">
-                                                {{-- <img src="{{{ asset($profile_image) }}}" alt="{{{ trans('lang.user_avatar') }}}"> --}}
+                                              
                                                 <img src="{{{ asset(Helper::getImage('uploads/users/' . Auth::user()->id, $profile->avater, '' , 'user.jpg')) }}}" alt="{{{ trans('lang.user_avatar') }}}">
                                             </figure>
                                             <div class="wt-username">
