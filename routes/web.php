@@ -104,6 +104,8 @@ Route::group(
         Route::post('admin/article/categories/update-cats/{id}', 'ArticleCategoryController@update');
         Route::post('admin/articles/categories/upload-temp-image', 'ArticleCategoryController@uploadTempImage');
         Route::post('admin/article/delete-checked-cats', 'ArticleCategoryController@deleteSelected');
+        Route::post('/verifyUser', 'UserController@verifyUser');
+
         // Articles Routes
         Route::get('admin/articles', 'ArticleController@index')->name('articles');
         Route::get('admin/articles/edit-article/{id}', 'ArticleController@edit')->name('editArticle');
